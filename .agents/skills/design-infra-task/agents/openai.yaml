@@ -1,0 +1,4 @@
+interface:
+  display_name: "Design Infra Task"
+  short_description: "Design an infra-bench task from a dataset and its task rules."
+  default_prompt: "Design a new infra-bench task for a target dataset. Read the dataset manifest and the matching docs/task-rules file before proposing the task."
