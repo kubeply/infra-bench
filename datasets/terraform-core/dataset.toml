@@ -5,7 +5,7 @@
 [dataset]
 name = "kubeply/terraform-core"
 description = "Terraform infrastructure-as-code benchmark scenarios for AI agents."
-keywords = [ "terraform", "infrastructure", "iac", "benchmark", "agents",]
+keywords = ["terraform", "infrastructure", "iac", "benchmark", "agents"]
 [[dataset.authors]]
 name = "Kubeply"
 email = "thomas@kubeply.com"
@@ -15,5 +15,4 @@ tasks = []
 
 [[files]]
 path = "metric.py"
-digest = "sha256:bb6eb31d7e96e7b895f88b63517f078c3d50827da521a1dad40390a5e28b67a4"
-
+digest = "sha256:52299ec1e5986fcc50c3c13eaeef2e66038b9184b0a9cb69c34d886eb7fcf8a7"

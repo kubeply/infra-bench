@@ -1,0 +1,95 @@
+---
+name: pr-validation
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-validation-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  # renovate: datasource=github-releases depName=rhysd/actionlint
+  ACTIONLINT_VERSION: v1.7.12
+  # renovate: datasource=npm depName=@taplo/cli
+  TAPLO_VERSION: 0.7.0
+
+jobs:
+  actionlint:
+    if: |
+      github.event_name == 'push' ||
+      (!github.event.pull_request.draft &&
+      github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on:
+      group: kubeply-low-latency
+      labels: kubeply-arm64-low-latency
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Install actionlint
+        run: |
+          set -euo pipefail
+          : "${ACTIONLINT_VERSION:?ACTIONLINT_VERSION is required}"
+          actionlint_version="${ACTIONLINT_VERSION#v}"
+          case "$(uname -m)" in
+            aarch64|arm64)
+              actionlint_arch="arm64"
+              ;;
+            x86_64|amd64)
+              actionlint_arch="amd64"
+              ;;
+            *)
+              echo "Unsupported architecture: $(uname -m)" >&2
+              exit 1
+              ;;
+          esac
+          curl -fsSLo /tmp/actionlint.tar.gz \
+            "https://github.com/rhysd/actionlint/releases/download/${ACTIONLINT_VERSION}/actionlint_${actionlint_version}_linux_${actionlint_arch}.tar.gz"
+          mkdir -p /tmp/actionlint
+          tar -xzf /tmp/actionlint.tar.gz -C /tmp/actionlint
+          sudo install -m 0755 /tmp/actionlint/actionlint /usr/local/bin/actionlint
+
+      - name: Validate GitHub Actions workflows
+        run: actionlint
+
+  fast-checks:
+    if: |
+      github.event_name == 'push' ||
+      (!github.event.pull_request.draft &&
+      github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on:
+      group: kubeply-low-latency
+      labels: kubeply-arm64-low-latency
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - uses: astral-sh/setup-uv@cec208311dfd045dd5311c1add060b2062131d57 # v8.0.0
+        with:
+          # renovate: datasource=pypi depName=uv
+          version: 0.11.7
+
+      - name: Install lint tools
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y jq nodejs npm shellcheck
+
+      - name: Validate file formatting and lint
+        run: ./scripts/lint-files.sh
+
+      - name: Validate repository structure
+        run: ./scripts/validate-structure.sh
+
+      - name: Verify dataset manifests are synchronized
+        run: |
+          set -euo pipefail
+          uvx --from harbor harbor sync datasets/kubernetes-core
+          uvx --from harbor harbor sync datasets/terraform-core
+          npx --yes "@taplo/cli@${TAPLO_VERSION}" fmt "**/*.toml" "!jobs/**"
+          git diff --exit-code -- datasets

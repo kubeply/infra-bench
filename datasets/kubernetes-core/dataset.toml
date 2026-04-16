@@ -5,7 +5,7 @@
 [dataset]
 name = "kubeply/kubernetes-core"
 description = "Kubernetes-first infrastructure benchmark scenarios for AI agents."
-keywords = [ "kubernetes", "infrastructure", "benchmark", "agents",]
+keywords = ["kubernetes", "infrastructure", "benchmark", "agents"]
 [[dataset.authors]]
 name = "Kubeply"
 email = "thomas@kubeply.com"
@@ -18,5 +18,4 @@ digest = "sha256:16fb625bf4804478e7f9af7557e221be81e29b3b5a52c95bbbc3f3ff8c57118
 
 [[files]]
 path = "metric.py"
-digest = "sha256:bb6eb31d7e96e7b895f88b63517f078c3d50827da521a1dad40390a5e28b67a4"
-
+digest = "sha256:52299ec1e5986fcc50c3c13eaeef2e66038b9184b0a9cb69c34d886eb7fcf8a7"
