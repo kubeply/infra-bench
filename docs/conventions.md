@@ -12,6 +12,8 @@
 
 Every `task.toml` should include:
 
+- `canary`: same full string as the first line of `instruction.md`, formatted
+  as `<infra-bench-canary: UUID>`.
 - `difficulty`: one of `easy`, `medium`, `hard`.
 - `category`: broad area, starting with `kubernetes`.
 - `tags`: focused labels such as `manifests`, `service`, `rbac`, `storage`.
@@ -34,7 +36,19 @@ Use difficulty to describe expected operator complexity, not line count.
 
 ## Instructions
 
-`instruction.md` should tell the agent:
+The first line of `instruction.md` must be the task canary:
+
+```md
+<infra-bench-canary: UUID>
+```
+
+Generate it with:
+
+```bash
+python3 -c 'import uuid; print(f"<infra-bench-canary: {uuid.uuid4()}>")'
+```
+
+After the canary, `instruction.md` should tell the agent:
 
 - The working directory.
 - The user-visible goal.

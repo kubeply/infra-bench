@@ -1,20 +1,14 @@
-```text
-//    ▘  ▐▘      ▌       ▌
-//    ▌▛▌▜▘▛▘▀▌▄▖▛▌█▌▛▌▛▘▛▌
-//    ▌▌▌▐ ▌ █▌  ▙▌▙▖▌▌▙▖▌▌
-```
-
----
+# infrabench
 
 `infra-bench` is an open benchmark of realistic infrastructure tasks for evaluating AI agents.
 
 ## Datasets
 
-| Dataset | Easy | Medium | Hard | Status |
+| Dataset | 🟢 Easy | 🟡 Medium | 🔴 Hard | Status |
 | --- | ---: | ---: | ---: | --- |
-| [`kubeply/kubernetes-core`](datasets/kubernetes-core) | 0 | 0 | 0 | Working |
-| `kubeply/terraform-core` | 0 | 0 | 0 | Not started yet |
-| `kubeply/linux-ops-core` | 0 | 0 | 0 | Not started yet |
+| [`kubeply/kubernetes-core`](datasets/kubernetes-core) | 0 | 0 | 0 | 🛠️ Working |
+| [`kubeply/terraform-core`](datasets/terraform-core) | 0 | 0 | 0 | 🛠️ Working |
+| `kubeply/observability-core` | 0 | 0 | 0 | ⏳ Not started yet |
 
 ## Quickstart
 

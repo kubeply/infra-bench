@@ -27,7 +27,18 @@ available in the runtime environment.
 
 For Docker environments, the Dockerfile should copy starting assets into `/app`.
 
-## 4. Write the Instruction
+## 4. Generate the Canary
+
+Run:
+
+```bash
+python3 -c 'import uuid; print(f"<infra-bench-canary: {uuid.uuid4()}>")'
+```
+
+Add the generated canary as the first line of `instruction.md` and store the
+same full string in `[metadata].canary` in `task.toml`.
+
+## 5. Write the Instruction
 
 Keep the prompt direct:
 
@@ -39,25 +50,25 @@ Keep the prompt direct:
 
 Do not describe exact verifier assertions.
 
-## 5. Write the Verifier
+## 6. Write the Verifier
 
 The verifier should answer: did the operator outcome happen?
 
 For most tasks, `tests/test.sh` can run a Python script and map exit code to
 `/logs/verifier/reward.txt`.
 
-## 6. Write the Oracle Solution
+## 7. Write the Oracle Solution
 
 `solution/solve.sh` should pass the verifier from a clean task environment.
 Keep it deterministic and short.
 
-## 7. Refresh the Dataset
+## 8. Refresh the Dataset
 
 Run:
 
 ```bash
 ./scripts/validate-structure.sh
-cd datasets/kubernetes-core
+cd datasets/<dataset-name>
 uvx --from harbor harbor add ./<task-name>
 uvx --from harbor harbor sync
 ```

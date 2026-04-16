@@ -38,13 +38,22 @@ fi
 
 "$python_bin" - <<'PY'
 from pathlib import Path
+import re
 import tomllib
+
+CANARY_RE = re.compile(
+    r"^<infra-bench-canary: "
+    r"[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}"
+    r">$"
+)
 
 for path in sorted(Path("datasets").glob("*/dataset.toml")):
     data = tomllib.loads(path.read_text())
     dataset = data.get("dataset", {})
     if not dataset.get("name"):
         raise SystemExit(f"{path}: missing dataset.name")
+
+seen_canaries = {}
 
 for path in sorted(Path("datasets").glob("*/*/task.toml")):
     data = tomllib.loads(path.read_text())
@@ -53,6 +62,31 @@ for path in sorted(Path("datasets").glob("*/*/task.toml")):
         raise SystemExit(f"{path}: missing task.name")
     if not data.get("schema_version"):
         raise SystemExit(f"{path}: missing schema_version")
+
+    metadata = data.get("metadata", {})
+    canary = metadata.get("canary")
+    if not isinstance(canary, str):
+        raise SystemExit(f"{path}: missing metadata.canary")
+    if not CANARY_RE.fullmatch(canary):
+        raise SystemExit(
+            f"{path}: metadata.canary must match '<infra-bench-canary: UUIDv4>'"
+        )
+    if canary in seen_canaries:
+        raise SystemExit(
+            f"{path}: metadata.canary duplicates {seen_canaries[canary]}"
+        )
+    seen_canaries[canary] = path
+
+    instruction_path = path.parent / "instruction.md"
+    instruction_lines = instruction_path.read_text().splitlines()
+    if not instruction_lines:
+        raise SystemExit(f"{instruction_path}: missing canary first line")
+
+    instruction_canary = instruction_lines[0].strip()
+    if instruction_canary != canary:
+        raise SystemExit(
+            f"{instruction_path}: first line must match metadata.canary in {path}"
+        )
 PY
 
 echo "structure ok"

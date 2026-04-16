@@ -74,10 +74,11 @@ Before considering a change complete:
 ```bash
 ./scripts/validate-structure.sh
 uvx --from harbor harbor sync datasets/kubernetes-core
+uvx --from harbor harbor sync datasets/terraform-core
 ```
 
 When feasible, run the changed task with the oracle agent:
 
 ```bash
-uvx --from harbor harbor run -p datasets/kubernetes-core/<task> -a oracle
+uvx --from harbor harbor run -p datasets/<dataset>/<task> -a oracle
 ```
