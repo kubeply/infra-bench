@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: "If you use infra-bench in academic work, please cite it using this metadata."
+title: "infra-bench: Open benchmark tasks for evaluating AI agents on real infrastructure work"
+type: software
+authors:
+  - name: "Kubeply"
+date-released: 2026-04-16
+url: "https://github.com/kubeply/infra-bench"
+license: "Apache-2.0"
