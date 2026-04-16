@@ -1,7 +1,40 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:recommended"
+  "extends": ["config:recommended", "helpers:pinGitHubActionDigests"],
+  "dependencyDashboard": true,
+  "ignorePaths": ["jobs/**"],
+  "labels": ["dependencies"],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["/^\\.github\\/workflows\\/.*\\.ya?ml$/"],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>[a-z-]+) depName=(?<depName>[^\\s]+)\\n\\s+[A-Z0-9_]+_VERSION: (?<currentValue>[^\\s]+)"
+      ]
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["/^\\.github\\/workflows\\/.*\\.ya?ml$/"],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>pypi) depName=(?<depName>[^\\s]+)\\n\\s+version: (?<currentValue>[^\\s]+)"
+      ]
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["/^scripts\\/lint-files\\.sh$/"],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>[a-z-]+) depName=(?<depName>[^\\s]+)\\n[A-Z0-9_]+_VERSION=\"(?<currentValue>[^\"]+)\""
+      ]
+    }
   ],
-  "dependencyDashboard": true
+  "packageRules": [
+    {
+      "matchManagers": ["github-actions"],
+      "groupName": "github-actions"
+    },
+    {
+      "matchFileNames": ["scripts/lint-files.sh", ".github/workflows/*.yaml"],
+      "groupName": "ci tooling"
+    }
+  ]
 }

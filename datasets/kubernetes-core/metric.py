@@ -29,7 +29,9 @@ def main(input_path: Path, output_path: Path):
         rewards.extend(extract_values(json.loads(line)))
 
     mean = sum(rewards) / len(rewards) if rewards else 0
-    pass_rate = sum(1 for reward in rewards if reward >= 1.0) / len(rewards) if rewards else 0
+    pass_rate = (
+        sum(1 for reward in rewards if reward >= 1.0) / len(rewards) if rewards else 0
+    )
 
     output_path.write_text(
         json.dumps(
