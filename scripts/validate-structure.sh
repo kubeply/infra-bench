@@ -60,10 +60,20 @@ for path in sorted(Path("datasets").glob("*/*/task.toml")):
     task = data.get("task", {})
     if not task.get("name"):
         raise SystemExit(f"{path}: missing task.name")
+    if not task.get("category"):
+        raise SystemExit(f"{path}: missing task.category")
+    if not isinstance(task.get("keywords"), list) or not task.get("keywords"):
+        raise SystemExit(f"{path}: missing task.keywords")
     if not data.get("schema_version"):
         raise SystemExit(f"{path}: missing schema_version")
 
     metadata = data.get("metadata", {})
+    for duplicate_field in ("author_name", "author_email", "category", "tags"):
+        if duplicate_field in metadata:
+            raise SystemExit(
+                f"{path}: metadata.{duplicate_field} duplicates task fields"
+            )
+
     canary = metadata.get("canary")
     if not isinstance(canary, str):
         raise SystemExit(f"{path}: missing metadata.canary")
