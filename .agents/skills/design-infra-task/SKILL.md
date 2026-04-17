@@ -44,7 +44,7 @@ Include these fields:
 - Proposed task directory: `datasets/<dataset-name>/<task-name>`
 - Harbor task name: `kubeply/<task-name>`
 - Difficulty: `easy`, `medium`, or `hard`
-- Category and tags
+- Task category and keywords
 - Operator story: one sentence
 - Scenario type
 - Environment class
