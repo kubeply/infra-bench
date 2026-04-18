@@ -13,7 +13,7 @@ email = "thomas@kubeply.com"
 
 [[tasks]]
 name = "kubeply/debug-service-endpoints"
-digest = "sha256:559d109c3116f1a753dc61091826def1fb920c92743e2e1519008cf98d9001d8"
+digest = "sha256:5e768bb5a1e91ae4a1b9da31cb82e89d34db54ff6508ba970c26834a3541a51e"
 
 
 [[files]]

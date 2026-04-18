@@ -12,6 +12,5 @@ RUN apt-get update \
 ENV KUBECONFIG=/kube/kubeconfig.yaml
 
 WORKDIR /app
-COPY workspace/ /app/
 COPY scripts/ /usr/local/bin/
 RUN chmod +x /usr/local/bin/prepare-kubeconfig /usr/local/bin/bootstrap-cluster

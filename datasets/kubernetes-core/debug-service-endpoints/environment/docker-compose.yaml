@@ -4,7 +4,7 @@ services:
       bootstrap:
         condition: service_completed_successfully
     volumes:
-      - kubeconfig:/kube
+      - agent-kubeconfig:/kube:ro
 
   k3s:
     image: rancher/k3s:v1.30.6-k3s1
@@ -13,11 +13,11 @@ services:
       - server
       - --disable=traefik
       - --disable=servicelb
-      - --write-kubeconfig=/kube/kubeconfig.yaml
+      - --write-kubeconfig=/admin-kube/admin-kubeconfig.yaml
       - --write-kubeconfig-mode=666
       - --tls-san=k3s
     volumes:
-      - kubeconfig:/kube
+      - admin-kubeconfig:/admin-kube
       - k3s-data:/var/lib/rancher/k3s
     healthcheck:
       test: ["CMD-SHELL", "kubectl get --raw=/readyz >/dev/null 2>&1"]
@@ -33,11 +33,14 @@ services:
       k3s:
         condition: service_healthy
     environment:
-      KUBECONFIG: /kube/kubeconfig.yaml
+      KUBECONFIG: /admin-kube/admin-kubeconfig.yaml
     volumes:
-      - kubeconfig:/kube
+      - agent-kubeconfig:/kube
+      - admin-kubeconfig:/admin-kube
+      - ./workspace/bootstrap:/bootstrap:ro
     command: ["bootstrap-cluster"]
 
 volumes:
-  kubeconfig:
+  agent-kubeconfig:
+  admin-kubeconfig:
   k3s-data:

@@ -3,6 +3,54 @@ kind: Namespace
 metadata:
   name: web-debug
 ---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: infra-bench-agent
+  namespace: web-debug
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: infra-bench-agent-token
+  namespace: web-debug
+  annotations:
+    kubernetes.io/service-account.name: infra-bench-agent
+type: kubernetes.io/service-account-token
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: infra-bench-agent
+  namespace: web-debug
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps", "endpoints", "events", "pods", "pods/log", "services"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["apps"]
+    resources: ["daemonsets", "deployments", "replicasets", "statefulsets"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["batch"]
+    resources: ["cronjobs", "jobs"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["services"]
+    verbs: ["patch", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: infra-bench-agent
+  namespace: web-debug
+subjects:
+  - kind: ServiceAccount
+    name: infra-bench-agent
+    namespace: web-debug
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: infra-bench-agent
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:

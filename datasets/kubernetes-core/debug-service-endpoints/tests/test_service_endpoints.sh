@@ -63,6 +63,21 @@ if [[ "$service_names" != "web" ]]; then
   exit 1
 fi
 
+unexpected_workloads="$(
+  {
+    kubectl -n "$namespace" get daemonsets.apps -o name
+    kubectl -n "$namespace" get statefulsets.apps -o name
+    kubectl -n "$namespace" get jobs.batch -o name
+    kubectl -n "$namespace" get cronjobs.batch -o name
+  } 2>/dev/null | sort
+)"
+
+if [[ -n "$unexpected_workloads" ]]; then
+  echo "Unexpected replacement workload resources in $namespace:" >&2
+  echo "$unexpected_workloads" >&2
+  exit 1
+fi
+
 deployment_labels="$(kubectl -n "$namespace" get deployment web -o jsonpath='{.spec.template.metadata.labels.app}')"
 service_selector="$(kubectl -n "$namespace" get service web -o jsonpath='{.spec.selector.app}')"
 container_names="$(kubectl -n "$namespace" get deployment web -o jsonpath='{.spec.template.spec.containers[*].name}')"
@@ -120,6 +135,30 @@ if [[ "$ready_pods" != "2" ]]; then
   echo "Expected 2 ready pods for app=web, got $ready_pods" >&2
   exit 1
 fi
+
+while IFS='|' read -r pod_name pod_app owner_kind; do
+  [[ -z "$pod_name" ]] && continue
+
+  if [[ "$pod_app" != "web" || "$owner_kind" != "ReplicaSet" ]]; then
+    echo "Unexpected pod ownership for ${pod_name}: app=${pod_app} ownerKind=${owner_kind}" >&2
+    exit 1
+  fi
+done < <(
+  kubectl -n "$namespace" get pods \
+    -o jsonpath='{range .items[*]}{.metadata.name}{"|"}{.metadata.labels.app}{"|"}{.metadata.ownerReferences[0].kind}{"\n"}{end}'
+)
+
+while IFS='|' read -r replicaset_name owner_kind owner_name; do
+  [[ -z "$replicaset_name" ]] && continue
+
+  if [[ "$owner_kind" != "Deployment" || "$owner_name" != "web" ]]; then
+    echo "Unexpected ReplicaSet ownership for ${replicaset_name}: ownerKind=${owner_kind} ownerName=${owner_name}" >&2
+    exit 1
+  fi
+done < <(
+  kubectl -n "$namespace" get replicasets \
+    -o jsonpath='{range .items[*]}{.metadata.name}{"|"}{.metadata.ownerReferences[0].kind}{"|"}{.metadata.ownerReferences[0].name}{"\n"}{end}'
+)
 
 for _ in $(seq 1 60); do
   endpoint_ips="$(kubectl -n "$namespace" get endpoints web -o jsonpath='{.subsets[*].addresses[*].ip}' 2>/dev/null || true)"
