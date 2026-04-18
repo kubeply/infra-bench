@@ -15,6 +15,10 @@ email = "thomas@kubeply.com"
 name = "kubeply/debug-service-endpoints"
 digest = "sha256:5e768bb5a1e91ae4a1b9da31cb82e89d34db54ff6508ba970c26834a3541a51e"
 
+[[tasks]]
+name = "kubeply/repair-readiness-probe-path"
+digest = "sha256:5c81a0bb9069d331634294394af92b5fea1486b78e1442b2cbef3b406f2a7a1f"
+
 
 [[files]]
 path = "metric.py"
