@@ -1,0 +1,4 @@
+interface:
+  display_name: "Implement Infra Task"
+  short_description: "Implement one approved infra-bench task issue."
+  default_prompt: "Use $implement-infra-task to implement one approved infra-bench task issue into a validated Harbor task."
