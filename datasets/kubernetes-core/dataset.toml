@@ -17,7 +17,7 @@ digest = "sha256:559d109c3116f1a753dc61091826def1fb920c92743e2e1519008cf98d9001d
 
 [[tasks]]
 name = "kubeply/repair-readiness-probe-path"
-digest = "sha256:8c52014520002f889c459aecf0169ef1a779beccbcca2e5c87f9f8bbd23353a2"
+digest = "sha256:5c81a0bb9069d331634294394af92b5fea1486b78e1442b2cbef3b406f2a7a1f"
 
 
 [[files]]
