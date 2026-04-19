@@ -98,3 +98,12 @@ check the task, not to demonstrate the best human workflow.
   specific task domain.
 - Update the relevant dataset documentation and manifest when adding tasks to a
   dataset.
+
+## CI Tooling
+
+Keep CI tool installation small and pinned. Prefer standalone tools or lightweight
+runners over broad package-manager installs that pull large dependency trees.
+
+For JavaScript-distributed lint tools such as Prettier and Taplo, use Bun and
+`bunx` instead of apt-installing `nodejs` and `npm`. On the ARM GitHub runner,
+apt `npm` can pull hundreds of packages and dominate PR validation time.

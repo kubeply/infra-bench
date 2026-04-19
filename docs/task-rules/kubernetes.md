@@ -108,12 +108,37 @@ Use `bootstrap-cluster` to:
 - Apply the broken starting state.
 - Wait only for resources that should be healthy before the agent starts.
 - Record immutable baseline facts needed by the verifier, such as Deployment
-  and Service UIDs, in a task-local ConfigMap.
+  and Service UIDs. If those facts are stored in Kubernetes resources, the agent
+  must not be able to mutate those resources.
 
 Use `prepare-kubeconfig` from the agent, solution, and verifier when the
 cluster writes a kubeconfig with container-local addresses. Keep that helper
 small and task-local until multiple Kubernetes tasks prove a shared helper is
 worth maintaining.
+
+### Local Cluster Access Boundaries
+
+Local-cluster tasks should separate bootstrap/verifier authority from agent
+authority.
+
+- Keep an admin kubeconfig available only to bootstrap and verifier paths.
+- Generate a least-privilege ServiceAccount kubeconfig for the agent.
+- Mount the agent kubeconfig read-only into the main agent container.
+- Grant the agent only the read verbs needed for diagnosis and the write verbs
+  needed for the intended fix.
+- Do not let the agent update verifier-trusted baseline objects, such as
+  ConfigMaps that store original resource UIDs.
+
+Do not copy answer-bearing bootstrap assets into `/app`. If
+`environment/workspace/bootstrap/*.yaml` reveals the broken field or intended
+fix, mount it only into the bootstrap service, for example at `/bootstrap:ro`.
+The agent workspace should contain only files the task intentionally exposes.
+
+Current Harbor Docker local-cluster tasks may need `allow_internet = true` so
+the main container can reach the k3s sidecar network. Treat that as a documented
+exception to the general preference for `allow_internet = false`; do not flip a
+local-cluster task to `false` without proving the oracle can still reach the
+cluster.
 
 The agent prompt should make the live-cluster expectation explicit. Tell the
 agent to use `kubectl`, state that the cluster is already running, and describe
@@ -134,8 +159,14 @@ Avoid checking YAML formatting unless formatting is the task.
 For `local_cluster` tasks, verifiers should also defend against common shortcut
 solutions:
 
-- Compare baseline UIDs for resources that must not be deleted and recreated.
-- Check that replacement workloads or Services were not added.
+- Compare trusted baseline UIDs for resources that must not be deleted and
+  recreated. A UID stored in an agent-writable ConfigMap is not trusted.
+- Check that replacement workloads or Services were not added. Cover workload
+  kinds beyond Deployments, including StatefulSets, DaemonSets, Jobs, CronJobs,
+  standalone Pods, and stray ReplicaSets.
+- Verify ownership relationships, not just counts. For Deployment tasks, check
+  that Pods are owned by ReplicaSets and ReplicaSets are owned by the intended
+  Deployment.
 - Check critical fields that the prompt forbids changing, such as images,
   container ports, Service ports, selectors, replica counts, and RBAC subjects.
 - Verify the runtime behavior that matters, such as ready pods, populated

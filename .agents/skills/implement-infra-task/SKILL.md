@@ -88,6 +88,8 @@ Before editing files, restate the contract in a short plan:
      verification.
    - Keep task-specific bootstrap and verifier logic task-local unless several
      implemented tasks prove shared code is worth adding.
+   - For live-cluster tasks, do not copy bootstrap manifests that reveal the
+     answer into `/app`; mount them only into the bootstrap service.
 
 5. Write `instruction.md`.
    - State the working directory.
@@ -117,6 +119,16 @@ For easy Kubernetes tasks, prefer `local_cluster` unless the issue explicitly
 requires otherwise. The task should prove a live `kubectl` diagnosis of one
 clear broken relationship.
 
+Local-cluster tasks should use separate cluster credentials:
+
+- Keep the admin kubeconfig available only to bootstrap and verifier paths.
+- Generate a least-privilege ServiceAccount kubeconfig for the agent.
+- Mount the agent kubeconfig read-only into the main agent container.
+- Grant only the read verbs needed for diagnosis and the write verbs needed for
+  the intended fix.
+- Do not let the agent mutate verifier-trusted baseline data, such as a
+  ConfigMap that stores original resource UIDs.
+
 The verifier should usually check:
 
 - Original resource UIDs for resources that must not be replaced.
@@ -126,6 +138,10 @@ The verifier should usually check:
   replica counts, ServiceAccounts, and policy boundaries.
 - Absence of replacement workloads, replacement Services, cluster restarts, or
   broad privilege/policy bypasses.
+- Unexpected workload kinds beyond Deployments, including StatefulSets,
+  DaemonSets, Jobs, CronJobs, standalone Pods, and stray ReplicaSets.
+- Ownership relationships, such as Pods owned by ReplicaSets and ReplicaSets
+  owned by the intended Deployment.
 
 Use the smallest local-cluster structure that fits the task:
 
@@ -142,6 +158,18 @@ environment/
 
 Keep Docker Compose focused on orchestration. Put cluster bootstrap logic in
 `environment/scripts/` and syntax-check those scripts.
+
+Run a bypass review before final validation:
+
+- Can the agent mutate verifier baseline data?
+- Can the agent delete and recreate the target resource and still pass?
+- Can the agent create alternate workloads, Services, or standalone Pods?
+- Can the agent read bootstrap assets that reveal the answer?
+- Does the verifier check ownership relationships, not just counts?
+
+For current k3s sidecar tasks, keep `allow_internet = true` unless an oracle run
+proves the agent can still reach the cluster with it disabled. This is a Harbor
+Docker networking constraint, not permission to rely on external services.
 
 ## Guardrails
 

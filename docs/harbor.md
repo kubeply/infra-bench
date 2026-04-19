@@ -90,7 +90,7 @@ email = "thomas@kubeply.com"
 | `environment` | `storage_mb` | integer | Storage allocation in MiB. |
 | `environment` | `gpus` | integer | GPU allocation. Use `0` unless a task explicitly requires GPU access. |
 | `environment` | `gpu_types` | list of strings or null | Optional allowed GPU types, such as `H100` or `A100`. |
-| `environment` | `allow_internet` | boolean | Whether the task environment may access the internet. Prefer `false`. |
+| `environment` | `allow_internet` | boolean | Whether the task environment may access the internet. Prefer `false`, except where the environment class needs Docker sidecar networking that Harbor currently gates behind this setting. |
 | `environment` | `env` | object | Environment variables for the task environment. |
 | `environment` | `mcp_servers` | list of MCP server configs | MCP servers exposed to the task environment. Use `[]` unless required. |
 | `environment` | `skills_dir` | string or null | Optional skills directory exposed to the task environment. |
@@ -132,6 +132,13 @@ mcp_servers = []
 skills_dir = null
 env = {}
 ```
+
+`allow_internet = false` is the default target for task isolation, but verify it
+against the actual environment class. Current Docker Compose local-cluster tasks
+that use a k3s sidecar may require `allow_internet = true` for the agent
+container to reach the cluster API. When using that exception, keep external
+dependencies out of the task and rely on restricted cluster credentials to
+reduce the shortcut surface.
 
 Healthchecks are optional and should be used only when the task environment
 starts a service that must become ready before the agent begins:
