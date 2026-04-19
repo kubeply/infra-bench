@@ -19,6 +19,10 @@ digest = "sha256:a375ed8cfa19863097481c670e4abfc5f950305afd1becb235ec4ac892628f8
 name = "kubeply/repair-readiness-probe-path"
 digest = "sha256:5c81a0bb9069d331634294394af92b5fea1486b78e1442b2cbef3b406f2a7a1f"
 
+[[tasks]]
+name = "kubeply/fix-config-key-reference"
+digest = "sha256:f5e53cd6a5056208f69c1179ab53652fa86676adca1517847a262bb0ad28cdf2"
+
 
 [[files]]
 path = "metric.py"
