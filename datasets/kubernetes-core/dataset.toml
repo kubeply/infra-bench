@@ -13,15 +13,15 @@ email = "thomas@kubeply.com"
 
 [[tasks]]
 name = "kubeply/debug-service-endpoints"
-digest = "sha256:a375ed8cfa19863097481c670e4abfc5f950305afd1becb235ec4ac892628f8c"
+digest = "sha256:4454da50bd9ebfb8feb92bc6a76dc9ecd1ee909ef54d5b036ddbe78c520899be"
 
 [[tasks]]
 name = "kubeply/repair-readiness-probe-path"
-digest = "sha256:5c81a0bb9069d331634294394af92b5fea1486b78e1442b2cbef3b406f2a7a1f"
+digest = "sha256:5e2b584afe34d91997c5c79048d2c29a79b1d76f269e31768d00bfaf0151df6b"
 
 [[tasks]]
 name = "kubeply/fix-config-key-reference"
-digest = "sha256:f5e53cd6a5056208f69c1179ab53652fa86676adca1517847a262bb0ad28cdf2"
+digest = "sha256:750f4a0ebf167fbf3da93ab3762f378253c31b36cbbb97a584805d2fd4e4a836"
 
 
 [[files]]
