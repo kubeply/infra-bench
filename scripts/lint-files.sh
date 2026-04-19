@@ -20,7 +20,7 @@ collect_files() {
     "$@"
 }
 
-require_command npx
+require_command bunx
 require_command jq
 require_command shellcheck
 require_command uvx
@@ -37,8 +37,8 @@ while IFS= read -r -d "" path; do
   toml_files+=("$path")
 done < <(collect_files -type f -name "*.toml" -print0)
 if [[ "${#toml_files[@]}" -gt 0 ]]; then
-  npx --yes "@taplo/cli@${TAPLO_VERSION}" fmt --check "${toml_files[@]}"
-  npx --yes "@taplo/cli@${TAPLO_VERSION}" lint "${toml_files[@]}"
+  bunx "@taplo/cli@${TAPLO_VERSION}" fmt --check "${toml_files[@]}"
+  bunx "@taplo/cli@${TAPLO_VERSION}" lint "${toml_files[@]}"
 fi
 
 yaml_json_files=()
@@ -48,7 +48,7 @@ done < <(
   collect_files -type f \( -name "*.yaml" -o -name "*.yml" -o -name "*.json" \) -print0
 )
 if [[ "${#yaml_json_files[@]}" -gt 0 ]]; then
-  npx --yes "prettier@${PRETTIER_VERSION}" --check "${yaml_json_files[@]}"
+  bunx "prettier@${PRETTIER_VERSION}" --check "${yaml_json_files[@]}"
 fi
 
 json_files=()
