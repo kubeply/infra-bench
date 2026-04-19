@@ -27,6 +27,10 @@ digest = "sha256:750f4a0ebf167fbf3da93ab3762f378253c31b36cbbb97a584805d2fd4e4a83
 name = "kubeply/add-rbac-list-verb"
 digest = "sha256:07b2565c5a52b5d76ff93b05f56efa02ff6aabbb90cb136fc415105de19b97f6"
 
+[[tasks]]
+name = "kubeply/fix-node-selector-mismatch"
+digest = "sha256:72feffcbad96c9f0a2855d0e6dd35281f1455941b5ccdc582af7cc8b9a2bbb86"
+
 
 [[files]]
 path = "metric.py"
