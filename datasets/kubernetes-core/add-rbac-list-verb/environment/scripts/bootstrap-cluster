@@ -42,7 +42,9 @@ if [[ -z "$pod_name" || "$pod_phase" != "Running" || "$forbidden_log" -eq 0 ]]; 
   echo "expected $job pod to be running and blocked by an RBAC forbidden error before starting the task" >&2
   kubectl -n "$namespace" get jobs,pods -o wide >&2 || true
   kubectl -n "$namespace" describe job "$job" >&2 || true
-  [[ -n "$pod_name" ]] && kubectl -n "$namespace" logs "$pod_name" >&2 || true
+  if [[ -n "$pod_name" ]]; then
+    kubectl -n "$namespace" logs "$pod_name" >&2 || true
+  fi
   exit 1
 fi
 
