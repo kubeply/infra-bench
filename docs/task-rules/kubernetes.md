@@ -25,6 +25,29 @@ Kubernetes is the first benchmark domain for `infra-bench`.
   topology constraints.
 - Storage: fix PVC, volume, and mount issues.
 
+## Difficulty Progression
+
+Use difficulty to describe Kubernetes operator complexity and bypass resistance,
+not the number of files touched.
+
+- `easy`: one broken relationship, one primary resource family, and direct
+  symptoms. The intended fix should be reachable after a short `kubectl`
+  inspection, and the verifier should still reject delete-and-recreate or
+  alternate-resource shortcuts.
+- `medium`: two or more related Kubernetes concepts, a moderate diagnosis path,
+  or symptoms that require correlating resources. Good medium tasks may combine
+  a workload with a Service, ConfigMap, Secret, RBAC rule, NetworkPolicy,
+  storage object, Job, or controller-generated resource. The fix should still
+  be bounded to one operator outcome and should not require guessing hidden
+  verifier details.
+- `hard`: layered or ambiguous failure modes, multi-step remediation, scarce
+  capacity, migration or upgrade constraints, or validation that spans several
+  controllers and runtime behaviors.
+
+For medium and hard `local_cluster` tasks, start from the same two-image
+environment pattern used by the easy tasks. Do not reintroduce a single image
+that copies bootstrap-only scripts or manifests into the agent runtime.
+
 ## Coverage Area Keywords
 
 Kubernetes tasks should include one primary coverage-area keyword in
@@ -102,6 +125,10 @@ environment/
 `-- workspace/
     `-- <starting-assets>
 ```
+
+A copyable skeleton lives in
+`docs/templates/kubernetes-local-cluster-task/`. Replace every `TODO_*`
+placeholder before moving it into `datasets/kubernetes-core/<task-name>`.
 
 Use `bootstrap-cluster` to:
 
@@ -207,6 +234,7 @@ Before adding a Kubernetes task to the dataset, run it in this order:
 
    ```bash
    ./scripts/validate-structure.sh
+   python3 scripts/lint-kubernetes-rbac.py
    uvx --from harbor harbor sync datasets/kubernetes-core
    ```
 

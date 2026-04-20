@@ -13,15 +13,15 @@ email = "thomas@kubeply.com"
 
 [[tasks]]
 name = "kubeply/debug-service-endpoints"
-digest = "sha256:e02e828fb483f459854a4b64084fb31fdcc2f47de1c9c311e5fbe16c5ab89a30"
+digest = "sha256:ad2522db0bc6e92192e36cd9d5e64e94040a25a79f45561e68e72e57aa7f91df"
 
 [[tasks]]
 name = "kubeply/repair-readiness-probe-path"
-digest = "sha256:1c770aac9dde7f65ecadc2f4581f7c10a149948cc38414a07084c51a0660dca1"
+digest = "sha256:391b7bf3bf75fb5e524e2524286e032c8ccf2cf53b62ec08c1008a7decccc0dc"
 
 [[tasks]]
 name = "kubeply/fix-config-key-reference"
-digest = "sha256:37de4cdff7fb947fe6061bfd18d6e51028ab4485f9f711b5e99e2617637dbd1e"
+digest = "sha256:e51141f46ae57aed0f23eb05e401814bf4c7518851443cd6aab69badf0a83716"
 
 [[tasks]]
 name = "kubeply/add-rbac-list-verb"
