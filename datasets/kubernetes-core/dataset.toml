@@ -48,6 +48,10 @@ name = "kubeply/allow-api-network-policy"
 digest = "sha256:0a8c0875f58c061263bbb32f387975fdb5c833e8a0ccfd61b491599af60275dc"
 
 [[tasks]]
+name = "kubeply/fix-controller-service-selector"
+digest = "sha256:6472791efe142f0f0fb5fe7ac1a1f06e2ba93b099088d75874b2ae1fe930b84d"
+
+[[tasks]]
 name = "kubeply/restore-missing-configmap"
 digest = "sha256:be2ea9a81c43f8ac2779e89f0340fa5a30a5c4ba416e193ae7dd7cbbf9a57319"
 
