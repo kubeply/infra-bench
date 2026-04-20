@@ -47,6 +47,10 @@ digest = "sha256:a762cbddbefd86f346b3a080f0904fc608a903a445b63a490cd3fd78e425d1d
 name = "kubeply/allow-api-network-policy"
 digest = "sha256:0a8c0875f58c061263bbb32f387975fdb5c833e8a0ccfd61b491599af60275dc"
 
+[[tasks]]
+name = "kubeply/fix-crashloop-env-var"
+digest = "sha256:5b2887f95238c71976bf6338061a34bfeccc869068797b155eaead0103da86b1"
+
 
 [[files]]
 path = "metric.py"
