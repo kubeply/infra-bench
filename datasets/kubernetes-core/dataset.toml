@@ -107,6 +107,10 @@ digest = "sha256:53ff419fac150c5f62d8bea258b0db9b313215377c7b21048d6a9eab0db2636
 name = "kubeply/repair-secret-projection-reload"
 digest = "sha256:23035e2bf05bd4c283e44544b368d4771b1bb0cf77bc7b3fc8e4f2786dad9b0b"
 
+[[tasks]]
+name = "kubeply/recover-api-rollout-after-config-change"
+digest = "sha256:a5e2eb8955828edabdc722c4f42447904fee03a7ea27e0c60e187989f256c159"
+
 
 [[files]]
 path = "metric.py"
