@@ -105,7 +105,7 @@ digest = "sha256:044879a085cfffac3be3354912a2623370c61fe76336bad9490c3acb6615c5e
 
 [[tasks]]
 name = "kubeply/repair-secret-projection-reload"
-digest = "sha256:aaddd785781348d6c7714e5cf252861dad9c7878a3e191244e125f2d02796ffb"
+digest = "sha256:35caee4f0f4e966ea318eaabdf8906c3144f4c4c5571315db06fc76989511c83"
 
 
 [[files]]
