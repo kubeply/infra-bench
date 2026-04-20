@@ -3,8 +3,12 @@ name: oracle-validation
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "17 2 * * *"
+    inputs:
+      run_oracle:
+        description: "Run the heavy Kubernetes Core oracle sweep"
+        required: true
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -15,6 +19,7 @@ concurrency:
 
 jobs:
   kubernetes-core-oracle:
+    if: ${{ inputs.run_oracle }}
     runs-on:
       group: kubeply-low-latency
       labels: kubeply-arm64-low-latency
