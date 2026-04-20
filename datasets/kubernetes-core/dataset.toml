@@ -48,6 +48,10 @@ name = "kubeply/allow-api-network-policy"
 digest = "sha256:0a8c0875f58c061263bbb32f387975fdb5c833e8a0ccfd61b491599af60275dc"
 
 [[tasks]]
+name = "kubeply/repair-ingress-backend-port"
+digest = "sha256:f45c4a1b163fa9881cec804fefc5777b897792ebdf8734192cc0107c48b0e3dc"
+
+[[tasks]]
 name = "kubeply/fix-hpa-scale-target"
 digest = "sha256:698753cb65f257973e556bceb8047739be5d97d5f73bd6f9bf30cc753e60b8ea"
 
