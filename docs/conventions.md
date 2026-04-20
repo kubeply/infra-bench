@@ -77,6 +77,9 @@ Do not reveal verifier internals or exact assertions.
 - Keep the Docker build context minimal.
 - Do not copy tests, solutions, or hidden answers into the environment image.
 - Prefer deterministic local assets over network calls at verification time.
+- For local-cluster tasks, separate the agent, solution, and verifier runtime
+  image from the bootstrap image so bootstrap scripts and answer-bearing setup
+  assets are not present in the agent container.
 
 ## Verification
 

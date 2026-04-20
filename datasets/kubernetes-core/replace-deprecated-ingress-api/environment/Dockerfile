@@ -13,5 +13,5 @@ ENV KUBECONFIG=/kube/kubeconfig.yaml
 
 WORKDIR /app
 COPY workspace/app/ /app/
-COPY scripts/ /usr/local/bin/
-RUN chmod +x /usr/local/bin/prepare-kubeconfig /usr/local/bin/bootstrap-cluster
+COPY scripts/prepare-kubeconfig /usr/local/bin/prepare-kubeconfig
+RUN chmod +x /usr/local/bin/prepare-kubeconfig
