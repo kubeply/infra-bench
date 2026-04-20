@@ -101,7 +101,11 @@ digest = "sha256:c68947e1b4cedd1c6ef6f8f7e7f387b9b3e41445dd1f03e86b9fcb78f88e069
 
 [[tasks]]
 name = "kubeply/trace-service-route-regression"
-digest = "sha256:044879a085cfffac3be3354912a2623370c61fe76336bad9490c3acb6615c5ea"
+digest = "sha256:53ff419fac150c5f62d8bea258b0db9b313215377c7b21048d6a9eab0db2636d"
+
+[[tasks]]
+name = "kubeply/repair-secret-projection-reload"
+digest = "sha256:23035e2bf05bd4c283e44544b368d4771b1bb0cf77bc7b3fc8e4f2786dad9b0b"
 
 [[tasks]]
 name = "kubeply/recover-api-rollout-after-config-change"
