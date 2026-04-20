@@ -47,6 +47,10 @@ digest = "sha256:a762cbddbefd86f346b3a080f0904fc608a903a445b63a490cd3fd78e425d1d
 name = "kubeply/allow-api-network-policy"
 digest = "sha256:0a8c0875f58c061263bbb32f387975fdb5c833e8a0ccfd61b491599af60275dc"
 
+[[tasks]]
+name = "kubeply/reconnect-frontend-api"
+digest = "sha256:bde1664bd450e1a6d0d45a8cbe5adad95edcc83cb0eed2f019fa82ad172cf72e"
+
 
 [[files]]
 path = "metric.py"
