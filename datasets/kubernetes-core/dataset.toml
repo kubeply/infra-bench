@@ -48,6 +48,10 @@ name = "kubeply/allow-api-network-policy"
 digest = "sha256:0a8c0875f58c061263bbb32f387975fdb5c833e8a0ccfd61b491599af60275dc"
 
 [[tasks]]
+name = "kubeply/fix-quirky-health-endpoint"
+digest = "sha256:1ed90424cd5cf1617143751d0a5ac61c46a5259ad671de914bd7376566de9f03"
+
+[[tasks]]
 name = "kubeply/repair-ingress-backend-port"
 digest = "sha256:f45c4a1b163fa9881cec804fefc5777b897792ebdf8734192cc0107c48b0e3dc"
 
