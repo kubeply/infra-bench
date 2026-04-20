@@ -48,6 +48,10 @@ name = "kubeply/allow-api-network-policy"
 digest = "sha256:0a8c0875f58c061263bbb32f387975fdb5c833e8a0ccfd61b491599af60275dc"
 
 [[tasks]]
+name = "kubeply/fix-restricted-security-context"
+digest = "sha256:13914fc4b5b30c6ef28c638e4c481ad51a1e5fdef6de74e0a580d37d297f79cb"
+
+[[tasks]]
 name = "kubeply/fix-crashloop-env-var"
 digest = "sha256:5b2887f95238c71976bf6338061a34bfeccc869068797b155eaead0103da86b1"
 
