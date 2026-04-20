@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-namespace="rbac-debug"
+namespace="audit-team"
 job="config-audit"
 target_role="diagnostic-config-reader"
 target_rolebinding="diagnostic-config-reader"

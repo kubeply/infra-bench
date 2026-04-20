@@ -3,8 +3,8 @@ set -euo pipefail
 
 prepare-kubeconfig
 
-source_namespace="catalog-source"
-target_namespace="catalog-migrated"
+source_namespace="catalog-primary"
+target_namespace="catalog-secondary"
 deployment="catalog-web"
 service="catalog-web"
 configmap="app-config"

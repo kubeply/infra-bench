@@ -6,7 +6,7 @@ cluster.
 A Kubernetes cluster is already running and `kubectl` is configured through
 `KUBECONFIG`.
 
-The `maintenance-worker` Deployment in the `maintenance-debug` namespace is
+The `maintenance-worker` Deployment in the `warehouse-team` namespace is
 intended to run on the maintenance node, but its pod is Pending because it does
 not tolerate the node taint.
 

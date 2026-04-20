@@ -6,7 +6,7 @@ cluster.
 A Kubernetes cluster is already running and `kubectl` is configured through
 `KUBECONFIG`.
 
-The `web-debug` namespace contains a Deployment named `web` and a Service named
+The `web-platform` namespace contains a Deployment named `web` and a Service named
 `web`. The pods are running, but the Service has no usable endpoints, so traffic
 sent to the Service cannot reach the workload.
 

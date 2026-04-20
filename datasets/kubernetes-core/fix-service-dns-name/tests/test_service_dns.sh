@@ -3,12 +3,12 @@ set -euo pipefail
 
 prepare-kubeconfig
 
-client_namespace="dns-debug"
-backend_namespace="backend-services"
+client_namespace="checkout-team"
+backend_namespace="orders-team"
 client_deployment="checkout-client"
 backend_deployment="orders-api"
 backend_service="orders-api"
-expected_backend_url="http://orders-api.backend-services.svc.cluster.local"
+expected_backend_url="http://orders-api.orders-team.svc.cluster.local"
 wrong_backend_url="http://orders-api.default.svc.cluster.local"
 
 dump_debug() {

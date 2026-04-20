@@ -3,7 +3,7 @@ set -euo pipefail
 
 prepare-kubeconfig
 
-namespace="operator-debug"
+namespace="search-team"
 crd="widgets.platform.infra-bench.dev"
 controller="widget-controller"
 resource="search-index"

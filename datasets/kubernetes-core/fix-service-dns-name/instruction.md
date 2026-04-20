@@ -6,7 +6,7 @@ cluster.
 A Kubernetes cluster is already running and `kubectl` is configured through
 `KUBECONFIG`.
 
-The `checkout-client` Deployment in the `dns-debug` namespace cannot reach its
+The `checkout-client` Deployment in the `checkout-team` namespace cannot reach its
 backend because its configured in-cluster Service DNS name points to the wrong
 namespace. The backend Service already exists in the cluster.
 

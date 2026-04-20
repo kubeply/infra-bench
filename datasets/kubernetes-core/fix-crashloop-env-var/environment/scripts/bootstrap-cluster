@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-namespace="incident-debug"
+namespace="payments-team"
 deployment="api-worker"
 service="api-worker"
 settings_configmap="api-worker-settings"

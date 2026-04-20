@@ -8,7 +8,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: legacy-web
-  namespace: upgrade-debug
+  namespace: edge-team
 spec:
   ingressClassName: traefik
   tls:

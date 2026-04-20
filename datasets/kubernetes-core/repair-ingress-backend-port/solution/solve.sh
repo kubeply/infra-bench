@@ -3,7 +3,7 @@ set -euo pipefail
 
 prepare-kubeconfig
 
-namespace="ingress-debug"
+namespace="support-team"
 ingress="storefront"
 
 kubectl -n "$namespace" patch ingress "$ingress" \

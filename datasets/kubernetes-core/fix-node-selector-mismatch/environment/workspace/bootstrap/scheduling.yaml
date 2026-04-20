@@ -1,19 +1,19 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: scheduling-debug
+  name: inventory-team
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: infra-bench-agent
-  namespace: scheduling-debug
+  namespace: inventory-team
 ---
 apiVersion: v1
 kind: Secret
 metadata:
   name: infra-bench-agent-token
-  namespace: scheduling-debug
+  namespace: inventory-team
   annotations:
     kubernetes.io/service-account.name: infra-bench-agent
 type: kubernetes.io/service-account-token
@@ -22,7 +22,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: infra-bench-agent
-  namespace: scheduling-debug
+  namespace: inventory-team
 rules:
   - apiGroups: [""]
     resources: ["configmaps", "events", "pods", "pods/log"]
@@ -42,11 +42,11 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: infra-bench-agent
-  namespace: scheduling-debug
+  namespace: inventory-team
 subjects:
   - kind: ServiceAccount
     name: infra-bench-agent
-    namespace: scheduling-debug
+    namespace: inventory-team
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
@@ -55,7 +55,7 @@ roleRef:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: infra-bench-node-reader-scheduling-debug
+  name: infra-bench-node-reader-inventory-team
 rules:
   - apiGroups: [""]
     resources: ["nodes"]
@@ -64,21 +64,21 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: infra-bench-node-reader-scheduling-debug
+  name: infra-bench-node-reader-inventory-team
 subjects:
   - kind: ServiceAccount
     name: infra-bench-agent
-    namespace: scheduling-debug
+    namespace: inventory-team
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: infra-bench-node-reader-scheduling-debug
+  name: infra-bench-node-reader-inventory-team
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: inventory-worker
-  namespace: scheduling-debug
+  namespace: inventory-team
   labels:
     app: inventory-worker
 spec:
@@ -104,7 +104,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: infra-bench-baseline
-  namespace: scheduling-debug
+  namespace: inventory-team
 data:
   deployment_uid: ""
   node_name: ""

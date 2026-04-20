@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-namespace="cpu-debug"
+namespace="reporting-team"
 deployment="report-api"
 agent_secret="infra-bench-agent-token"
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-namespace="ingress-debug"
+namespace="support-team"
 deployment="storefront"
 service="storefront"
 ingress="storefront"

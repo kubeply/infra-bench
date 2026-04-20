@@ -6,7 +6,7 @@ cluster.
 A Kubernetes cluster is already running and `kubectl` is configured through
 `KUBECONFIG`.
 
-The `security-debug` namespace intentionally enforces restricted Pod Security.
+The `billing-team` namespace intentionally enforces restricted Pod Security.
 The `reporting` Deployment cannot create a pod because one required
 securityContext field is missing.
 

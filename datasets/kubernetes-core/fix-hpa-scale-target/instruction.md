@@ -6,7 +6,7 @@ cluster.
 A Kubernetes cluster is already running and `kubectl` is configured through
 `KUBECONFIG`.
 
-The `catalog-api` workload in the `autoscale-debug` namespace is healthy, but
+The `catalog-api` workload in the `catalog-team` namespace is healthy, but
 its HorizontalPodAutoscaler cannot resolve the workload it is supposed to
 observe because the scale target reference points to the wrong Deployment name.
 

@@ -3,7 +3,7 @@ set -euo pipefail
 
 prepare-kubeconfig
 
-namespace="cpu-debug"
+namespace="reporting-team"
 deployment="report-api"
 
 kubectl -n "$namespace" patch deployment "$deployment" \

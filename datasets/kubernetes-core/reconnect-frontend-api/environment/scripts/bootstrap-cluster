@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-namespace="dependency-debug"
+namespace="customer-portal"
 api_deployment="api"
 frontend_deployment="frontend"
 agent_secret="infra-bench-agent-token"

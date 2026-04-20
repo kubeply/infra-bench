@@ -6,7 +6,7 @@ cluster.
 A Kubernetes cluster is already running and `kubectl` is configured through
 `KUBECONFIG`.
 
-The `frontend` workload in the `policy-debug` namespace cannot reach the
+The `frontend` workload in the `retail-gateway` namespace cannot reach the
 `api` Service even though both workloads are healthy. An existing NetworkPolicy
 is meant to keep the API isolated while allowing only the frontend traffic path.
 

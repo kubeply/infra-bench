@@ -6,7 +6,7 @@ cluster.
 A Kubernetes cluster is already running and `kubectl` is configured through
 `KUBECONFIG`.
 
-The `config-debug` namespace contains a Deployment named `orders-api` and a
+The `orders-team` namespace contains a Deployment named `orders-api` and a
 ConfigMap named `orders-config`. The Deployment's pods cannot start because one
 environment variable references a ConfigMap key that is not present.
 

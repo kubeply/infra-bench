@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-namespace="quirky-debug"
+namespace="glyph-platform"
 deployment="glyph-cache"
 service="glyph-cache"
 agent_secret="infra-bench-agent-token"

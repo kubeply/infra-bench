@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-namespace="gpu-debug"
+namespace="vision-services"
 deployment="vision-worker"
 agent_secret="infra-bench-agent-token"
 

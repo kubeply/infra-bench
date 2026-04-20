@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-namespace="web-debug"
+namespace="web-platform"
 agent_secret="infra-bench-agent-token"
 
 prepare-kubeconfig

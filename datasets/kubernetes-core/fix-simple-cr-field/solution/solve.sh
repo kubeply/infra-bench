@@ -3,7 +3,7 @@ set -euo pipefail
 
 prepare-kubeconfig
 
-namespace="operator-debug"
+namespace="search-team"
 
 kubectl -n "$namespace" patch widget search-index \
   --type merge \

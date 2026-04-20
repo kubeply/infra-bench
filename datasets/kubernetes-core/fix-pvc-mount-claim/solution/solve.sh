@@ -3,7 +3,7 @@ set -euo pipefail
 
 prepare-kubeconfig
 
-namespace="storage-debug"
+namespace="ledger-services"
 deployment="ledger-api"
 
 kubectl -n "$namespace" patch deployment "$deployment" \

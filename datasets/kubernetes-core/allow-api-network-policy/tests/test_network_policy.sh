@@ -3,7 +3,7 @@ set -euo pipefail
 
 prepare-kubeconfig
 
-namespace="policy-debug"
+namespace="retail-gateway"
 policy="allow-frontend-to-api"
 
 dump_debug() {

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-namespace="TODO_NAMESPACE"
+namespace="TODO_NEUTRAL_NAMESPACE"
 agent_secret="infra-bench-agent-token"
 
 prepare-kubeconfig

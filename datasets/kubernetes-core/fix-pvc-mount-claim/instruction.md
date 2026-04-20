@@ -6,7 +6,7 @@ cluster.
 A Kubernetes cluster is already running and `kubectl` is configured through
 `KUBECONFIG`.
 
-The `ledger-api` Deployment in the `storage-debug` namespace cannot start its
+The `ledger-api` Deployment in the `ledger-services` namespace cannot start its
 pod because its volume references a PersistentVolumeClaim name that does not
 exist. The intended PVC already exists and is bound.
 

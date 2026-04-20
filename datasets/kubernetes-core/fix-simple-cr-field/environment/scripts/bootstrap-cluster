@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-namespace="operator-debug"
+namespace="search-team"
 crd="widgets.platform.infra-bench.dev"
 controller="widget-controller"
 resource="search-index"

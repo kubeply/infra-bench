@@ -3,7 +3,7 @@ set -euo pipefail
 
 prepare-kubeconfig
 
-namespace="storage-debug"
+namespace="ledger-services"
 deployment="ledger-api"
 pvc="ledger-data"
 pv="infra-bench-ledger-data"

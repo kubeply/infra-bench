@@ -4,7 +4,7 @@ trap 'echo "Verifier failed near line ${LINENO}" >&2' ERR
 
 prepare-kubeconfig
 
-namespace="batch-debug"
+namespace="catalog-ops"
 job="catalog-maintenance"
 runner_serviceaccount="maintenance-runner"
 script_configmap="maintenance-script"

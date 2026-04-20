@@ -3,7 +3,7 @@ set -euo pipefail
 
 prepare-kubeconfig
 
-namespace="upgrade-debug"
+namespace="edge-team"
 deployment="legacy-web"
 service="legacy-web"
 ingress="legacy-web"

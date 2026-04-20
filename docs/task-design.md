@@ -30,6 +30,10 @@ agent is meant to see into `/app`. For local-cluster Kubernetes tasks, keep
 bootstrap-only assets and scripts out of the agent image; expose them through a
 separate bootstrap image or bootstrap-only mounts.
 
+For Kubernetes cluster state, choose neutral namespace names. Namespaces should
+look like plausible team, tenant, or application boundaries, not the task slug,
+failure mode, intended fix, or benchmark coverage area.
+
 ## 4. Generate the Canary
 
 Run:
@@ -52,6 +56,9 @@ Keep the prompt direct:
 - What not to do.
 
 Do not describe exact verifier assertions.
+
+For Kubernetes prompts, do not use namespace names that reveal the issue; keep
+them consistent with the neutral names in the starting cluster.
 
 ## 6. Write the Verifier
 

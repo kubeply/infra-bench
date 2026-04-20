@@ -3,7 +3,7 @@ set -euo pipefail
 
 prepare-kubeconfig
 
-namespace="config-debug"
+namespace="orders-team"
 deployment="orders-api"
 
 kubectl -n "$namespace" patch deployment "$deployment" \

@@ -6,7 +6,7 @@ cluster.
 A Kubernetes cluster is already running and `kubectl` is configured through
 `KUBECONFIG`.
 
-One application pod in the `incident-debug` namespace is crash-looping because
+One application pod in the `payments-team` namespace is crash-looping because
 a Deployment environment variable has an invalid value. Use events, pod status,
 and logs to identify the failing workload and the value it expects.
 

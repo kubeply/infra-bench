@@ -1,19 +1,19 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: autoscale-debug
+  name: catalog-team
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: infra-bench-agent
-  namespace: autoscale-debug
+  namespace: catalog-team
 ---
 apiVersion: v1
 kind: Secret
 metadata:
   name: infra-bench-agent-token
-  namespace: autoscale-debug
+  namespace: catalog-team
   annotations:
     kubernetes.io/service-account.name: infra-bench-agent
 type: kubernetes.io/service-account-token
@@ -22,7 +22,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: infra-bench-agent
-  namespace: autoscale-debug
+  namespace: catalog-team
 rules:
   - apiGroups: [""]
     resources: ["configmaps", "events", "pods", "pods/log", "services"]
@@ -45,11 +45,11 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: infra-bench-agent
-  namespace: autoscale-debug
+  namespace: catalog-team
 subjects:
   - kind: ServiceAccount
     name: infra-bench-agent
-    namespace: autoscale-debug
+    namespace: catalog-team
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
@@ -59,7 +59,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: catalog-api
-  namespace: autoscale-debug
+  namespace: catalog-team
   labels:
     app: catalog-api
 spec:
@@ -90,7 +90,7 @@ apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: catalog-api
-  namespace: autoscale-debug
+  namespace: catalog-team
   labels:
     app: catalog-api
 spec:
@@ -112,7 +112,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: infra-bench-baseline
-  namespace: autoscale-debug
+  namespace: catalog-team
 data:
   deployment_uid: ""
   hpa_uid: ""
