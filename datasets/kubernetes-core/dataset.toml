@@ -111,6 +111,10 @@ digest = "sha256:23035e2bf05bd4c283e44544b368d4771b1bb0cf77bc7b3fc8e4f2786dad9b0
 name = "kubeply/recover-api-rollout-after-config-change"
 digest = "sha256:a5e2eb8955828edabdc722c4f42447904fee03a7ea27e0c60e187989f256c159"
 
+[[tasks]]
+name = "kubeply/schedule-reporting-api-on-labeled-node"
+digest = "sha256:ed4387d266f68bac86e26ecf23d67ef32c8cae13deeb180843015507a71efe6f"
+
 
 [[files]]
 path = "metric.py"
