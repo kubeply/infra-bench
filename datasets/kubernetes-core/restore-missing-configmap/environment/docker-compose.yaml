@@ -1,0 +1,46 @@
+services:
+  main:
+    depends_on:
+      bootstrap:
+        condition: service_completed_successfully
+    volumes:
+      - agent-kubeconfig:/kube:ro
+
+  k3s:
+    image: rancher/k3s:v1.30.6-k3s1
+    privileged: true
+    command:
+      - server
+      - --disable=traefik
+      - --disable=servicelb
+      - --write-kubeconfig=/admin-kube/admin-kubeconfig.yaml
+      - --write-kubeconfig-mode=666
+      - --tls-san=k3s
+    volumes:
+      - admin-kubeconfig:/admin-kube
+      - k3s-data:/var/lib/rancher/k3s
+    healthcheck:
+      test: ["CMD-SHELL", "kubectl get --raw=/readyz >/dev/null 2>&1"]
+      interval: 5s
+      timeout: 10s
+      retries: 30
+      start_period: 20s
+
+  bootstrap:
+    build:
+      context: .
+    depends_on:
+      k3s:
+        condition: service_healthy
+    environment:
+      KUBECONFIG: /admin-kube/admin-kubeconfig.yaml
+    volumes:
+      - agent-kubeconfig:/kube
+      - admin-kubeconfig:/admin-kube
+      - ./workspace/bootstrap:/bootstrap:ro
+    command: ["bootstrap-cluster"]
+
+volumes:
+  agent-kubeconfig:
+  admin-kubeconfig:
+  k3s-data:
