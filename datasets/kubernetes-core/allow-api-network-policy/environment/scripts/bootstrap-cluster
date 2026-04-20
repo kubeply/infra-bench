@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-namespace="policy-debug"
+namespace="retail-gateway"
 policy="allow-frontend-to-api"
 agent_secret="infra-bench-agent-token"
 

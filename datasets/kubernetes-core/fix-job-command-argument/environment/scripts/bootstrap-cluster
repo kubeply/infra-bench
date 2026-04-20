@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-namespace="batch-debug"
+namespace="catalog-ops"
 job="catalog-maintenance"
 runner_serviceaccount="maintenance-runner"
 script_configmap="maintenance-script"

@@ -3,7 +3,7 @@ set -euo pipefail
 
 prepare-kubeconfig
 
-namespace="readiness-debug"
+namespace="checkout-services"
 deployment="checkout-api"
 
 kubectl -n "$namespace" patch deployment "$deployment" \

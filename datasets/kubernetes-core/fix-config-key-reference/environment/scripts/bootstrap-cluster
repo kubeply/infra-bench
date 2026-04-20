@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-namespace="config-debug"
+namespace="orders-team"
 deployment="orders-api"
 configmap="orders-config"
 agent_secret="infra-bench-agent-token"

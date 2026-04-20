@@ -6,7 +6,7 @@ cluster.
 A Kubernetes cluster is already running and `kubectl` is configured through
 `KUBECONFIG`.
 
-The `readiness-debug` namespace contains a Deployment named `checkout-api`.
+The `checkout-services` namespace contains a Deployment named `checkout-api`.
 Its pods are running, but they never become Ready, so the Deployment rollout
 does not complete.
 

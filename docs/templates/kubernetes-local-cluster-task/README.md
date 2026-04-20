@@ -15,3 +15,7 @@ The template follows the two-image convention:
 Before copying this template into `datasets/kubernetes-core/<task-name>`,
 replace all `TODO_*` placeholders, generate a fresh canary, and run the
 validation workflow documented in `docs/task-rules/kubernetes.md`.
+
+Choose a neutral value for `TODO_NEUTRAL_NAMESPACE`. The namespace should look
+like a plausible tenant, team, or application namespace, and must not include
+the task slug, failure mode, intended fix, or coverage-area hint.

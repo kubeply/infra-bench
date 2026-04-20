@@ -3,7 +3,7 @@ set -euo pipefail
 
 prepare-kubeconfig
 
-namespace="incident-debug"
+namespace="payments-team"
 deployment="api-worker"
 
 kubectl -n "$namespace" set env deployment/"$deployment" APP_MODE=production

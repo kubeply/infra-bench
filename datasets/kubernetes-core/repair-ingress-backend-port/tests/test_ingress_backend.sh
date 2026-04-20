@@ -3,7 +3,7 @@ set -euo pipefail
 
 prepare-kubeconfig
 
-namespace="ingress-debug"
+namespace="support-team"
 deployment="storefront"
 service="storefront"
 ingress="storefront"

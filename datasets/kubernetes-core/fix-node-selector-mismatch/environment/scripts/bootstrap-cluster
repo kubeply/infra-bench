@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-namespace="scheduling-debug"
+namespace="inventory-team"
 deployment="inventory-worker"
 agent_secret="infra-bench-agent-token"
 

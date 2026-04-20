@@ -6,7 +6,7 @@ cluster.
 A Kubernetes cluster is already running and `kubectl` is configured through
 `KUBECONFIG`.
 
-The `glyph-cache` app in namespace `quirky-debug` is running, but its pods never
+The `glyph-cache` app in namespace `glyph-platform` is running, but its pods never
 become Ready. This unfamiliar app exposes a nonstandard health endpoint, while
 the Deployment readiness probe still checks a conventional path.
 

@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: readiness-debug
+  name: checkout-services
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: checkout-content
-  namespace: readiness-debug
+  namespace: checkout-services
 data:
   readyz: |
     ok
@@ -16,13 +16,13 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: infra-bench-agent
-  namespace: readiness-debug
+  namespace: checkout-services
 ---
 apiVersion: v1
 kind: Secret
 metadata:
   name: infra-bench-agent-token
-  namespace: readiness-debug
+  namespace: checkout-services
   annotations:
     kubernetes.io/service-account.name: infra-bench-agent
 type: kubernetes.io/service-account-token
@@ -31,7 +31,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: infra-bench-agent
-  namespace: readiness-debug
+  namespace: checkout-services
 rules:
   - apiGroups: [""]
     resources: ["configmaps", "events", "pods", "pods/log"]
@@ -51,11 +51,11 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: infra-bench-agent
-  namespace: readiness-debug
+  namespace: checkout-services
 subjects:
   - kind: ServiceAccount
     name: infra-bench-agent
-    namespace: readiness-debug
+    namespace: checkout-services
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
@@ -65,7 +65,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: checkout-api
-  namespace: readiness-debug
+  namespace: checkout-services
   labels:
     app: checkout-api
 spec:
@@ -105,6 +105,6 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: infra-bench-baseline
-  namespace: readiness-debug
+  namespace: checkout-services
 data:
   deployment_uid: ""

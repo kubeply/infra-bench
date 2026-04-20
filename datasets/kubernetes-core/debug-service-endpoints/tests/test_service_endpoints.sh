@@ -3,7 +3,7 @@ set -euo pipefail
 
 prepare-kubeconfig
 
-namespace="web-debug"
+namespace="web-platform"
 
 dump_debug() {
   echo "--- namespace ---"

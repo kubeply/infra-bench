@@ -3,7 +3,7 @@ set -euo pipefail
 
 prepare-kubeconfig
 
-namespace="autoscale-debug"
+namespace="catalog-team"
 hpa="catalog-api"
 
 kubectl -n "$namespace" patch hpa "$hpa" \

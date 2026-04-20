@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-namespace="maintenance-debug"
+namespace="warehouse-team"
 deployment="maintenance-worker"
 agent_secret="infra-bench-agent-token"
 

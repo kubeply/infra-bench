@@ -3,7 +3,7 @@ set -euo pipefail
 
 prepare-kubeconfig
 
-namespace="maintenance-debug"
+namespace="warehouse-team"
 deployment="maintenance-worker"
 
 kubectl -n "$namespace" patch deployment "$deployment" \

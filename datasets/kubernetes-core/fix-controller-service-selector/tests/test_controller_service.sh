@@ -3,7 +3,7 @@ set -euo pipefail
 
 prepare-kubeconfig
 
-namespace="controller-debug"
+namespace="metrics-team"
 deployment="metrics-adapter"
 service="metrics-adapter"
 

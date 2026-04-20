@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-namespace="upgrade-debug"
+namespace="edge-team"
 deployment="legacy-web"
 service="legacy-web"
 secret="legacy-web-tls"

@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: security-debug
+  name: billing-team
   labels:
     pod-security.kubernetes.io/enforce: restricted
     pod-security.kubernetes.io/enforce-version: latest
@@ -12,13 +12,13 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: infra-bench-agent
-  namespace: security-debug
+  namespace: billing-team
 ---
 apiVersion: v1
 kind: Secret
 metadata:
   name: infra-bench-agent-token
-  namespace: security-debug
+  namespace: billing-team
   annotations:
     kubernetes.io/service-account.name: infra-bench-agent
 type: kubernetes.io/service-account-token
@@ -26,7 +26,7 @@ type: kubernetes.io/service-account-token
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: infra-bench-namespace-reader-security-debug
+  name: infra-bench-namespace-reader-billing-team
 rules:
   - apiGroups: [""]
     resources: ["namespaces"]
@@ -35,21 +35,21 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: infra-bench-namespace-reader-security-debug
+  name: infra-bench-namespace-reader-billing-team
 subjects:
   - kind: ServiceAccount
     name: infra-bench-agent
-    namespace: security-debug
+    namespace: billing-team
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: infra-bench-namespace-reader-security-debug
+  name: infra-bench-namespace-reader-billing-team
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: infra-bench-agent
-  namespace: security-debug
+  namespace: billing-team
 rules:
   - apiGroups: [""]
     resources:
@@ -70,11 +70,11 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: infra-bench-agent
-  namespace: security-debug
+  namespace: billing-team
 subjects:
   - kind: ServiceAccount
     name: infra-bench-agent
-    namespace: security-debug
+    namespace: billing-team
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
@@ -84,7 +84,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: reporting
-  namespace: security-debug
+  namespace: billing-team
   labels:
     app: reporting
 spec:
@@ -134,7 +134,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: reporting
-  namespace: security-debug
+  namespace: billing-team
 spec:
   selector:
     app: reporting
@@ -147,7 +147,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: infra-bench-baseline
-  namespace: security-debug
+  namespace: billing-team
 data:
   deployment_uid: ""
   service_uid: ""

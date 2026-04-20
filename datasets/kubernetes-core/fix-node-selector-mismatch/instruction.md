@@ -6,7 +6,7 @@ cluster.
 A Kubernetes cluster is already running and `kubectl` is configured through
 `KUBECONFIG`.
 
-The `inventory-worker` Deployment in the `scheduling-debug` namespace cannot
+The `inventory-worker` Deployment in the `inventory-team` namespace cannot
 schedule its pods because its pod template selects a node label value that no
 node has.
 

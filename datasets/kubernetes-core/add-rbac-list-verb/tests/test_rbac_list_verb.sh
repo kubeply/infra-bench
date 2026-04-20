@@ -3,7 +3,7 @@ set -euo pipefail
 
 prepare-kubeconfig
 
-namespace="rbac-debug"
+namespace="audit-team"
 job="config-audit"
 target_role="diagnostic-config-reader"
 target_rolebinding="diagnostic-config-reader"
@@ -161,7 +161,7 @@ rolebinding_ref="$(
     -o jsonpath='{.subjects[*].kind}{"|"}{.subjects[*].name}{"|"}{.subjects[*].namespace}{"|"}{.roleRef.apiGroup}{"|"}{.roleRef.kind}{"|"}{.roleRef.name}'
 )"
 
-if [[ "$rolebinding_ref" != "ServiceAccount|diagnostic-runner|rbac-debug|rbac.authorization.k8s.io|Role|diagnostic-config-reader" ]]; then
+if [[ "$rolebinding_ref" != "ServiceAccount|diagnostic-runner|audit-team|rbac.authorization.k8s.io|Role|diagnostic-config-reader" ]]; then
   echo "RoleBinding $target_rolebinding no longer binds $target_role to $target_serviceaccount: $rolebinding_ref" >&2
   exit 1
 fi

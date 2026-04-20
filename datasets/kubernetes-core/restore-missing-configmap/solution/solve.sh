@@ -3,8 +3,8 @@ set -euo pipefail
 
 prepare-kubeconfig
 
-source_namespace="catalog-source"
-target_namespace="catalog-migrated"
+source_namespace="catalog-primary"
+target_namespace="catalog-secondary"
 configmap="app-config"
 
 app_mode="$(kubectl -n "$source_namespace" get configmap "$configmap" -o jsonpath='{.data.APP_MODE}')"

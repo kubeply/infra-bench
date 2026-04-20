@@ -6,7 +6,7 @@ cluster.
 A Kubernetes cluster is already running and `kubectl` is configured through
 `KUBECONFIG`.
 
-The `metrics-adapter` controller Deployment in the `controller-debug` namespace
+The `metrics-adapter` controller Deployment in the `metrics-team` namespace
 is running, but its `metrics-adapter` Service has no endpoints after a
 values-style label mismatch.
 

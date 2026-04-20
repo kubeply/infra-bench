@@ -3,7 +3,7 @@ set -euo pipefail
 
 prepare-kubeconfig
 
-namespace="quirky-debug"
+namespace="glyph-platform"
 deployment="glyph-cache"
 service="glyph-cache"
 

@@ -6,7 +6,7 @@ cluster.
 A Kubernetes cluster is already running and `kubectl` is configured through
 `KUBECONFIG`.
 
-The `search-index` custom resource in the `operator-debug` namespace is not
+The `search-index` custom resource in the `search-team` namespace is not
 reconciling because one spec field contains a value the installed controller
 does not accept.
 

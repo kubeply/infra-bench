@@ -3,7 +3,7 @@ set -euo pipefail
 
 prepare-kubeconfig
 
-namespace="controller-debug"
+namespace="metrics-team"
 service="metrics-adapter"
 
 kubectl -n "$namespace" patch service "$service" \

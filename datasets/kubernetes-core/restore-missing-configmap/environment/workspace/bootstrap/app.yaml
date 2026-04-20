@@ -1,24 +1,24 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: catalog-source
+  name: catalog-primary
 ---
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: catalog-migrated
+  name: catalog-secondary
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: infra-bench-agent
-  namespace: catalog-migrated
+  namespace: catalog-secondary
 ---
 apiVersion: v1
 kind: Secret
 metadata:
   name: infra-bench-agent-token
-  namespace: catalog-migrated
+  namespace: catalog-secondary
   annotations:
     kubernetes.io/service-account.name: infra-bench-agent
 type: kubernetes.io/service-account-token
@@ -27,7 +27,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: app-config
-  namespace: catalog-source
+  namespace: catalog-primary
 data:
   APP_MODE: migrated
   FEATURE_FLAG: search-v2
@@ -37,7 +37,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: source-config-reader
-  namespace: catalog-source
+  namespace: catalog-primary
 rules:
   - apiGroups: [""]
     resources: ["configmaps"]
@@ -47,11 +47,11 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: source-config-reader
-  namespace: catalog-source
+  namespace: catalog-primary
 subjects:
   - kind: ServiceAccount
     name: infra-bench-agent
-    namespace: catalog-migrated
+    namespace: catalog-secondary
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
@@ -61,7 +61,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: infra-bench-agent
-  namespace: catalog-migrated
+  namespace: catalog-secondary
 rules:
   - apiGroups: [""]
     resources:
@@ -81,11 +81,11 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: infra-bench-agent
-  namespace: catalog-migrated
+  namespace: catalog-secondary
 subjects:
   - kind: ServiceAccount
     name: infra-bench-agent
-    namespace: catalog-migrated
+    namespace: catalog-secondary
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
@@ -95,7 +95,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: catalog-web
-  namespace: catalog-migrated
+  namespace: catalog-secondary
   labels:
     app: catalog-web
 spec:
@@ -139,7 +139,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: catalog-web
-  namespace: catalog-migrated
+  namespace: catalog-secondary
 spec:
   selector:
     app: catalog-web
@@ -152,7 +152,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: infra-bench-baseline
-  namespace: catalog-migrated
+  namespace: catalog-secondary
 data:
   deployment_uid: ""
   service_uid: ""

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-namespace="security-debug"
+namespace="billing-team"
 deployment="reporting"
 service="reporting"
 agent_secret="infra-bench-agent-token"

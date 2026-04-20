@@ -3,7 +3,7 @@ set -euo pipefail
 
 prepare-kubeconfig
 
-namespace="dependency-debug"
+namespace="customer-portal"
 api="api"
 frontend="frontend"
 

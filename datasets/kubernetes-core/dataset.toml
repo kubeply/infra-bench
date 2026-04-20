@@ -13,91 +13,91 @@ email = "thomas@kubeply.com"
 
 [[tasks]]
 name = "kubeply/debug-service-endpoints"
-digest = "sha256:ad2522db0bc6e92192e36cd9d5e64e94040a25a79f45561e68e72e57aa7f91df"
+digest = "sha256:32f7f6c46e6c460fa1a012ab19ed73ebc3bc63f3cb8eb1f51888ff42d094db7d"
 
 [[tasks]]
 name = "kubeply/repair-readiness-probe-path"
-digest = "sha256:391b7bf3bf75fb5e524e2524286e032c8ccf2cf53b62ec08c1008a7decccc0dc"
+digest = "sha256:81dc634025c51ef948f420a222ba87124eb0838f95e82930287a6147f58e98f8"
 
 [[tasks]]
 name = "kubeply/fix-config-key-reference"
-digest = "sha256:e51141f46ae57aed0f23eb05e401814bf4c7518851443cd6aab69badf0a83716"
+digest = "sha256:17f5c2b8efd9099036dca3f2af0e64ae928d728481d6cb8e1df8d71148295eb8"
 
 [[tasks]]
 name = "kubeply/add-rbac-list-verb"
-digest = "sha256:11a6274a0f74837f28d7db6b0ef7f23bb5c569ea1df3499497ca65fdd612dbbc"
+digest = "sha256:ada54ce64fb45a8936e9878622c1d383879ddaf84147cb3906941698ece7f2f6"
 
 [[tasks]]
 name = "kubeply/fix-node-selector-mismatch"
-digest = "sha256:66acc2d2a504ccaa78c5390fb1ef635c0bc647457ff14959757fcc0c437d39cf"
+digest = "sha256:9f5102aa9da536bec2f00e3248ffaf2ee426724edb2e0217bb3ed0c9d8595063"
 
 [[tasks]]
 name = "kubeply/rightsize-cpu-request"
-digest = "sha256:2f9a76704667c75df2c60ec316464a59422eb70b19f4bc6413b6be819c8820f2"
+digest = "sha256:915a17b8ab98802fc3623f5ba50d95c8ccc6b3498f995c059cb161685522439d"
 
 [[tasks]]
 name = "kubeply/target-gpu-node-label"
-digest = "sha256:8e86b52bc36decf6505e783640c21eb53c620c489157667a0f391be77807b82a"
+digest = "sha256:ecce3384c16f848c6e6d7524dc3ba72b36a37a28fa134b8e786603a300c41908"
 
 [[tasks]]
 name = "kubeply/fix-pvc-mount-claim"
-digest = "sha256:eb0953b533f0358e6b6ee0b813f08dd13d16057fa4809fe69199dfebb60ae50f"
+digest = "sha256:4f85370ccb1872c50c6080e262ee05a2766c5ef695a36fbeda1b2471ede0ee23"
 
 [[tasks]]
 name = "kubeply/allow-api-network-policy"
-digest = "sha256:7d39d5d8a682743ef5e5546b29966fdab352f1c53d496c3119bdce97aab05b50"
+digest = "sha256:162cf4019676ad0fc6b8bf6eebe4db9e7fbbb69f354cd927b57e33c90a8a8e03"
 
 [[tasks]]
 name = "kubeply/reconnect-frontend-api"
-digest = "sha256:15194a10caf9a120f598b33218331aab85753356f979667cf3ed1a22652806fa"
+digest = "sha256:603f70744af5c5fb65da806d0683f1a7638f95fd042ae1c644eba531f1dc2690"
 
 [[tasks]]
 name = "kubeply/fix-restricted-security-context"
-digest = "sha256:9056620af630b79c28b367f991de19152631ff7ae862f68b42973d8b0ca6e33b"
+digest = "sha256:e3ad7489242e4ec2ccc4a65452a6e2849e049ae51e45ac2e7cdc2643447c0e00"
 
 [[tasks]]
 name = "kubeply/fix-crashloop-env-var"
-digest = "sha256:13bc3e0bb80c9ecfb5b8ad0d3006e759d616863e88f548e0748c8de3ab825314"
+digest = "sha256:e3d4d1b38f26ebb7aa4d370ea2d9834694243251671980bd38ab8e58e2029530"
 
 [[tasks]]
 name = "kubeply/fix-service-dns-name"
-digest = "sha256:2ee03fef01302bee66907a75a65069de512ed15cb1021f214f563de26fdcdf23"
+digest = "sha256:68c7e588d799561c87ef7e2802e8b0db87ca4389c2e68ad7f54cf698e76eaa51"
 
 [[tasks]]
 name = "kubeply/fix-job-command-argument"
-digest = "sha256:2ee0a8a720a05d5be84bed0e18d6515fcb7cbccd3093bc63401593f985f08d81"
+digest = "sha256:ab2854d99b05e7c4eff56d9ff13394230da47773b2390830486bfb3dc76c6df8"
 
 [[tasks]]
 name = "kubeply/fix-quirky-health-endpoint"
-digest = "sha256:8836a9785636ce9186481a46a149572dc2fad203812b2bd9788ae20282d7012f"
+digest = "sha256:6030032247f8048d1de89e6989fd70705d255118b017783a310629fa1403cb50"
 
 [[tasks]]
 name = "kubeply/repair-ingress-backend-port"
-digest = "sha256:c9f0632cc679a3e360a02d131e681080d96a927cc61a36281d3384959a14b666"
+digest = "sha256:91c45ead512ee7493dab27a590673d5a6f444bda8ed5da710b3eec4d9f044ac4"
 
 [[tasks]]
 name = "kubeply/fix-hpa-scale-target"
-digest = "sha256:812d077c3522c49c6a62668e19b39d2e215388af2457570721777b156fcc944c"
+digest = "sha256:eb5cf6d8042c96158e83662b67f8fffd8c23a5c3c7b3a49aaa7b766fb60059cf"
 
 [[tasks]]
 name = "kubeply/fix-controller-service-selector"
-digest = "sha256:4a407e8a45ebdf090eb4bfb7398d8fad5fea1c1d6e11842bed5e1074093bc9b4"
+digest = "sha256:870f5a9787a5d188a586991cf0a50e46198574b5f00f891379f3eb53a5c06d4b"
 
 [[tasks]]
 name = "kubeply/restore-missing-configmap"
-digest = "sha256:3604a02aa147f634c606962fb0cc63ebb311b4503c76bf37dcf19b1df1690616"
+digest = "sha256:e5fd8e4ad6bc8cb6a98b73f01e067902ef26a4c1bca81588a314ef5e4a940463"
 
 [[tasks]]
 name = "kubeply/replace-deprecated-ingress-api"
-digest = "sha256:772e872ac341a63db23ea3d90dbe6ddc0e39e3f2bc2c126a412e75f0846858fb"
+digest = "sha256:958701ea0808590caf07a5f54658925bf9608bfd5e123045f49b0a41052be1ad"
 
 [[tasks]]
 name = "kubeply/add-maintenance-toleration"
-digest = "sha256:b99f0e62f6004c4018d72e2dd94a93a26199ef89d2464694b7c4b5e0661034da"
+digest = "sha256:1cb5a36f7083451b81d9a75ce07478bbe8021d75e8a8e0aaf8bee0c2a274e744"
 
 [[tasks]]
 name = "kubeply/fix-simple-cr-field"
-digest = "sha256:ecc37de7bde7fe9be3e5c7fc79beafd08c9b0ead3d72e7ce84bea4e9f24c9292"
+digest = "sha256:c68947e1b4cedd1c6ef6f8f7e7f387b9b3e41445dd1f03e86b9fcb78f88e069a"
 
 
 [[files]]

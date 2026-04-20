@@ -3,7 +3,7 @@ set -euo pipefail
 
 prepare-kubeconfig
 
-namespace="gpu-debug"
+namespace="vision-services"
 deployment="vision-worker"
 
 dump_debug() {

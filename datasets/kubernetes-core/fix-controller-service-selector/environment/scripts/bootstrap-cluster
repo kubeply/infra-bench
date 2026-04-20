@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-namespace="controller-debug"
+namespace="metrics-team"
 deployment="metrics-adapter"
 service="metrics-adapter"
 agent_secret="infra-bench-agent-token"

@@ -11,6 +11,11 @@ Kubernetes is the first benchmark domain for `infra-bench`.
 - Include broken starting state in `environment/`, not in tests.
 - The verifier should check behavior or externally observable state, not just
   exact file diffs.
+- Use neutral Kubernetes namespace names in cluster state and prompts. Do not
+  name namespaces after the task slug, failure mode, intended fix, or coverage
+  area, such as `dns-debug`, `rbac-debug`, `readiness-debug`, or
+  `fix-selector`. Prefer plausible tenant, team, or application names that
+  help the agent orient without revealing the issue.
 - Avoid tasks that require privileged host access unless the dataset explicitly
   documents that environment class.
 
@@ -129,6 +134,8 @@ environment/
 A copyable skeleton lives in
 `docs/templates/kubernetes-local-cluster-task/`. Replace every `TODO_*`
 placeholder before moving it into `datasets/kubernetes-core/<task-name>`.
+Use `TODO_NEUTRAL_NAMESPACE` for a realistic namespace name that does not reveal
+the task category or bug.
 
 Use `bootstrap-cluster` to:
 

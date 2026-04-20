@@ -6,7 +6,7 @@ cluster.
 A Kubernetes cluster is already running and `kubectl` is configured through
 `KUBECONFIG`.
 
-The `report-api` Deployment in the `cpu-debug` namespace cannot schedule its
+The `report-api` Deployment in the `reporting-team` namespace cannot schedule its
 pods because the container CPU request is far larger than the available node
 capacity.
 

@@ -6,7 +6,7 @@ cluster.
 A Kubernetes cluster is already running and `kubectl` is configured through
 `KUBECONFIG`.
 
-The API workload in namespace `dependency-debug` is healthy, but the
+The API workload in namespace `customer-portal` is healthy, but the
 `frontend` Deployment cannot reach it because the frontend dependency URL
 points at the wrong Service name.
 

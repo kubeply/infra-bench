@@ -6,7 +6,7 @@ cluster.
 A Kubernetes cluster is already running and `kubectl` is configured through
 `KUBECONFIG`.
 
-The `vision-worker` Deployment in the `gpu-debug` namespace cannot schedule its
+The `vision-worker` Deployment in the `vision-services` namespace cannot schedule its
 pods because its simulated GPU node selector does not match the available
 accelerator node label.
 

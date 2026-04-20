@@ -3,7 +3,7 @@ set -euo pipefail
 
 prepare-kubeconfig
 
-namespace="incident-debug"
+namespace="payments-team"
 deployment="api-worker"
 service="api-worker"
 settings_configmap="api-worker-settings"

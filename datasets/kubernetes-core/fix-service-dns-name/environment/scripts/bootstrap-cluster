@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-client_namespace="dns-debug"
-backend_namespace="backend-services"
+client_namespace="checkout-team"
+backend_namespace="orders-team"
 client_deployment="checkout-client"
 backend_deployment="orders-api"
 backend_service="orders-api"
@@ -33,7 +33,7 @@ for _ in $(seq 1 120); do
   fi
 
   if ! kubectl -n "$client_namespace" exec "$client_pod" -- wget -qO- -T 2 http://orders-api.default.svc.cluster.local >/tmp/wrong-dns.out 2>/tmp/wrong-dns.err \
-    && kubectl -n "$client_namespace" exec "$client_pod" -- wget -qO- -T 2 http://orders-api.backend-services.svc.cluster.local >/tmp/correct-dns.out 2>/tmp/correct-dns.err; then
+    && kubectl -n "$client_namespace" exec "$client_pod" -- wget -qO- -T 2 http://orders-api.orders-team.svc.cluster.local >/tmp/correct-dns.out 2>/tmp/correct-dns.err; then
     break
   fi
 
@@ -52,7 +52,7 @@ if kubectl -n "$client_namespace" exec "$client_pod" -- wget -qO- -T 2 http://or
   exit 1
 fi
 
-if ! kubectl -n "$client_namespace" exec "$client_pod" -- wget -qO- -T 2 http://orders-api.backend-services.svc.cluster.local >/tmp/correct-dns.out 2>/tmp/correct-dns.err; then
+if ! kubectl -n "$client_namespace" exec "$client_pod" -- wget -qO- -T 2 http://orders-api.orders-team.svc.cluster.local >/tmp/correct-dns.out 2>/tmp/correct-dns.err; then
   echo "expected the correct backend Service DNS name to work before starting the task" >&2
   cat /tmp/correct-dns.err >&2 || true
   exit 1

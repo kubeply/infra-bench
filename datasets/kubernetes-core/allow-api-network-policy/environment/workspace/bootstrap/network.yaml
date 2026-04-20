@@ -1,19 +1,19 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: policy-debug
+  name: retail-gateway
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: infra-bench-agent
-  namespace: policy-debug
+  namespace: retail-gateway
 ---
 apiVersion: v1
 kind: Secret
 metadata:
   name: infra-bench-agent-token
-  namespace: policy-debug
+  namespace: retail-gateway
   annotations:
     kubernetes.io/service-account.name: infra-bench-agent
 type: kubernetes.io/service-account-token
@@ -22,7 +22,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: infra-bench-agent
-  namespace: policy-debug
+  namespace: retail-gateway
 rules:
   - apiGroups: [""]
     resources:
@@ -57,11 +57,11 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: infra-bench-agent
-  namespace: policy-debug
+  namespace: retail-gateway
 subjects:
   - kind: ServiceAccount
     name: infra-bench-agent
-    namespace: policy-debug
+    namespace: retail-gateway
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
@@ -71,7 +71,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: api
-  namespace: policy-debug
+  namespace: retail-gateway
   labels:
     app: api
     tier: backend
@@ -97,7 +97,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: api
-  namespace: policy-debug
+  namespace: retail-gateway
   labels:
     app: api
 spec:
@@ -112,7 +112,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: frontend
-  namespace: policy-debug
+  namespace: retail-gateway
   labels:
     app: frontend
     tier: frontend
@@ -136,7 +136,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: intruder
-  namespace: policy-debug
+  namespace: retail-gateway
   labels:
     app: intruder
     tier: other
@@ -160,7 +160,7 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: allow-frontend-to-api
-  namespace: policy-debug
+  namespace: retail-gateway
 spec:
   podSelector:
     matchLabels:
@@ -180,7 +180,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: infra-bench-baseline
-  namespace: policy-debug
+  namespace: retail-gateway
 data:
   policy_uid: ""
   service_uid: ""

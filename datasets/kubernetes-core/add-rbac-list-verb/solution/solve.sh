@@ -3,7 +3,7 @@ set -euo pipefail
 
 prepare-kubeconfig
 
-namespace="rbac-debug"
+namespace="audit-team"
 role="diagnostic-config-reader"
 job="config-audit"
 

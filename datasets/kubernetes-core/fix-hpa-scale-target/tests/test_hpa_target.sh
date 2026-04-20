@@ -3,7 +3,7 @@ set -euo pipefail
 
 prepare-kubeconfig
 
-namespace="autoscale-debug"
+namespace="catalog-team"
 deployment="catalog-api"
 hpa="catalog-api"
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-namespace="storage-debug"
+namespace="ledger-services"
 deployment="ledger-api"
 pvc="ledger-data"
 pv="infra-bench-ledger-data"

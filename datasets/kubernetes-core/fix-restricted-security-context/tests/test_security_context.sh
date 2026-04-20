@@ -3,7 +3,7 @@ set -euo pipefail
 
 prepare-kubeconfig
 
-namespace="security-debug"
+namespace="billing-team"
 deployment="reporting"
 service="reporting"
 

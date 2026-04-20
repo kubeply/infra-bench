@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: operator-debug
+  name: search-team
 ---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
@@ -42,13 +42,13 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: infra-bench-agent
-  namespace: operator-debug
+  namespace: search-team
 ---
 apiVersion: v1
 kind: Secret
 metadata:
   name: infra-bench-agent-token
-  namespace: operator-debug
+  namespace: search-team
   annotations:
     kubernetes.io/service-account.name: infra-bench-agent
 type: kubernetes.io/service-account-token
@@ -57,12 +57,12 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: widget-controller
-  namespace: operator-debug
+  namespace: search-team
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: infra-bench-crd-reader-operator-debug
+  name: infra-bench-crd-reader-search-team
 rules:
   - apiGroups: ["apiextensions.k8s.io"]
     resources: ["customresourcedefinitions"]
@@ -71,15 +71,15 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: infra-bench-crd-reader-operator-debug
+  name: infra-bench-crd-reader-search-team
 subjects:
   - kind: ServiceAccount
     name: infra-bench-agent
-    namespace: operator-debug
+    namespace: search-team
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: infra-bench-crd-reader-operator-debug
+  name: infra-bench-crd-reader-search-team
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -100,7 +100,7 @@ metadata:
 subjects:
   - kind: ServiceAccount
     name: widget-controller
-    namespace: operator-debug
+    namespace: search-team
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -110,7 +110,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: infra-bench-agent
-  namespace: operator-debug
+  namespace: search-team
 rules:
   - apiGroups: [""]
     resources: ["configmaps", "events", "pods", "pods/log", "services"]
@@ -133,11 +133,11 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: infra-bench-agent
-  namespace: operator-debug
+  namespace: search-team
 subjects:
   - kind: ServiceAccount
     name: infra-bench-agent
-    namespace: operator-debug
+    namespace: search-team
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
@@ -147,7 +147,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: widget-controller
-  namespace: operator-debug
+  namespace: search-team
   labels:
     app: widget-controller
 spec:
@@ -169,11 +169,11 @@ spec:
             - -c
             - |
               while true; do
-                mode="$(kubectl -n operator-debug get widget search-index -o jsonpath='{.spec.mode}' 2>/dev/null || true)"
+                mode="$(kubectl -n search-team get widget search-index -o jsonpath='{.spec.mode}' 2>/dev/null || true)"
                 if [ "$mode" = "active" ] || [ "$mode" = "passive" ]; then
-                  kubectl -n operator-debug patch widget search-index --subresource=status --type merge --patch '{"status":{"observedMode":"'"$mode"'","conditions":[{"type":"Ready","status":"True","reason":"Reconciled","message":"Widget mode is supported"}]}}' >/dev/null 2>&1 || true
+                  kubectl -n search-team patch widget search-index --subresource=status --type merge --patch '{"status":{"observedMode":"'"$mode"'","conditions":[{"type":"Ready","status":"True","reason":"Reconciled","message":"Widget mode is supported"}]}}' >/dev/null 2>&1 || true
                 elif [ -n "$mode" ]; then
-                  kubectl -n operator-debug patch widget search-index --subresource=status --type merge --patch '{"status":{"observedMode":"'"$mode"'","conditions":[{"type":"Ready","status":"False","reason":"InvalidMode","message":"Unsupported mode '"$mode"'; valid values are active or passive"}]}}' >/dev/null 2>&1 || true
+                  kubectl -n search-team patch widget search-index --subresource=status --type merge --patch '{"status":{"observedMode":"'"$mode"'","conditions":[{"type":"Ready","status":"False","reason":"InvalidMode","message":"Unsupported mode '"$mode"'; valid values are active or passive"}]}}' >/dev/null 2>&1 || true
                 fi
                 sleep 2
               done
@@ -182,7 +182,7 @@ apiVersion: platform.infra-bench.dev/v1alpha1
 kind: Widget
 metadata:
   name: search-index
-  namespace: operator-debug
+  namespace: search-team
   finalizers:
     - platform.infra-bench.dev/finalizer
 spec:
@@ -192,7 +192,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: infra-bench-baseline
-  namespace: operator-debug
+  namespace: search-team
 data:
   custom_resource_uid: ""
   crd_uid: ""

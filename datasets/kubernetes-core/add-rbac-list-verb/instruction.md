@@ -6,7 +6,7 @@ cluster.
 A Kubernetes cluster is already running and `kubectl` is configured through
 `KUBECONFIG`.
 
-The `config-audit` Job in the `rbac-debug` namespace is unable to complete
+The `config-audit` Job in the `audit-team` namespace is unable to complete
 because its ServiceAccount does not have the exact RBAC permission it needs to
 inspect ConfigMaps.
 

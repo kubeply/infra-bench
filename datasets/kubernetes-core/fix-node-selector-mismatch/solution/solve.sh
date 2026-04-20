@@ -3,7 +3,7 @@ set -euo pipefail
 
 prepare-kubeconfig
 
-namespace="scheduling-debug"
+namespace="inventory-team"
 deployment="inventory-worker"
 
 kubectl -n "$namespace" patch deployment "$deployment" \

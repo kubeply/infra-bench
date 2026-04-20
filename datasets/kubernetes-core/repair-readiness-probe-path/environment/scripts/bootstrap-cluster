@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-namespace="readiness-debug"
+namespace="checkout-services"
 deployment="checkout-api"
 agent_secret="infra-bench-agent-token"
 

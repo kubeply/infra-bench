@@ -3,7 +3,7 @@ set -euo pipefail
 
 prepare-kubeconfig
 
-namespace="batch-debug"
+namespace="catalog-ops"
 job="catalog-maintenance"
 
 kubectl -n "$namespace" delete job "$job" --wait=true
@@ -13,7 +13,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: catalog-maintenance
-  namespace: batch-debug
+  namespace: catalog-ops
   labels:
     app: catalog-maintenance
     job-type: maintenance

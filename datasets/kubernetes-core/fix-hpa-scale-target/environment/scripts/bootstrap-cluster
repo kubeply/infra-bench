@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-namespace="autoscale-debug"
+namespace="catalog-team"
 deployment="catalog-api"
 hpa="catalog-api"
 agent_secret="infra-bench-agent-token"
