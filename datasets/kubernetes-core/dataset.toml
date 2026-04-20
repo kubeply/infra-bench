@@ -39,6 +39,10 @@ digest = "sha256:237a22bbd6af5a96505184fb6e05ed4be140c6809df2e43e9ae82fd380dd9f7
 name = "kubeply/target-gpu-node-label"
 digest = "sha256:ca253e6343a95cfad49a896382107ef32a3c9010fc053002da0355524479612c"
 
+[[tasks]]
+name = "kubeply/fix-pvc-mount-claim"
+digest = "sha256:a762cbddbefd86f346b3a080f0904fc608a903a445b63a490cd3fd78e425d1d9"
+
 
 [[files]]
 path = "metric.py"
