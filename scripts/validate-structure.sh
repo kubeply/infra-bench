@@ -19,6 +19,16 @@ while IFS= read -r task_toml; do
 
   [[ -f "$task_dir/instruction.md" ]] || fail "$task_dir missing instruction.md"
   [[ -d "$task_dir/environment" ]] || fail "$task_dir missing environment/"
+  if [[ -f "$task_dir/environment/scripts/bootstrap-cluster" ]]; then
+    [[ -f "$task_dir/environment/Dockerfile" ]] || fail "$task_dir missing environment/Dockerfile"
+    [[ -f "$task_dir/environment/Dockerfile.bootstrap" ]] || fail "$task_dir missing environment/Dockerfile.bootstrap"
+    [[ -f "$task_dir/environment/docker-compose.yaml" ]] || fail "$task_dir missing environment/docker-compose.yaml"
+    if grep -q 'bootstrap-cluster' "$task_dir/environment/Dockerfile"; then
+      fail "$task_dir agent Dockerfile must not copy bootstrap-cluster"
+    fi
+    grep -q 'Dockerfile.bootstrap' "$task_dir/environment/docker-compose.yaml" \
+      || fail "$task_dir bootstrap service must build from Dockerfile.bootstrap"
+  fi
   [[ -f "$task_dir/solution/solve.sh" ]] || fail "$task_dir missing solution/solve.sh"
   [[ -x "$task_dir/solution/solve.sh" ]] || fail "$task_dir solution/solve.sh is not executable"
   [[ -f "$task_dir/tests/test.sh" ]] || fail "$task_dir missing tests/test.sh"

@@ -94,6 +94,7 @@ For Kubernetes tasks that use a local cluster, prefer this structure:
 ```text
 environment/
 |-- Dockerfile
+|-- Dockerfile.bootstrap
 |-- docker-compose.yaml
 |-- scripts/
 |   |-- bootstrap-cluster
@@ -111,8 +112,16 @@ Use `bootstrap-cluster` to:
   and Service UIDs. If those facts are stored in Kubernetes resources, the agent
   must not be able to mutate those resources.
 
-Use `prepare-kubeconfig` from the agent, solution, and verifier when the
-cluster writes a kubeconfig with container-local addresses. Keep that helper
+Use separate task-local images for local-cluster work:
+
+- `environment/Dockerfile` is the agent, solution, and verifier runtime. It
+  should include `kubectl`, `prepare-kubeconfig`, and only files intentionally
+  exposed to the agent.
+- `environment/Dockerfile.bootstrap` is the bootstrap runtime. It may include
+  `bootstrap-cluster` and any setup-only helpers needed to prepare the cluster.
+
+Use `prepare-kubeconfig` from the agent, solution, verifier, and bootstrap when
+the cluster writes a kubeconfig with container-local addresses. Keep that helper
 small and task-local until multiple Kubernetes tasks prove a shared helper is
 worth maintaining.
 
@@ -128,8 +137,11 @@ authority.
   needed for the intended fix.
 - Do not let the agent update verifier-trusted baseline objects, such as
   ConfigMaps that store original resource UIDs.
+- Do not copy `bootstrap-cluster` into the agent runtime image. The bootstrap
+  service should build from `Dockerfile.bootstrap` or otherwise receive
+  bootstrap-only code outside the agent container.
 
-Do not copy answer-bearing bootstrap assets into `/app`. If
+Do not copy answer-bearing bootstrap assets into `/app` or the agent image. If
 `environment/workspace/bootstrap/*.yaml` reveals the broken field or intended
 fix, mount it only into the bootstrap service, for example at `/bootstrap:ro`.
 The agent workspace should contain only files the task intentionally exposes.

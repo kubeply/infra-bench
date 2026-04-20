@@ -56,6 +56,12 @@ Include these fields:
 - Required metadata, including `canary`
 - Validation commands
 
+For Kubernetes `local_cluster` task designs, specify the two-image environment
+shape: `environment/Dockerfile` for the agent, solution, and verifier runtime,
+and `environment/Dockerfile.bootstrap` for bootstrap-only setup code and
+fixtures. Bootstrap manifests and scripts must not be present in the agent
+image unless they are intentionally part of the task.
+
 ## Canary Requirement
 
 Every published task must include the same canary string in two places:

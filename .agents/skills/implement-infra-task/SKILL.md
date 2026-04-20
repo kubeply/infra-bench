@@ -88,8 +88,9 @@ Before editing files, restate the contract in a short plan:
      verification.
    - Keep task-specific bootstrap and verifier logic task-local unless several
      implemented tasks prove shared code is worth adding.
-   - For live-cluster tasks, do not copy bootstrap manifests that reveal the
-     answer into `/app`; mount them only into the bootstrap service.
+   - For live-cluster tasks, do not copy bootstrap scripts or bootstrap
+     manifests that reveal the answer into the agent image or `/app`; keep them
+     in the bootstrap image and bootstrap-only mounts.
 
 5. Write `instruction.md`.
    - State the working directory.
@@ -128,6 +129,9 @@ Local-cluster tasks should use separate cluster credentials:
   the intended fix.
 - Do not let the agent mutate verifier-trusted baseline data, such as a
   ConfigMap that stores original resource UIDs.
+- Use separate task-local images: `environment/Dockerfile` for the agent,
+  solution, and verifier runtime, and `environment/Dockerfile.bootstrap` for the
+  bootstrap service. Do not copy `bootstrap-cluster` into the agent image.
 
 The verifier should usually check:
 
@@ -148,6 +152,7 @@ Use the smallest local-cluster structure that fits the task:
 ```text
 environment/
 |-- Dockerfile
+|-- Dockerfile.bootstrap
 |-- docker-compose.yaml
 |-- scripts/
 |   |-- bootstrap-cluster
@@ -164,7 +169,7 @@ Run a bypass review before final validation:
 - Can the agent mutate verifier baseline data?
 - Can the agent delete and recreate the target resource and still pass?
 - Can the agent create alternate workloads, Services, or standalone Pods?
-- Can the agent read bootstrap assets that reveal the answer?
+- Can the agent read bootstrap scripts or assets that reveal the answer?
 - Does the verifier check ownership relationships, not just counts?
 
 For current k3s sidecar tasks, keep `allow_internet = true` unless an oracle run

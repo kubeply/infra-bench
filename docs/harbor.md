@@ -140,6 +140,13 @@ container to reach the cluster API. When using that exception, keep external
 dependencies out of the task and rely on restricted cluster credentials to
 reduce the shortcut surface.
 
+Docker Compose local-cluster tasks should use separate images for the agent
+runtime and bootstrap runtime. The default `environment/Dockerfile` is the
+agent, solution, and verifier image and must not include `bootstrap-cluster` or
+answer-bearing setup assets. Bootstrap services should build from a
+bootstrap-specific Dockerfile, such as `environment/Dockerfile.bootstrap`, and
+may mount `environment/workspace/bootstrap` read-only.
+
 Healthchecks are optional and should be used only when the task environment
 starts a service that must become ready before the agent begins:
 

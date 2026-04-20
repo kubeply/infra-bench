@@ -25,7 +25,10 @@ Document the class in `task.toml` metadata.
 Place all starting files under `environment/`. The agent should only need files
 available in the runtime environment.
 
-For Docker environments, the Dockerfile should copy starting assets into `/app`.
+For Docker environments, the agent `Dockerfile` should copy only the files the
+agent is meant to see into `/app`. For local-cluster Kubernetes tasks, keep
+bootstrap-only assets and scripts out of the agent image; expose them through a
+separate bootstrap image or bootstrap-only mounts.
 
 ## 4. Generate the Canary
 

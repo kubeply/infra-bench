@@ -29,6 +29,7 @@ services:
   bootstrap:
     build:
       context: .
+      dockerfile: Dockerfile.bootstrap
     depends_on:
       k3s:
         condition: service_healthy
