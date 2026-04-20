@@ -99,6 +99,10 @@ digest = "sha256:b99f0e62f6004c4018d72e2dd94a93a26199ef89d2464694b7c4b5e0661034d
 name = "kubeply/fix-simple-cr-field"
 digest = "sha256:ecc37de7bde7fe9be3e5c7fc79beafd08c9b0ead3d72e7ce84bea4e9f24c9292"
 
+[[tasks]]
+name = "kubeply/trace-service-route-regression"
+digest = "sha256:044879a085cfffac3be3354912a2623370c61fe76336bad9490c3acb6615c5ea"
+
 
 [[files]]
 path = "metric.py"
