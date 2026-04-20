@@ -52,6 +52,10 @@ name = "kubeply/reconnect-frontend-api"
 digest = "sha256:bde1664bd450e1a6d0d45a8cbe5adad95edcc83cb0eed2f019fa82ad172cf72e"
 
 [[tasks]]
+name = "kubeply/fix-restricted-security-context"
+digest = "sha256:13914fc4b5b30c6ef28c638e4c481ad51a1e5fdef6de74e0a580d37d297f79cb"
+
+[[tasks]]
 name = "kubeply/fix-crashloop-env-var"
 digest = "sha256:5b2887f95238c71976bf6338061a34bfeccc869068797b155eaead0103da86b1"
 
