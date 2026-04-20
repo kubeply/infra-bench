@@ -51,6 +51,42 @@ digest = "sha256:0a8c0875f58c061263bbb32f387975fdb5c833e8a0ccfd61b491599af60275d
 name = "kubeply/fix-service-dns-name"
 digest = "sha256:aaf92abb9ada41bdeec33e6eab818c9e1687c4a5c0ab94b25e925804db82217d"
 
+[[tasks]]
+name = "kubeply/fix-job-command-argument"
+digest = "sha256:149dad0eaa76c83b0cec0a1132b02cf7d0ddd11802c0a02c22a6ceae2390c951"
+
+[[tasks]]
+name = "kubeply/fix-quirky-health-endpoint"
+digest = "sha256:1ed90424cd5cf1617143751d0a5ac61c46a5259ad671de914bd7376566de9f03"
+
+[[tasks]]
+name = "kubeply/repair-ingress-backend-port"
+digest = "sha256:f45c4a1b163fa9881cec804fefc5777b897792ebdf8734192cc0107c48b0e3dc"
+
+[[tasks]]
+name = "kubeply/fix-hpa-scale-target"
+digest = "sha256:698753cb65f257973e556bceb8047739be5d97d5f73bd6f9bf30cc753e60b8ea"
+
+[[tasks]]
+name = "kubeply/fix-controller-service-selector"
+digest = "sha256:6472791efe142f0f0fb5fe7ac1a1f06e2ba93b099088d75874b2ae1fe930b84d"
+
+[[tasks]]
+name = "kubeply/restore-missing-configmap"
+digest = "sha256:be2ea9a81c43f8ac2779e89f0340fa5a30a5c4ba416e193ae7dd7cbbf9a57319"
+
+[[tasks]]
+name = "kubeply/replace-deprecated-ingress-api"
+digest = "sha256:f4acd1b055e07ecdddd0b66f8d44ae463be1d0850444d4ac8bdc2cab4107f85e"
+
+[[tasks]]
+name = "kubeply/add-maintenance-toleration"
+digest = "sha256:bf5e9942ce0a4b542c5f395694762b5de044edc3e1790ef8483f0886135f24e5"
+
+[[tasks]]
+name = "kubeply/fix-simple-cr-field"
+digest = "sha256:9516144bdfcbb532be0397be196cde7bd6dfe9e220c88912ee5500d06975780e"
+
 
 [[files]]
 path = "metric.py"
