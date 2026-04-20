@@ -10,7 +10,7 @@ Customers are seeing the storefront fail when it tries to load catalog data.
 Several other services are running in the same namespace and are healthy; do
 not assume every service you see is part of the incident.
 
-Use `kubectl` to inspect the `route-regression` namespace and bring the
+Use `kubectl` to inspect the `retail-platform` namespace and bring the
 storefront back to a healthy state.
 
 Constraints:

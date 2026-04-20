@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-namespace="route-regression"
+namespace="retail-platform"
 agent_secret="infra-bench-agent-token"
 
 prepare-kubeconfig

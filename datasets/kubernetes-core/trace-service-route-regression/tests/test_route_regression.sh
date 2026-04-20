@@ -3,7 +3,7 @@ set -euo pipefail
 
 prepare-kubeconfig
 
-namespace="route-regression"
+namespace="retail-platform"
 
 deployments=(catalog-api docs inventory-api metrics storefront)
 services=(docs inventory-api metrics storefront storefront-api)

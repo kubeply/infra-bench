@@ -3,7 +3,7 @@ set -euo pipefail
 
 prepare-kubeconfig
 
-namespace="route-regression"
+namespace="retail-platform"
 
 kubectl -n "$namespace" patch service storefront-api \
   --type merge \
