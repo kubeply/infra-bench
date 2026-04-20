@@ -9,6 +9,25 @@ fail() {
   exit 1
 }
 
+service_block() {
+  local compose_file="$1"
+  local service="$2"
+
+  awk -v service="$service" '
+    $0 ~ "^  " service ":$" {
+      in_service = 1
+      print
+      next
+    }
+    in_service && $0 ~ /^  [[:alnum:]_-]+:$/ {
+      exit
+    }
+    in_service {
+      print
+    }
+  ' "$compose_file"
+}
+
 [[ -f LICENSE ]] || fail "missing LICENSE"
 [[ -f AGENTS.md ]] || fail "missing AGENTS.md"
 [[ -d docs ]] || fail "missing docs/"
@@ -26,8 +45,30 @@ while IFS= read -r task_toml; do
     if grep -q 'bootstrap-cluster' "$task_dir/environment/Dockerfile"; then
       fail "$task_dir agent Dockerfile must not copy bootstrap-cluster"
     fi
+    if grep -Eq 'COPY[[:space:]]+scripts/[[:space:]]' "$task_dir/environment/Dockerfile"; then
+      fail "$task_dir agent Dockerfile must copy only scripts/prepare-kubeconfig"
+    fi
+    if grep -Eq 'COPY[[:space:]]+.*workspace/bootstrap|ADD[[:space:]]+.*workspace/bootstrap' "$task_dir/environment/Dockerfile"; then
+      fail "$task_dir agent Dockerfile must not copy workspace/bootstrap"
+    fi
+    grep -q 'bootstrap-cluster' "$task_dir/environment/Dockerfile.bootstrap" \
+      || fail "$task_dir bootstrap Dockerfile must include bootstrap-cluster"
     grep -q 'Dockerfile.bootstrap' "$task_dir/environment/docker-compose.yaml" \
       || fail "$task_dir bootstrap service must build from Dockerfile.bootstrap"
+
+    main_block="$(service_block "$task_dir/environment/docker-compose.yaml" main)"
+    bootstrap_block="$(service_block "$task_dir/environment/docker-compose.yaml" bootstrap)"
+
+    grep -q 'agent-kubeconfig:/kube:ro' <<<"$main_block" \
+      || fail "$task_dir main service must mount agent kubeconfig read-only"
+    if grep -q 'admin-kubeconfig:/admin-kube' <<<"$main_block"; then
+      fail "$task_dir main service must not mount admin kubeconfig"
+    fi
+    if grep -q './workspace/bootstrap' <<<"$main_block"; then
+      fail "$task_dir main service must not mount workspace/bootstrap"
+    fi
+    grep -q './workspace/bootstrap:/bootstrap:ro' <<<"$bootstrap_block" \
+      || fail "$task_dir bootstrap service must mount workspace/bootstrap read-only"
   fi
   [[ -f "$task_dir/solution/solve.sh" ]] || fail "$task_dir missing solution/solve.sh"
   [[ -x "$task_dir/solution/solve.sh" ]] || fail "$task_dir solution/solve.sh is not executable"

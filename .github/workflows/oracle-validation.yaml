@@ -1,0 +1,30 @@
+---
+name: oracle-validation
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 2 * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: oracle-validation-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  kubernetes-core-oracle:
+    runs-on:
+      group: kubeply-low-latency
+      labels: kubeply-arm64-low-latency
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+        with:
+          # renovate: datasource=pypi depName=uv
+          version: 0.11.7
+
+      - name: Run Kubernetes Core oracle sweep
+        run: uvx --from harbor harbor run -p datasets/kubernetes-core -a oracle

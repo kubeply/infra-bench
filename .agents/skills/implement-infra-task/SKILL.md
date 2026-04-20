@@ -28,9 +28,10 @@ question before editing files.
    - `docs/task-rules/<domain>.md`
 3. Inspect existing tasks in `datasets/<dataset-name>/`, especially tasks with
    the same difficulty or environment class.
-4. For Kubernetes Core v1 easy tasks, inspect
-   `datasets/kubernetes-core/debug-service-endpoints` as the current local
-   cluster reference pattern.
+4. For Kubernetes Core live-cluster tasks, inspect
+   `docs/templates/kubernetes-local-cluster-task/` and
+   `datasets/kubernetes-core/debug-service-endpoints` as the current two-image
+   local-cluster reference pattern.
 
 Derive `<domain>` from the dataset name:
 
@@ -114,11 +115,19 @@ Before editing files, restate the contract in a short plan:
 9. Update the GitHub issue or PR with the actual validation results. Do not
    mark the issue complete until oracle validation passes.
 
-## Kubernetes Core v1 Easy Rules
+## Kubernetes Core v1 Rules
 
 For easy Kubernetes tasks, prefer `local_cluster` unless the issue explicitly
 requires otherwise. The task should prove a live `kubectl` diagnosis of one
 clear broken relationship.
+
+For medium Kubernetes tasks, preserve the same local-cluster isolation pattern
+and raise complexity through diagnosis, not hidden answers. A medium task should
+usually require correlating at least two related Kubernetes concepts, such as a
+workload plus Service, ConfigMap, Secret, RBAC, NetworkPolicy, storage, Job, or
+controller-generated resource. Keep the intended outcome bounded to one operator
+goal, and document which shortcut fixes the verifier rejects before tuning the
+oracle solution.
 
 Local-cluster tasks should use separate cluster credentials:
 
@@ -198,6 +207,7 @@ bash -n datasets/<dataset-name>/<task-name>/environment/scripts/*
 bash -n datasets/<dataset-name>/<task-name>/tests/*.sh
 bash -n datasets/<dataset-name>/<task-name>/solution/solve.sh
 ./scripts/validate-structure.sh
+python3 scripts/lint-kubernetes-rbac.py
 uvx --from harbor harbor sync datasets/<dataset-name>
 uvx --from harbor harbor run -p datasets/<dataset-name>/<task-name> -a oracle
 ```

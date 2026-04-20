@@ -62,6 +62,13 @@ and `environment/Dockerfile.bootstrap` for bootstrap-only setup code and
 fixtures. Bootstrap manifests and scripts must not be present in the agent
 image unless they are intentionally part of the task.
 
+For Kubernetes medium task designs, require a bounded diagnosis across at least
+two related Kubernetes concepts, such as workload plus Service, ConfigMap,
+Secret, RBAC, NetworkPolicy, storage, Job, or controller-generated state. Keep
+the outcome focused on one operator goal and identify the shortcut fixes the
+verifier must reject. Use `docs/templates/kubernetes-local-cluster-task/` as the
+starting environment shape for live-cluster medium and hard tasks.
+
 ## Canary Requirement
 
 Every published task must include the same canary string in two places:
@@ -83,6 +90,7 @@ For a designed task, list the checks that must pass once implemented:
 
 ```bash
 ./scripts/validate-structure.sh
+python3 scripts/lint-kubernetes-rbac.py
 uvx --from harbor harbor sync datasets/<dataset-name>
 uvx --from harbor harbor run -p datasets/<dataset-name>/<task-name> -a oracle
 ```

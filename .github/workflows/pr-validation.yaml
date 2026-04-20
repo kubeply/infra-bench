@@ -87,8 +87,19 @@ jobs:
       - name: Validate file formatting and lint
         run: ./scripts/lint-files.sh
 
+      - name: Validate task shell syntax
+        run: |
+          set -euo pipefail
+          bash -n scripts/validate-structure.sh \
+            datasets/kubernetes-core/*/environment/scripts/* \
+            datasets/kubernetes-core/*/tests/*.sh \
+            datasets/kubernetes-core/*/solution/solve.sh
+
       - name: Validate repository structure
         run: ./scripts/validate-structure.sh
+
+      - name: Lint Kubernetes agent RBAC
+        run: python3 scripts/lint-kubernetes-rbac.py
 
       - name: Verify dataset manifests are synchronized
         run: |
@@ -96,4 +107,4 @@ jobs:
           uvx --from harbor harbor sync datasets/kubernetes-core
           uvx --from harbor harbor sync datasets/terraform-core
           bunx "@taplo/cli@${TAPLO_VERSION}" fmt "**/*.toml" "!jobs/**"
-          git diff --exit-code -- datasets
+          git diff --exit-code
