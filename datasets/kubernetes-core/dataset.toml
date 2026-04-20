@@ -35,6 +35,10 @@ digest = "sha256:72feffcbad96c9f0a2855d0e6dd35281f1455941b5ccdc582af7cc8b9a2bbb8
 name = "kubeply/rightsize-cpu-request"
 digest = "sha256:237a22bbd6af5a96505184fb6e05ed4be140c6809df2e43e9ae82fd380dd9f7d"
 
+[[tasks]]
+name = "kubeply/target-gpu-node-label"
+digest = "sha256:ca253e6343a95cfad49a896382107ef32a3c9010fc053002da0355524479612c"
+
 
 [[files]]
 path = "metric.py"
