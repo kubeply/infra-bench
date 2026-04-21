@@ -139,6 +139,9 @@ digest = "sha256:aa1955d20ac559b0322a950224be829589aaa0e2bef0f024af334b1ddda4366
 name = "kubeply/place-inference-canary-on-gpu-node"
 digest = "sha256:fde9620cd2163caa604319e8c201364e1ba5e8bca28a3a2cfd9aa3cfa839285c"
 
+[[tasks]]
+name = "kubeply/recover-nightly-report-cronjob"
+digest = "sha256:6b9933550307157c0a90fe326c472494d9aa6aafc99519037cccc577168ceb27"
 
 [[files]]
 path = "metric.py"
