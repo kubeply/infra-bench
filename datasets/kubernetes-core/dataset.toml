@@ -123,6 +123,10 @@ digest = "sha256:23d08f4bae84323d6440087983475c28a90bb794151035f28249cd50d5c155b
 name = "kubeply/restore-worker-config-access"
 digest = "sha256:cd780ecabe049ad97e65dbd4ae86434cca355f7c0756866d41bafda4017bebf2"
 
+[[tasks]]
+name = "kubeply/place-inference-canary-on-gpu-node"
+digest = "sha256:fde9620cd2163caa604319e8c201364e1ba5e8bca28a3a2cfd9aa3cfa839285c"
+
 
 [[files]]
 path = "metric.py"
