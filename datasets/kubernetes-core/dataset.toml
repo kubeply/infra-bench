@@ -127,6 +127,34 @@ digest = "sha256:cd780ecabe049ad97e65dbd4ae86434cca355f7c0756866d41bafda4017bebf
 name = "kubeply/prepare-node-drain-with-pdb"
 digest = "sha256:bb7a07635c0f0ba2d4b6ab822d936e44ab460080827e87e0985a6d99e74f8293"
 
+[[tasks]]
+name = "kubeply/repair-worker-hpa-scaling-inputs"
+digest = "sha256:36ad98fd586a1d640504c3da020800987d65db8b434c86038b6ab00816f8b201"
+
+[[tasks]]
+name = "kubeply/repair-cross-namespace-service-discovery"
+digest = "sha256:0735beab1c2974d7556efa17d135056f1be4f36ae5559751313d889f42679289"
+
+[[tasks]]
+name = "kubeply/repair-cache-volume-binding"
+digest = "sha256:2f8e4588de540b6576eaabddda6d3d4052bb6add3502f2e499fb0da3a35f71dd"
+
+[[tasks]]
+name = "kubeply/restore-checkout-network-path"
+digest = "sha256:16483bfceefab0046f52ad350bc69368ebdd85259f05c94652d9911fa8d78775"
+
+[[tasks]]
+name = "kubeply/restore-portal-ingress-tls-route"
+digest = "sha256:04214ec40c38fbcc77c6fc0a29d45bff277ab3fc18b272fb0f342878c4ff81c5"
+
+[[tasks]]
+name = "kubeply/clear-upgrade-blocking-apis"
+digest = "sha256:aa1955d20ac559b0322a950224be829589aaa0e2bef0f024af334b1ddda43664"
+
+[[tasks]]
+name = "kubeply/place-inference-canary-on-gpu-node"
+digest = "sha256:fde9620cd2163caa604319e8c201364e1ba5e8bca28a3a2cfd9aa3cfa839285c"
+
 
 [[files]]
 path = "metric.py"
