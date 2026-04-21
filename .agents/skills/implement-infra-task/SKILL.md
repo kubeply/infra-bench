@@ -98,12 +98,18 @@ Before editing files, restate the contract in a short plan:
    - State the live outcome the operator must achieve.
    - State constraints and out-of-scope changes.
    - Do not reveal exact verifier assertions.
+   - For medium and hard tasks, keep the incident report symptom-only. Do not
+     name the root cause, Kubernetes primitive, useful evidence source, or
+     healthy distractor services unless the issue explicitly requires it.
 
 6. Write the verifier before tuning the oracle.
    - Verify behavior or semantic state, not formatting.
    - Write `/logs/verifier/reward.txt` or `/logs/verifier/reward.json`.
    - Dump useful debug output under `/logs/verifier` on failure.
    - Reject shortcut fixes described in the issue or implementation contract.
+   - Ensure verifier commands only require credentials available to the
+     verifier. Avoid impersonation, cluster-scope reads, or `auth can-i --as`
+     checks unless the task explicitly grants that authority.
 
 7. Write `solution/solve.sh`.
    - Keep it deterministic and boring.
@@ -128,6 +134,17 @@ workload plus Service, ConfigMap, Secret, RBAC, NetworkPolicy, storage, Job, or
 controller-generated resource. Keep the intended outcome bounded to one operator
 goal, and document which shortcut fixes the verifier rejects before tuning the
 oracle solution.
+
+Before finalizing a medium prompt, run this prompt-leak review:
+
+- Is the visible issue one short user-facing symptom?
+- Does the prompt avoid naming the root cause, subsystem, exact Kubernetes
+  concept, useful command output, or known failing field?
+- Does it avoid naming healthy or unrelated resources as distractors?
+- Does the namespace look neutral rather than like the task slug or fix?
+- Do constraints state policy without revealing the exact resource or field to
+  edit?
+- Does the verifier still enforce the hidden relationships and bypass checks?
 
 Local-cluster tasks should use separate cluster credentials:
 
@@ -180,6 +197,9 @@ Run a bypass review before final validation:
 - Can the agent create alternate workloads, Services, or standalone Pods?
 - Can the agent read bootstrap scripts or assets that reveal the answer?
 - Does the verifier check ownership relationships, not just counts?
+- Does the verifier reject broad "make it pass" shortcuts, such as disabling a
+  policy, granting cluster-admin, scaling to zero, or replacing the target
+  resource with a lookalike?
 
 For current k3s sidecar tasks, keep `allow_internet = true` unless an oracle run
 proves the agent can still reach the cluster with it disabled. This is a Harbor
@@ -211,6 +231,10 @@ python3 scripts/lint-kubernetes-rbac.py
 uvx --from harbor harbor sync datasets/<dataset-name>
 uvx --from harbor harbor run -p datasets/<dataset-name>/<task-name> -a oracle
 ```
+
+After Harbor sync, inspect the dataset manifest diff and keep only intended
+digest or metadata changes. Do not include unrelated TOML formatting churn in a
+task PR.
 
 For live Kubernetes tasks, run at least one real-agent trial before publishing
 when feasible:
