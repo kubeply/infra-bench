@@ -127,6 +127,26 @@ digest = "sha256:cd780ecabe049ad97e65dbd4ae86434cca355f7c0756866d41bafda4017bebf
 name = "kubeply/repair-cross-namespace-service-discovery"
 digest = "sha256:dc0e64aab08531aab913b5c7666efebcdc01de4b6e41245a43c38d2bf138c2ae"
 
+[[tasks]]
+name = "kubeply/repair-cache-volume-binding"
+digest = "sha256:2f8e4588de540b6576eaabddda6d3d4052bb6add3502f2e499fb0da3a35f71dd"
+
+[[tasks]]
+name = "kubeply/restore-checkout-network-path"
+digest = "sha256:16483bfceefab0046f52ad350bc69368ebdd85259f05c94652d9911fa8d78775"
+
+[[tasks]]
+name = "kubeply/restore-portal-ingress-tls-route"
+digest = "sha256:04214ec40c38fbcc77c6fc0a29d45bff277ab3fc18b272fb0f342878c4ff81c5"
+
+[[tasks]]
+name = "kubeply/clear-upgrade-blocking-apis"
+digest = "sha256:aa1955d20ac559b0322a950224be829589aaa0e2bef0f024af334b1ddda43664"
+
+[[tasks]]
+name = "kubeply/place-inference-canary-on-gpu-node"
+digest = "sha256:fde9620cd2163caa604319e8c201364e1ba5e8bca28a3a2cfd9aa3cfa839285c"
+
 
 [[files]]
 path = "metric.py"
