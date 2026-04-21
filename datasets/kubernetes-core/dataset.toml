@@ -124,6 +124,10 @@ name = "kubeply/restore-worker-config-access"
 digest = "sha256:cd780ecabe049ad97e65dbd4ae86434cca355f7c0756866d41bafda4017bebf2"
 
 [[tasks]]
+name = "kubeply/restore-portal-ingress-tls-route"
+digest = "sha256:04214ec40c38fbcc77c6fc0a29d45bff277ab3fc18b272fb0f342878c4ff81c5"
+
+[[tasks]]
 name = "kubeply/clear-upgrade-blocking-apis"
 digest = "sha256:aa1955d20ac559b0322a950224be829589aaa0e2bef0f024af334b1ddda43664"
 
