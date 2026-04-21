@@ -125,7 +125,7 @@ digest = "sha256:cd780ecabe049ad97e65dbd4ae86434cca355f7c0756866d41bafda4017bebf
 
 [[tasks]]
 name = "kubeply/repair-cross-namespace-service-discovery"
-digest = "sha256:dc0e64aab08531aab913b5c7666efebcdc01de4b6e41245a43c38d2bf138c2ae"
+digest = "sha256:0735beab1c2974d7556efa17d135056f1be4f36ae5559751313d889f42679289"
 
 [[tasks]]
 name = "kubeply/repair-cache-volume-binding"
