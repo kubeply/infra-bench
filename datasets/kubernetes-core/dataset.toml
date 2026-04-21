@@ -124,6 +124,10 @@ name = "kubeply/restore-worker-config-access"
 digest = "sha256:cd780ecabe049ad97e65dbd4ae86434cca355f7c0756866d41bafda4017bebf2"
 
 [[tasks]]
+name = "kubeply/clear-upgrade-blocking-apis"
+digest = "sha256:aa1955d20ac559b0322a950224be829589aaa0e2bef0f024af334b1ddda43664"
+
+[[tasks]]
 name = "kubeply/place-inference-canary-on-gpu-node"
 digest = "sha256:fde9620cd2163caa604319e8c201364e1ba5e8bca28a3a2cfd9aa3cfa839285c"
 
