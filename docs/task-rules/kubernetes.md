@@ -49,6 +49,18 @@ not the number of files touched.
   capacity, migration or upgrade constraints, or validation that spans several
   controllers and runtime behaviors.
 
+Medium and hard prompts should usually be one short symptom plus the standard
+workspace and safety constraints. Do not name the failing subsystem, Kubernetes
+primitive, likely root cause, or exact evidence path unless that information
+would be visible to the real user who filed the incident. Avoid terms like
+`Secret`, `HPA`, `NetworkPolicy`, `nodeSelector`, `toleration`, `IngressClass`,
+or `PVC` in the prompt when those concepts are part of the diagnosis.
+
+Do not explain distractors. It is fine to include healthy documentation apps,
+reporting services, canaries, queues, or other cluster resources that are not
+part of the fix, but the prompt should not say that they are unrelated or
+healthy.
+
 For medium and hard `local_cluster` tasks, start from the same two-image
 environment pattern used by the easy tasks. Do not reintroduce a single image
 that copies bootstrap-only scripts or manifests into the agent runtime.
@@ -190,6 +202,12 @@ The agent prompt should make the live-cluster expectation explicit. Tell the
 agent to use `kubectl`, state that the cluster is already running, and describe
 the desired live state without revealing verifier assertions.
 
+When writing prompts for live-cluster medium tasks, audit for Kubernetes concept
+leaks. A sentence like "checkout records are failing" is usually enough. A
+sentence that mentions readiness, credential rotation, missing endpoints,
+metrics, logs, node labels, or a healthy side service often gives away the first
+diagnostic branch.
+
 ## Verifier Expectations
 
 Kubernetes verifiers should prefer semantic checks:
@@ -221,6 +239,12 @@ solutions:
 - Dump enough Kubernetes state on failure to debug the next run: namespace
   resources, relevant YAML, `describe` output, and recent events.
 
+Keep verifier permissions aligned with the kubeconfig available in the task
+runtime. Avoid checks such as `kubectl auth can-i --as ...`, cluster-scope
+reads, or impersonation unless the verifier credentials explicitly support
+them. Prefer direct semantic checks against the task namespace and the runtime
+behavior that proves the operator outcome.
+
 Keep verifier waits bounded and targeted. Wait for controller reconciliation
 where Kubernetes is eventually consistent, but fail with debug output instead of
 sleeping blindly.
@@ -244,6 +268,9 @@ Before adding a Kubernetes task to the dataset, run it in this order:
    python3 scripts/lint-kubernetes-rbac.py
    uvx --from harbor harbor sync datasets/kubernetes-core
    ```
+
+   Inspect `dataset.toml` after Harbor sync. Keep digest and intended task
+   metadata updates, but do not include unrelated formatting churn.
 
 3. Run the oracle agent to prove the scripted solution passes:
 

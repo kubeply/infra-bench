@@ -49,7 +49,8 @@ Include these fields:
 - Scenario type
 - Environment class
 - Broken starting state
-- Agent-facing instruction outline
+- Agent-facing symptom and instruction outline
+- Hidden diagnostic concepts
 - Expected solution approach
 - Verifier strategy
 - Oracle solution strategy
@@ -68,6 +69,17 @@ Secret, RBAC, NetworkPolicy, storage, Job, or controller-generated state. Keep
 the outcome focused on one operator goal and identify the shortcut fixes the
 verifier must reject. Use `docs/templates/kubernetes-local-cluster-task/` as the
 starting environment shape for live-cluster medium and hard tasks.
+
+Separate the agent-facing symptom from the hidden diagnosis. For medium
+Kubernetes tasks, the prompt should usually be one short user report, such as
+"Users report that checkout records are failing." Do not include the root cause,
+failing Kubernetes primitive, useful log source, healthy distractors, or a note
+that unrelated resources exist. The design brief can record those details under
+hidden diagnostic concepts and verifier strategy instead.
+
+When adding noisy services or unrelated resources, describe them in the broken
+starting state only. They should make the cluster realistic without the prompt
+telling the agent what to ignore.
 
 ## Canary Requirement
 

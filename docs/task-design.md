@@ -60,12 +60,29 @@ Do not describe exact verifier assertions.
 For Kubernetes prompts, do not use namespace names that reveal the issue; keep
 them consistent with the neutral names in the starting cluster.
 
+For medium and hard tasks, keep the agent-facing symptom intentionally sparse.
+The prompt may state the user-visible failure, but should not name the suspected
+root cause, exact Kubernetes concept, useful evidence source, or unrelated
+healthy services. For example, prefer "Users report that checkout records are
+failing" over "The billing API stopped becoming ready after database credential
+rotation." Do not tell the agent which resources are noise; add realistic
+distractor resources to the environment and let the agent decide what matters.
+
+Review constraints for answer leakage. A constraint that names the exact field
+or resource to change can make a medium task behave like an easy task. Prefer
+policy-level constraints, then let the verifier enforce the hidden relationships
+that matter.
+
 ## 6. Write the Verifier
 
 The verifier should answer: did the operator outcome happen?
 
 For most tasks, `tests/test.sh` can run a Python script and map exit code to
 `/logs/verifier/reward.txt`.
+
+Verifier logic may know the hidden diagnosis, but the task prompt should not.
+Use the verifier to reject bypasses such as replacement resources, broad
+privilege grants, disabled policies, or edits to verifier-trusted baselines.
 
 ## 7. Write the Oracle Solution
 
