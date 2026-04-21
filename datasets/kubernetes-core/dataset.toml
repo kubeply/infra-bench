@@ -115,6 +115,14 @@ digest = "sha256:a5e2eb8955828edabdc722c4f42447904fee03a7ea27e0c60e187989f256c15
 name = "kubeply/schedule-reporting-api-on-labeled-node"
 digest = "sha256:ed4387d266f68bac86e26ecf23d67ef32c8cae13deeb180843015507a71efe6f"
 
+[[tasks]]
+name = "kubeply/stabilize-cpu-throttled-worker"
+digest = "sha256:23d08f4bae84323d6440087983475c28a90bb794151035f28249cd50d5c155b4"
+
+[[tasks]]
+name = "kubeply/restore-worker-config-access"
+digest = "sha256:cd780ecabe049ad97e65dbd4ae86434cca355f7c0756866d41bafda4017bebf2"
+
 
 [[files]]
 path = "metric.py"
