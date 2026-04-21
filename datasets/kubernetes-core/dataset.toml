@@ -124,6 +124,10 @@ name = "kubeply/restore-worker-config-access"
 digest = "sha256:cd780ecabe049ad97e65dbd4ae86434cca355f7c0756866d41bafda4017bebf2"
 
 [[tasks]]
+name = "kubeply/repair-cross-namespace-service-discovery"
+digest = "sha256:0735beab1c2974d7556efa17d135056f1be4f36ae5559751313d889f42679289"
+
+[[tasks]]
 name = "kubeply/repair-cache-volume-binding"
 digest = "sha256:2f8e4588de540b6576eaabddda6d3d4052bb6add3502f2e499fb0da3a35f71dd"
 
