@@ -139,6 +139,9 @@ digest = "sha256:aa1955d20ac559b0322a950224be829589aaa0e2bef0f024af334b1ddda4366
 name = "kubeply/place-inference-canary-on-gpu-node"
 digest = "sha256:fde9620cd2163caa604319e8c201364e1ba5e8bca28a3a2cfd9aa3cfa839285c"
 
+[[tasks]]
+name = "kubeply/restore-grafana-logs-datasource"
+digest = "sha256:1942013dddfa54719fd6b9df3b72f084b6b6b69503f52efb4a6ebfe3b526bf71"
 
 [[files]]
 path = "metric.py"
