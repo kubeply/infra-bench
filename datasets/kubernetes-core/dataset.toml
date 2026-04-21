@@ -131,6 +131,9 @@ digest = "sha256:aa1955d20ac559b0322a950224be829589aaa0e2bef0f024af334b1ddda4366
 name = "kubeply/place-inference-canary-on-gpu-node"
 digest = "sha256:fde9620cd2163caa604319e8c201364e1ba5e8bca28a3a2cfd9aa3cfa839285c"
 
+[[tasks]]
+name = "kubeply/repair-report-custom-resource-status"
+digest = "sha256:7bb24dce2a54a398d5cc775ad3c05cc96456b9235cf8db21af516e3f0e7eef8e"
 
 [[files]]
 path = "metric.py"
