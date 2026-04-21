@@ -123,6 +123,10 @@ digest = "sha256:23d08f4bae84323d6440087983475c28a90bb794151035f28249cd50d5c155b
 name = "kubeply/restore-worker-config-access"
 digest = "sha256:cd780ecabe049ad97e65dbd4ae86434cca355f7c0756866d41bafda4017bebf2"
 
+[[tasks]]
+name = "kubeply/prepare-node-drain-with-pdb"
+digest = "sha256:bb7a07635c0f0ba2d4b6ab822d936e44ab460080827e87e0985a6d99e74f8293"
+
 
 [[files]]
 path = "metric.py"
