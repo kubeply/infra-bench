@@ -123,6 +123,10 @@ digest = "sha256:23d08f4bae84323d6440087983475c28a90bb794151035f28249cd50d5c155b
 name = "kubeply/restore-worker-config-access"
 digest = "sha256:cd780ecabe049ad97e65dbd4ae86434cca355f7c0756866d41bafda4017bebf2"
 
+[[tasks]]
+name = "kubeply/repair-worker-hpa-scaling-inputs"
+digest = "sha256:76072a63f412b8da96100404b2161570c32af98f5635f998288c6cfaa79d7b70"
+
 
 [[files]]
 path = "metric.py"
