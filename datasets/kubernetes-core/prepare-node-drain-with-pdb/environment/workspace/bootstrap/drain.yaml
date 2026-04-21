@@ -25,7 +25,8 @@ metadata:
   namespace: platform-team
 rules:
   - apiGroups: [""]
-    resources: ["configmaps", "endpoints", "events", "pods", "pods/log", "services"]
+    resources:
+      ["configmaps", "endpoints", "events", "pods", "pods/log", "services"]
     verbs: ["get", "list", "watch"]
   - apiGroups: [""]
     resources: ["pods/eviction"]

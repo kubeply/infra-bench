@@ -12,9 +12,7 @@ for _ in $(seq 1 180); do
   ready_nodes="$(
     kubectl get nodes \
       -o jsonpath='{range .items[*]}{.metadata.name}{"|"}{range .status.conditions[?(@.type=="Ready")]}{.status}{end}{"\n"}{end}' 2>/dev/null \
-      | grep -E '^(maintenance-node|general-node)\|True$' \
-      | wc -l \
-      | tr -d ' '
+      | grep -Ec '^(maintenance-node|general-node)\|True$' || true
   )"
 
   if [[ "$ready_nodes" == "2" ]]; then
