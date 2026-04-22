@@ -129,7 +129,7 @@ digest = "sha256:3da4c78a3fad5187727ada76dd6732b71f91711b4f42905b5b918fd11632504
 
 [[tasks]]
 name = "kubeply/prepare-node-drain-with-pdb"
-digest = "sha256:78f15054154313a997b47750f9606f628ce8be5930b472b3769e010feda1988c"
+digest = "sha256:69764053c8cb4b6f170260a77c33dd4ccc90d2d1d471a2581547c273a566e3fe"
 
 [[tasks]]
 name = "kubeply/repair-worker-hpa-scaling-inputs"

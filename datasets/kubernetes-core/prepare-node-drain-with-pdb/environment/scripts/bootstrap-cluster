@@ -34,7 +34,7 @@ kubectl label node "$general_node" infra-bench/node-pool=general infra-bench/dra
 
 kubectl apply -f /bootstrap/drain.yaml
 
-for deployment in orders-api docs background-worker; do
+for deployment in orders-api docs background-worker reporting-api; do
   if ! kubectl -n "$namespace" rollout status deployment/"$deployment" --timeout=180s; then
     kubectl -n "$namespace" get all,pdb -o wide >&2 || true
     kubectl -n "$namespace" describe deployment "$deployment" >&2 || true
@@ -52,16 +52,17 @@ for _ in $(seq 1 90); do
   )"
   orders_pdb_allowed="$(kubectl -n "$namespace" get pdb orders-api -o jsonpath='{.status.disruptionsAllowed}' 2>/dev/null || true)"
   worker_pdb_allowed="$(kubectl -n "$namespace" get pdb background-worker -o jsonpath='{.status.disruptionsAllowed}' 2>/dev/null || true)"
+  reporting_pdb_allowed="$(kubectl -n "$namespace" get pdb reporting-api -o jsonpath='{.status.disruptionsAllowed}' 2>/dev/null || true)"
 
-  if [[ "$orders_on_maintenance" == "2" && "$orders_pdb_allowed" == "0" && "$worker_pdb_allowed" -ge 1 ]]; then
+  if [[ "$orders_on_maintenance" == "2" && "$orders_pdb_allowed" == "0" && "$worker_pdb_allowed" -ge 1 && "$reporting_pdb_allowed" -ge 1 ]]; then
     break
   fi
 
   sleep 1
 done
 
-if [[ "$orders_on_maintenance" != "2" || "$orders_pdb_allowed" != "0" || "$worker_pdb_allowed" -lt 1 ]]; then
-  echo "expected orders-api pods pinned to maintenance node with PDB blocking one eviction, and worker PDB already allowing one" >&2
+if [[ "$orders_on_maintenance" != "2" || "$orders_pdb_allowed" != "0" || "$worker_pdb_allowed" -lt 1 || "$reporting_pdb_allowed" -lt 1 ]]; then
+  echo "expected orders-api pods pinned to maintenance node with PDB blocking one eviction, and other PDBs already allowing one" >&2
   kubectl get nodes --show-labels >&2 || true
   kubectl -n "$namespace" get pods -o wide >&2 || true
   kubectl -n "$namespace" get pdb -o wide >&2 || true
@@ -72,15 +73,18 @@ fi
 orders_deployment_uid="$(kubectl -n "$namespace" get deployment orders-api -o jsonpath='{.metadata.uid}')"
 docs_deployment_uid="$(kubectl -n "$namespace" get deployment docs -o jsonpath='{.metadata.uid}')"
 worker_deployment_uid="$(kubectl -n "$namespace" get deployment background-worker -o jsonpath='{.metadata.uid}')"
+reporting_deployment_uid="$(kubectl -n "$namespace" get deployment reporting-api -o jsonpath='{.metadata.uid}')"
 orders_service_uid="$(kubectl -n "$namespace" get service orders-api -o jsonpath='{.metadata.uid}')"
 docs_service_uid="$(kubectl -n "$namespace" get service docs -o jsonpath='{.metadata.uid}')"
 worker_service_uid="$(kubectl -n "$namespace" get service background-worker -o jsonpath='{.metadata.uid}')"
+reporting_service_uid="$(kubectl -n "$namespace" get service reporting-api -o jsonpath='{.metadata.uid}')"
 orders_pdb_uid="$(kubectl -n "$namespace" get pdb orders-api -o jsonpath='{.metadata.uid}')"
 worker_pdb_uid="$(kubectl -n "$namespace" get pdb background-worker -o jsonpath='{.metadata.uid}')"
+reporting_pdb_uid="$(kubectl -n "$namespace" get pdb reporting-api -o jsonpath='{.metadata.uid}')"
 
 kubectl -n "$namespace" patch configmap infra-bench-baseline \
   --type merge \
-  --patch "{\"data\":{\"orders_deployment_uid\":\"${orders_deployment_uid}\",\"docs_deployment_uid\":\"${docs_deployment_uid}\",\"worker_deployment_uid\":\"${worker_deployment_uid}\",\"orders_service_uid\":\"${orders_service_uid}\",\"docs_service_uid\":\"${docs_service_uid}\",\"worker_service_uid\":\"${worker_service_uid}\",\"orders_pdb_uid\":\"${orders_pdb_uid}\",\"worker_pdb_uid\":\"${worker_pdb_uid}\",\"maintenance_node_name\":\"${maintenance_node}\",\"general_node_name\":\"${general_node}\"}}"
+  --patch "{\"data\":{\"orders_deployment_uid\":\"${orders_deployment_uid}\",\"docs_deployment_uid\":\"${docs_deployment_uid}\",\"worker_deployment_uid\":\"${worker_deployment_uid}\",\"reporting_deployment_uid\":\"${reporting_deployment_uid}\",\"orders_service_uid\":\"${orders_service_uid}\",\"docs_service_uid\":\"${docs_service_uid}\",\"worker_service_uid\":\"${worker_service_uid}\",\"reporting_service_uid\":\"${reporting_service_uid}\",\"orders_pdb_uid\":\"${orders_pdb_uid}\",\"worker_pdb_uid\":\"${worker_pdb_uid}\",\"reporting_pdb_uid\":\"${reporting_pdb_uid}\",\"maintenance_node_name\":\"${maintenance_node}\",\"general_node_name\":\"${general_node}\"}}"
 
 for _ in $(seq 1 60); do
   token_data="$(kubectl -n "$namespace" get secret "$agent_secret" -o jsonpath='{.data.token}' 2>/dev/null || true)"
