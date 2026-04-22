@@ -8,7 +8,7 @@ prepare-kubeconfig
 
 kubectl apply -f /bootstrap/sidecar.yaml
 
-for deployment in docs status-api cache-warmer; do
+for deployment in docs status-api audit-gateway cache-warmer; do
   kubectl -n "$namespace" rollout status deployment/"$deployment" --timeout=180s
 done
 
@@ -33,6 +33,9 @@ for item in \
   "docs_service_uid:service:docs" \
   "status_deployment_uid:deployment:status-api" \
   "status_service_uid:service:status-api" \
+  "audit_deployment_uid:deployment:audit-gateway" \
+  "audit_service_uid:service:audit-gateway" \
+  "audit_template_uid:configmap:audit-template" \
   "cache_deployment_uid:deployment:cache-warmer"; do
   IFS=: read -r key kind name <<< "$item"
   uid="$(kubectl -n "$namespace" get "$kind" "$name" -o jsonpath='{.metadata.uid}')"
