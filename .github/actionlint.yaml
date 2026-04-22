@@ -1,3 +1,4 @@
 self-hosted-runner:
   labels:
     - kubeply-arm64-low-latency
+    - kubeply-infra-bench
