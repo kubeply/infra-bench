@@ -4,12 +4,7 @@ schema_version = "1.1"
 name = "kubeply/repair-sidecar-generated-config"
 description = "Repair a live Kubernetes app whose sidecar-generated runtime config no longer lands where the main container consumes it."
 category = "kubernetes"
-keywords = [
-  "kubernetes",
-  "quirky-apps",
-  "config-secrets",
-  "kubectl",
-]
+keywords = ["kubernetes", "quirky-apps", "config-secrets", "kubectl"]
 [[task.authors]]
 name = "Kubeply"
 email = "thomas@kubeply.com"

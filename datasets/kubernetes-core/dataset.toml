@@ -161,7 +161,7 @@ digest = "sha256:fde9620cd2163caa604319e8c201364e1ba5e8bca28a3a2cfd9aa3cfa839285
 
 [[tasks]]
 name = "kubeply/repair-sidecar-generated-config"
-digest = "sha256:54f8c5ed2d96070c81a8c225cad15fdb3e824458791c19b63f51c800c41d5826"
+digest = "sha256:15c740d6489abb53458a169b450d74415d34dc1d4cec0b027762f7aa9792aca5"
 
 [[tasks]]
 name = "kubeply/repair-restricted-multi-container-pod"
