@@ -19,6 +19,8 @@ dump_debug() {
   kubectl -n "$namespace" get services -o yaml || true
   echo "--- deployments yaml ---"
   kubectl -n "$namespace" get deployments -o yaml || true
+  echo "--- ingress client logs ---"
+  kubectl -n "$namespace" logs deployment/"$client_deployment" --tail=160 || true
   echo "--- endpoints yaml ---"
   kubectl -n "$namespace" get endpoints -o yaml || true
   echo "--- pod describe ---"
@@ -152,6 +154,7 @@ check_uid service internal-api internal_service_uid
 check_uid deployment portal portal_deployment_uid
 check_uid deployment docs docs_deployment_uid
 check_uid deployment internal-api internal_deployment_uid
+check_uid deployment "$client_deployment" client_deployment_uid
 check_uid secret portal-tls portal_secret_uid
 check_uid secret portal-old-tls portal_old_secret_uid
 check_uid secret docs-tls docs_secret_uid
@@ -289,12 +292,16 @@ if [[ -z "$client_pod" || "$traefik_service" != "traefik" ]]; then
 fi
 
 for _ in $(seq 1 30); do
+  client_log="$(kubectl -n "$namespace" logs deployment/"$client_deployment" --tail=160 2>/tmp/client.err || true)"
   if kubectl -n "$namespace" exec "$client_pod" -- wget -qO- -T 3 --header "Host: portal.example.test" http://traefik.kube-system.svc.cluster.local/ >/tmp/portal.out 2>/tmp/portal.err \
     && grep -q "portal route restored" /tmp/portal.out \
     && kubectl -n "$namespace" exec "$client_pod" -- wget -qO- -T 3 --header "Host: docs.example.test" http://traefik.kube-system.svc.cluster.local/ >/tmp/docs.out 2>/tmp/docs.err \
     && grep -q "docs route healthy" /tmp/docs.out \
     && kubectl -n "$namespace" exec "$client_pod" -- wget -qO- -T 3 http://internal-api:80/ >/tmp/internal-api.out 2>/tmp/internal-api.err \
-    && grep -q "internal api healthy" /tmp/internal-api.out; then
+    && grep -q "internal api healthy" /tmp/internal-api.out \
+    && grep -q "portal ingress check ok" <<< "$client_log" \
+    && grep -q "docs ingress check ok" <<< "$client_log" \
+    && grep -q "internal service check ok" <<< "$client_log"; then
     echo "Portal route reaches the preserved backend, and existing namespace services still work"
     exit 0
   fi
