@@ -38,6 +38,21 @@ if [[ -n "$endpoint_ips" ]]; then
 fi
 
 for _ in $(seq 1 60); do
+  dashboard_ready="$(kubectl -n "$namespace" get deployment metrics-dashboard -o jsonpath='{.status.readyReplicas}' 2>/dev/null || true)"
+  if [[ "${dashboard_ready:-0}" == "0" ]]; then
+    break
+  fi
+  sleep 1
+done
+
+if [[ "${dashboard_ready:-0}" != "0" ]]; then
+  echo "expected metrics-dashboard to start unready while metrics-adapter Service has no endpoints" >&2
+  kubectl -n "$namespace" get deployment metrics-dashboard -o yaml >&2 || true
+  kubectl -n "$namespace" logs deployment/metrics-dashboard --tail=80 >&2 || true
+  exit 1
+fi
+
+for _ in $(seq 1 60); do
   telemetry_endpoint_ips="$(kubectl -n "$namespace" get endpoints "$telemetry_service" -o jsonpath='{.subsets[*].addresses[*].ip}' 2>/dev/null || true)"
   telemetry_endpoint_port="$(kubectl -n "$namespace" get endpoints "$telemetry_service" -o jsonpath='{.subsets[0].ports[0].port}' 2>/dev/null || true)"
 
@@ -62,13 +77,15 @@ if [[ -z "$baseline_deployment_uid" || -z "$baseline_service_uid" ]]; then
   deployment_uid="$(kubectl -n "$namespace" get deployment "$deployment" -o jsonpath='{.metadata.uid}')"
   service_uid="$(kubectl -n "$namespace" get service "$service" -o jsonpath='{.metadata.uid}')"
   values_uid="$(kubectl -n "$namespace" get configmap metrics-adapter-values -o jsonpath='{.metadata.uid}')"
+  dashboard_deployment_uid="$(kubectl -n "$namespace" get deployment metrics-dashboard -o jsonpath='{.metadata.uid}')"
+  dashboard_service_uid="$(kubectl -n "$namespace" get service metrics-dashboard -o jsonpath='{.metadata.uid}')"
   telemetry_deployment_uid="$(kubectl -n "$namespace" get deployment "$telemetry_deployment" -o jsonpath='{.metadata.uid}')"
   telemetry_service_uid="$(kubectl -n "$namespace" get service "$telemetry_service" -o jsonpath='{.metadata.uid}')"
   telemetry_values_uid="$(kubectl -n "$namespace" get configmap telemetry-proxy-values -o jsonpath='{.metadata.uid}')"
 
   kubectl -n "$namespace" patch configmap infra-bench-baseline \
     --type merge \
-    --patch "{\"data\":{\"deployment_uid\":\"${deployment_uid}\",\"service_uid\":\"${service_uid}\",\"values_uid\":\"${values_uid}\",\"telemetry_deployment_uid\":\"${telemetry_deployment_uid}\",\"telemetry_service_uid\":\"${telemetry_service_uid}\",\"telemetry_values_uid\":\"${telemetry_values_uid}\"}}"
+    --patch "{\"data\":{\"deployment_uid\":\"${deployment_uid}\",\"service_uid\":\"${service_uid}\",\"values_uid\":\"${values_uid}\",\"dashboard_deployment_uid\":\"${dashboard_deployment_uid}\",\"dashboard_service_uid\":\"${dashboard_service_uid}\",\"telemetry_deployment_uid\":\"${telemetry_deployment_uid}\",\"telemetry_service_uid\":\"${telemetry_service_uid}\",\"telemetry_values_uid\":\"${telemetry_values_uid}\"}}"
 fi
 
 for _ in $(seq 1 60); do
