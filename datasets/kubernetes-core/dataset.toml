@@ -161,7 +161,7 @@ digest = "sha256:fde9620cd2163caa604319e8c201364e1ba5e8bca28a3a2cfd9aa3cfa839285
 
 [[tasks]]
 name = "kubeply/complete-staging-namespace-restore"
-digest = "sha256:35416312037a57bf6da0e2906aed971e1d85409e04831e5dfa315e267345ac73"
+digest = "sha256:0a6778afe4d65eeda407f008cd80e8be2fb07df8f346acac9055464111cbf276"
 
 [[tasks]]
 name = "kubeply/reconnect-checkout-worker-queue"
