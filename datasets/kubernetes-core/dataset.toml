@@ -160,6 +160,10 @@ name = "kubeply/place-inference-canary-on-gpu-node"
 digest = "sha256:fde9620cd2163caa604319e8c201364e1ba5e8bca28a3a2cfd9aa3cfa839285c"
 
 [[tasks]]
+name = "kubeply/restore-grafana-logs-datasource"
+digest = "sha256:1b44a92ff9a87c21274c59eed3b74b805a8870dab08c67fb7937647cb4ded223"
+
+[[tasks]]
 name = "kubeply/recover-nightly-report-cronjob"
 digest = "sha256:d0d528d26b8bbe03039ef842854b0b6ac20834d54c427b2365484436cdedd9b4"
 
