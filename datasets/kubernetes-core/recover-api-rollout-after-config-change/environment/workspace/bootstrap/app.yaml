@@ -12,6 +12,14 @@ data:
   health_path: healthz
 ---
 apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: billing-api-config
+  namespace: orders-platform
+data:
+  health_path: readyz
+---
+apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: infra-bench-agent
@@ -134,6 +142,68 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  name: billing-api
+  namespace: orders-platform
+  labels:
+    app: billing-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: billing-api
+  template:
+    metadata:
+      labels:
+        app: billing-api
+      annotations:
+        config-revision: readyz
+    spec:
+      containers:
+        - name: billing-api
+          image: busybox:1.36.1
+          command:
+            - /bin/sh
+            - -c
+            - |
+              path="${HEALTH_PATH#/}"
+              mkdir -p /www
+              printf 'billing-ok\n' > "/www/${path}"
+              printf 'billing health endpoint is /%s\n' "${path}"
+              exec httpd -f -p 8080 -h /www
+          env:
+            - name: HEALTH_PATH
+              valueFrom:
+                configMapKeyRef:
+                  name: billing-api-config
+                  key: health_path
+          ports:
+            - name: http
+              containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: http
+            initialDelaySeconds: 1
+            periodSeconds: 2
+            timeoutSeconds: 1
+            failureThreshold: 2
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: billing-api
+  namespace: orders-platform
+spec:
+  selector:
+    app: billing-api
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
   name: admin
   namespace: orders-platform
   labels:
@@ -246,9 +316,12 @@ metadata:
   namespace: orders-platform
 data:
   orders_api_deployment_uid: ""
+  billing_api_deployment_uid: ""
   admin_deployment_uid: ""
   docs_deployment_uid: ""
   orders_api_service_uid: ""
+  billing_api_service_uid: ""
   admin_service_uid: ""
   docs_service_uid: ""
   orders_api_config_uid: ""
+  billing_api_config_uid: ""
