@@ -4,12 +4,7 @@ schema_version = "1.1"
 name = "kubeply/repair-restricted-multi-container-pod"
 description = "Repair a live Kubernetes multi-container Deployment so it satisfies restricted Pod Security without weakening policy."
 category = "kubernetes"
-keywords = [
-  "kubernetes",
-  "security-posture",
-  "rollout-readiness",
-  "kubectl",
-]
+keywords = ["kubernetes", "security-posture", "rollout-readiness", "kubectl"]
 [[task.authors]]
 name = "Kubeply"
 email = "thomas@kubeply.com"

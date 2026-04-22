@@ -161,7 +161,7 @@ digest = "sha256:fde9620cd2163caa604319e8c201364e1ba5e8bca28a3a2cfd9aa3cfa839285
 
 [[tasks]]
 name = "kubeply/repair-restricted-multi-container-pod"
-digest = "sha256:baa572abf99b9bc6f48e6ee755455fa03ad8a94c25658b1815f802c40c53fa14"
+digest = "sha256:cc4e7d4ecec89d899f851a3b7cd68d9d131aeba821389b504cc7ab9d39d99033"
 
 [[tasks]]
 name = "kubeply/complete-staging-namespace-restore"
