@@ -109,7 +109,7 @@ digest = "sha256:23035e2bf05bd4c283e44544b368d4771b1bb0cf77bc7b3fc8e4f2786dad9b0
 
 [[tasks]]
 name = "kubeply/recover-api-rollout-after-config-change"
-digest = "sha256:b3bc5e35224fb920c8399b310194e44136298e559c01b557b6fb9300ee238e64"
+digest = "sha256:277074c8abeeb7ad119faf54e5d9e66d0eaeb76506da7f7559c9d35187837baa"
 
 [[tasks]]
 name = "kubeply/schedule-reporting-api-on-labeled-node"

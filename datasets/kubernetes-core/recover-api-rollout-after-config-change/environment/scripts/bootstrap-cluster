@@ -8,7 +8,7 @@ prepare-kubeconfig
 
 kubectl apply -f /bootstrap/app.yaml
 
-for deployment in orders-api admin docs; do
+for deployment in orders-api billing-api admin docs; do
   kubectl -n "$namespace" rollout status "deployment/${deployment}" --timeout=180s
 done
 
@@ -17,6 +17,9 @@ orders_api_deployment_uid="$(
 )"
 admin_deployment_uid="$(
   kubectl -n "$namespace" get deployment admin -o jsonpath='{.metadata.uid}'
+)"
+billing_api_deployment_uid="$(
+  kubectl -n "$namespace" get deployment billing-api -o jsonpath='{.metadata.uid}'
 )"
 docs_deployment_uid="$(
   kubectl -n "$namespace" get deployment docs -o jsonpath='{.metadata.uid}'
@@ -27,11 +30,17 @@ orders_api_service_uid="$(
 admin_service_uid="$(
   kubectl -n "$namespace" get service admin -o jsonpath='{.metadata.uid}'
 )"
+billing_api_service_uid="$(
+  kubectl -n "$namespace" get service billing-api -o jsonpath='{.metadata.uid}'
+)"
 docs_service_uid="$(
   kubectl -n "$namespace" get service docs -o jsonpath='{.metadata.uid}'
 )"
 orders_api_config_uid="$(
   kubectl -n "$namespace" get configmap orders-api-config -o jsonpath='{.metadata.uid}'
+)"
+billing_api_config_uid="$(
+  kubectl -n "$namespace" get configmap billing-api-config -o jsonpath='{.metadata.uid}'
 )"
 
 kubectl -n "$namespace" patch configmap infra-bench-baseline \
@@ -40,12 +49,15 @@ kubectl -n "$namespace" patch configmap infra-bench-baseline \
 {
   "data": {
     "orders_api_deployment_uid": "${orders_api_deployment_uid}",
+    "billing_api_deployment_uid": "${billing_api_deployment_uid}",
     "admin_deployment_uid": "${admin_deployment_uid}",
     "docs_deployment_uid": "${docs_deployment_uid}",
     "orders_api_service_uid": "${orders_api_service_uid}",
+    "billing_api_service_uid": "${billing_api_service_uid}",
     "admin_service_uid": "${admin_service_uid}",
     "docs_service_uid": "${docs_service_uid}",
-    "orders_api_config_uid": "${orders_api_config_uid}"
+    "orders_api_config_uid": "${orders_api_config_uid}",
+    "billing_api_config_uid": "${billing_api_config_uid}"
   }
 }
 PATCH

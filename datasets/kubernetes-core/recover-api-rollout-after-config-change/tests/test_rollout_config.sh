@@ -4,8 +4,8 @@ set -euo pipefail
 prepare-kubeconfig
 
 namespace="orders-platform"
-deployments=(admin docs orders-api)
-services=(admin docs orders-api)
+deployments=(admin billing-api docs orders-api)
+services=(admin billing-api docs orders-api)
 
 dump_debug() {
   echo "--- deployments ---"
@@ -61,23 +61,32 @@ assert_uid_preserved() {
 }
 
 assert_uid_preserved deployment orders-api orders_api_deployment_uid
+assert_uid_preserved deployment billing-api billing_api_deployment_uid
 assert_uid_preserved deployment admin admin_deployment_uid
 assert_uid_preserved deployment docs docs_deployment_uid
 assert_uid_preserved service orders-api orders_api_service_uid
+assert_uid_preserved service billing-api billing_api_service_uid
 assert_uid_preserved service admin admin_service_uid
 assert_uid_preserved service docs docs_service_uid
 assert_uid_preserved configmap orders-api-config orders_api_config_uid
+assert_uid_preserved configmap billing-api-config billing_api_config_uid
 
 deployment_names="$(kubectl -n "$namespace" get deployments -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' | sort)"
 service_names="$(kubectl -n "$namespace" get services -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' | sort)"
+configmap_names="$(kubectl -n "$namespace" get configmaps -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' | sort)"
 
-if [[ "$deployment_names" != $'admin\ndocs\norders-api' ]]; then
+if [[ "$deployment_names" != $'admin\nbilling-api\ndocs\norders-api' ]]; then
   echo "Unexpected Deployment set in ${namespace}: ${deployment_names}" >&2
   exit 1
 fi
 
-if [[ "$service_names" != $'admin\ndocs\norders-api' ]]; then
+if [[ "$service_names" != $'admin\nbilling-api\ndocs\norders-api' ]]; then
   echo "Unexpected Service set in ${namespace}: ${service_names}" >&2
+  exit 1
+fi
+
+if [[ "$configmap_names" != $'billing-api-config\ninfra-bench-baseline\nkube-root-ca.crt\norders-api-config' ]]; then
+  echo "Unexpected ConfigMap set in ${namespace}: ${configmap_names}" >&2
   exit 1
 fi
 
@@ -122,6 +131,7 @@ done
 orders_replicas="$(kubectl -n "$namespace" get deployment orders-api -o jsonpath='{.spec.replicas}')"
 orders_ready="$(kubectl -n "$namespace" get deployment orders-api -o jsonpath='{.status.readyReplicas}')"
 admin_replicas="$(kubectl -n "$namespace" get deployment admin -o jsonpath='{.spec.replicas}')"
+billing_replicas="$(kubectl -n "$namespace" get deployment billing-api -o jsonpath='{.spec.replicas}')"
 docs_replicas="$(kubectl -n "$namespace" get deployment docs -o jsonpath='{.spec.replicas}')"
 readiness_path="$(kubectl -n "$namespace" get deployment orders-api -o jsonpath='{.spec.template.spec.containers[0].readinessProbe.httpGet.path}')"
 readiness_port="$(kubectl -n "$namespace" get deployment orders-api -o jsonpath='{.spec.template.spec.containers[0].readinessProbe.httpGet.port}')"
@@ -134,8 +144,8 @@ if [[ "$orders_replicas" != "2" || "$orders_ready" != "2" ]]; then
   exit 1
 fi
 
-if [[ "$admin_replicas" != "1" || "$docs_replicas" != "1" ]]; then
-  echo "Noisy workload replica counts changed: admin=${admin_replicas} docs=${docs_replicas}" >&2
+if [[ "$admin_replicas" != "1" || "$billing_replicas" != "1" || "$docs_replicas" != "1" ]]; then
+  echo "Noisy workload replica counts changed: admin=${admin_replicas} billing=${billing_replicas} docs=${docs_replicas}" >&2
   exit 1
 fi
 
@@ -151,6 +161,15 @@ fi
 
 if [[ "$health_path" != "readyz" || "$config_revision" != "readyz" ]]; then
   echo "Config-driven rollout state changed unexpectedly: health_path=${health_path} revision=${config_revision}" >&2
+  exit 1
+fi
+
+billing_readiness_path="$(kubectl -n "$namespace" get deployment billing-api -o jsonpath='{.spec.template.spec.containers[0].readinessProbe.httpGet.path}')"
+billing_health_path="$(kubectl -n "$namespace" get configmap billing-api-config -o jsonpath='{.data.health_path}')"
+billing_config_revision="$(kubectl -n "$namespace" get deployment billing-api -o jsonpath='{.spec.template.metadata.annotations.config-revision}')"
+
+if [[ "$billing_readiness_path" != "/readyz" || "$billing_health_path" != "readyz" || "$billing_config_revision" != "readyz" ]]; then
+  echo "Healthy peer API config-driven readiness changed: readiness=${billing_readiness_path} health=${billing_health_path} revision=${billing_config_revision}" >&2
   exit 1
 fi
 
@@ -176,15 +195,15 @@ for _ in $(seq 1 60); do
   pod_count="$(kubectl -n "$namespace" get pods -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' | grep -c . || true)"
   ready_pods="$(kubectl -n "$namespace" get pods -o jsonpath='{range .items[*]}{range .status.conditions[?(@.type=="Ready")]}{.status}{"\n"}{end}{end}' | grep -c '^True$' || true)"
 
-  if [[ "$pod_count" == "4" && "$ready_pods" == "4" ]]; then
+  if [[ "$pod_count" == "5" && "$ready_pods" == "5" ]]; then
     break
   fi
 
   sleep 1
 done
 
-if [[ "$pod_count" != "4" || "$ready_pods" != "4" ]]; then
-  echo "Expected four ready pods after rollout, got pods=${pod_count} ready=${ready_pods}" >&2
+if [[ "$pod_count" != "5" || "$ready_pods" != "5" ]]; then
+  echo "Expected five ready pods after rollout, got pods=${pod_count} ready=${ready_pods}" >&2
   dump_debug
   exit 1
 fi
@@ -205,6 +224,13 @@ orders_log="$(kubectl -n "$namespace" logs -l app=orders-api --all-containers=tr
 if ! grep -q 'orders health endpoint is /readyz' <<< "$orders_log"; then
   echo "orders-api logs do not show the config-driven /readyz endpoint" >&2
   echo "$orders_log" >&2
+  exit 1
+fi
+
+billing_log="$(kubectl -n "$namespace" logs -l app=billing-api --all-containers=true --tail=80)"
+if ! grep -q 'billing health endpoint is /readyz' <<< "$billing_log"; then
+  echo "billing-api logs do not show the preserved /readyz endpoint" >&2
+  echo "$billing_log" >&2
   exit 1
 fi
 
