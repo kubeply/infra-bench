@@ -124,6 +124,22 @@ name = "kubeply/restore-worker-config-access"
 digest = "sha256:cd780ecabe049ad97e65dbd4ae86434cca355f7c0756866d41bafda4017bebf2"
 
 [[tasks]]
+name = "kubeply/restore-metrics-controller-after-values-change"
+digest = "sha256:abf31c71782441c97c096d237492864e22d83cb4201cf0506e14ea995aa805c5"
+
+[[tasks]]
+name = "kubeply/prepare-node-drain-with-pdb"
+digest = "sha256:4ebc7a639c9f9e1a95bbd8f612fab773a7814ff9e77224a5371c199e5a21c525"
+
+[[tasks]]
+name = "kubeply/repair-worker-hpa-scaling-inputs"
+digest = "sha256:36ad98fd586a1d640504c3da020800987d65db8b434c86038b6ab00816f8b201"
+
+[[tasks]]
+name = "kubeply/repair-cross-namespace-service-discovery"
+digest = "sha256:0735beab1c2974d7556efa17d135056f1be4f36ae5559751313d889f42679289"
+
+[[tasks]]
 name = "kubeply/repair-cache-volume-binding"
 digest = "sha256:2f8e4588de540b6576eaabddda6d3d4052bb6add3502f2e499fb0da3a35f71dd"
 
@@ -146,6 +162,23 @@ digest = "sha256:fde9620cd2163caa604319e8c201364e1ba5e8bca28a3a2cfd9aa3cfa839285
 [[tasks]]
 name = "kubeply/complete-staging-namespace-restore"
 digest = "sha256:35416312037a57bf6da0e2906aed971e1d85409e04831e5dfa315e267345ac73"
+
+[[tasks]]
+name = "kubeply/reconnect-checkout-worker-queue"
+digest = "sha256:51daaf8a738933cc2c00e2f80c3744119cad80374942b3fe49b60ab600c56784"
+
+[[tasks]]
+name = "kubeply/restore-grafana-logs-datasource"
+digest = "sha256:1b44a92ff9a87c21274c59eed3b74b805a8870dab08c67fb7937647cb4ded223"
+
+[[tasks]]
+name = "kubeply/recover-nightly-report-cronjob"
+digest = "sha256:d0d528d26b8bbe03039ef842854b0b6ac20834d54c427b2365484436cdedd9b4"
+
+[[tasks]]
+name = "kubeply/repair-report-custom-resource-status"
+digest = "sha256:14e970e26f77541f7b81977ca91fa0d66b35c1d5c52205258ed03f22364cd99f"
+
 
 [[files]]
 path = "metric.py"
