@@ -13,6 +13,10 @@ datasources:
     type: loki
     access: proxy
     url: http://loki.product-observability.svc.cluster.local:3100/ready
+  - name: cluster-metrics
+    type: prometheus
+    access: proxy
+    url: http://prometheus.product-observability.svc.cluster.local:9090/ready
 EOF
 )"
 
