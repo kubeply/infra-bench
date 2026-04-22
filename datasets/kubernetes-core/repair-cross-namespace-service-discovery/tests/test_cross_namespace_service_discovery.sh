@@ -84,14 +84,19 @@ for namespace in "$app_namespace" "$data_namespace"; do
   done
 done
 
-db_url="$(kubectl -n "$app_namespace" get deployment order-worker -o jsonpath='{.spec.template.spec.containers[0].env[0].value}')"
 env_name="$(kubectl -n "$app_namespace" get deployment order-worker -o jsonpath='{.spec.template.spec.containers[0].env[0].name}')"
+env_ref_name="$(kubectl -n "$app_namespace" get deployment order-worker -o jsonpath='{.spec.template.spec.containers[0].env[0].valueFrom.configMapKeyRef.name}')"
+env_ref_key="$(kubectl -n "$app_namespace" get deployment order-worker -o jsonpath='{.spec.template.spec.containers[0].env[0].valueFrom.configMapKeyRef.key}')"
+direct_env_value="$(kubectl -n "$app_namespace" get deployment order-worker -o jsonpath='{.spec.template.spec.containers[0].env[0].value}')"
 settings_url="$(kubectl -n "$app_namespace" get configmap worker-settings -o jsonpath='{.data.DATABASE_URL}')"
 shared_cluster_ip="$(kubectl -n "$data_namespace" get service database -o jsonpath='{.spec.clusterIP}')"
 [[ "$env_name" == "DATABASE_URL" ]] || fail "worker DATABASE_URL env var was renamed"
-[[ "$db_url" == "$expected_url" ]] || fail "DATABASE_URL should be $expected_url, got $db_url"
-[[ "$settings_url" == "$wrong_url" ]] || fail "worker-settings ConfigMap should remain diagnostic context"
-if [[ "$db_url" == *"$shared_cluster_ip"* || "$db_url" =~ ^https?://[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+ ]]; then
+[[ "$env_ref_name" == "worker-settings" && "$env_ref_key" == "DATABASE_URL" ]] \
+  || fail "worker should keep reading DATABASE_URL from worker-settings"
+[[ -z "$direct_env_value" ]] || fail "worker DATABASE_URL should not bypass worker-settings"
+[[ "$settings_url" == "$expected_url" ]] || fail "worker-settings DATABASE_URL should be $expected_url, got $settings_url"
+[[ "$settings_url" != "$wrong_url" ]] || fail "worker-settings still points at the namespace-local placeholder"
+if [[ "$settings_url" == *"$shared_cluster_ip"* || "$settings_url" =~ ^https?://[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+ ]]; then
   fail "DATABASE_URL must use Service DNS, not a ClusterIP literal"
 fi
 
