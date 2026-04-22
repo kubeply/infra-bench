@@ -123,7 +123,8 @@ metadata:
   namespace: analytics-team
 rules:
   - apiGroups: [""]
-    resources: ["configmaps", "endpoints", "events", "pods", "pods/log", "services"]
+    resources:
+      ["configmaps", "endpoints", "events", "pods", "pods/log", "services"]
     verbs: ["get", "list", "watch"]
   - apiGroups: ["apps"]
     resources: ["daemonsets", "deployments", "replicasets", "statefulsets"]
