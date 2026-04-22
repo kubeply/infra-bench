@@ -66,6 +66,9 @@ data:
   docs_service_uid: ""
   status_deployment_uid: ""
   status_service_uid: ""
+  audit_deployment_uid: ""
+  audit_service_uid: ""
+  audit_template_uid: ""
   cache_deployment_uid: ""
 ---
 apiVersion: v1
@@ -75,6 +78,14 @@ metadata:
   namespace: edge-apps
 data:
   backend: profile-api
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: audit-template
+  namespace: edge-apps
+data:
+  backend: audit-api
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -159,6 +170,94 @@ metadata:
 spec:
   selector:
     app: profile-gateway
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: audit-gateway
+  namespace: edge-apps
+  labels:
+    app: audit-gateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: audit-gateway
+  template:
+    metadata:
+      labels:
+        app: audit-gateway
+    spec:
+      containers:
+        - name: app
+          image: busybox:1.36.1
+          command:
+            - /bin/sh
+            - -c
+            - |
+              set -eu
+              mkdir -p /www
+              httpd -p 8080 -h /www &
+              while true; do
+                if [ -f /config/app.conf ] && grep -q "backend=audit-api" /config/app.conf; then
+                  echo "ok" > /www/ready
+                  echo "audit gateway loaded generated config from /config/app.conf"
+                else
+                  rm -f /www/ready
+                  echo "audit gateway waiting for generated config at /config/app.conf" >&2
+                fi
+                sleep 3
+              done
+          ports:
+            - name: http
+              containerPort: 8080
+          volumeMounts:
+            - name: generated-config
+              mountPath: /config
+          readinessProbe:
+            exec:
+              command: ["test", "-f", "/www/ready"]
+            periodSeconds: 2
+        - name: config-writer
+          image: busybox:1.36.1
+          env:
+            - name: CONFIG_OUTPUT
+              value: /generated/app.conf
+            - name: BACKEND
+              valueFrom:
+                configMapKeyRef:
+                  name: audit-template
+                  key: backend
+          command:
+            - /bin/sh
+            - -c
+            - |
+              set -eu
+              while true; do
+                mkdir -p "$(dirname "${CONFIG_OUTPUT}")"
+                printf 'backend=%s\n' "${BACKEND}" > "${CONFIG_OUTPUT}"
+                echo "wrote generated config to ${CONFIG_OUTPUT}"
+                sleep 3
+              done
+          volumeMounts:
+            - name: generated-config
+              mountPath: /generated
+      volumes:
+        - name: generated-config
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: audit-gateway
+  namespace: edge-apps
+spec:
+  selector:
+    app: audit-gateway
   ports:
     - name: http
       port: 8080

@@ -46,29 +46,34 @@ expect_uid deployment docs docs_deployment_uid
 expect_uid service docs docs_service_uid
 expect_uid deployment status-api status_deployment_uid
 expect_uid service status-api status_service_uid
+expect_uid deployment audit-gateway audit_deployment_uid
+expect_uid service audit-gateway audit_service_uid
+expect_uid configmap audit-template audit_template_uid
 expect_uid deployment cache-warmer cache_deployment_uid
 
 deployments="$(kubectl -n "$namespace" get deployments -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' | sort | tr '\n' ' ')"
-[[ "$deployments" == "cache-warmer docs profile-gateway status-api " ]] || fail "unexpected Deployments: $deployments"
+[[ "$deployments" == "audit-gateway cache-warmer docs profile-gateway status-api " ]] || fail "unexpected Deployments: $deployments"
 
 services="$(kubectl -n "$namespace" get services -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' | sort | tr '\n' ' ')"
-[[ "$services" == "docs profile-gateway status-api " ]] || fail "unexpected Services: $services"
+[[ "$services" == "audit-gateway docs profile-gateway status-api " ]] || fail "unexpected Services: $services"
 
 configmaps="$(kubectl -n "$namespace" get configmaps -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' | sort | tr '\n' ' ')"
-[[ "$configmaps" == "infra-bench-baseline kube-root-ca.crt profile-template " ]] || fail "unexpected ConfigMaps: $configmaps"
+[[ "$configmaps" == "audit-template infra-bench-baseline kube-root-ca.crt profile-template " ]] || fail "unexpected ConfigMaps: $configmaps"
 
 for resource in statefulsets daemonsets jobs cronjobs; do
   count="$(kubectl -n "$namespace" get "$resource" -o name | wc -l | tr -d ' ')"
   [[ "$count" == "0" ]] || fail "unexpected $resource were created"
 done
 
-for deployment in profile-gateway docs status-api cache-warmer; do
+for deployment in profile-gateway docs status-api audit-gateway cache-warmer; do
   kubectl -n "$namespace" rollout status deployment/"$deployment" --timeout=180s \
     || fail "deployment/$deployment did not complete rollout"
 done
 
-endpoint_ips="$(kubectl -n "$namespace" get endpoints profile-gateway -o jsonpath='{.subsets[*].addresses[*].ip}' 2>/dev/null || true)"
-[[ -n "$endpoint_ips" ]] || fail "profile-gateway Service has no endpoints"
+for service in profile-gateway docs status-api audit-gateway; do
+  endpoint_ips="$(kubectl -n "$namespace" get endpoints "$service" -o jsonpath='{.subsets[*].addresses[*].ip}' 2>/dev/null || true)"
+  [[ -n "$endpoint_ips" ]] || fail "$service Service has no endpoints"
+done
 
 container_names="$(kubectl -n "$namespace" get deployment profile-gateway -o jsonpath='{range .spec.template.spec.containers[*]}{.name}{"\n"}{end}' | sort | tr '\n' ' ')"
 [[ "$container_names" == "app config-writer " ]] || fail "profile-gateway must keep app and sidecar containers"
@@ -92,6 +97,15 @@ template_backend="$(kubectl -n "$namespace" get configmap profile-template -o js
 
 cache_containers="$(kubectl -n "$namespace" get deployment cache-warmer -o jsonpath='{range .spec.template.spec.containers[*]}{.name}{"\n"}{end}' | sort | tr '\n' ' ')"
 [[ "$cache_containers" == "cache-config-writer worker " ]] || fail "unrelated sidecar workload changed"
+
+audit_containers="$(kubectl -n "$namespace" get deployment audit-gateway -o jsonpath='{range .spec.template.spec.containers[*]}{.name}{"\n"}{end}' | sort | tr '\n' ' ')"
+audit_output_path="$(kubectl -n "$namespace" get deployment audit-gateway -o jsonpath='{.spec.template.spec.containers[1].env[?(@.name=="CONFIG_OUTPUT")].value}')"
+audit_backend_ref="$(kubectl -n "$namespace" get deployment audit-gateway -o jsonpath='{.spec.template.spec.containers[1].env[?(@.name=="BACKEND")].valueFrom.configMapKeyRef.name}')"
+audit_template_backend="$(kubectl -n "$namespace" get configmap audit-template -o jsonpath='{.data.backend}')"
+[[ "$audit_containers" == "app config-writer " ]] || fail "healthy sidecar gateway changed containers"
+[[ "$audit_output_path" == "/generated/app.conf" ]] || fail "healthy sidecar gateway output path changed"
+[[ "$audit_backend_ref" == "audit-template" && "$audit_template_backend" == "audit-api" ]] \
+  || fail "healthy sidecar gateway template changed"
 
 for _ in $(seq 1 90); do
   if kubectl -n "$namespace" logs deployment/profile-gateway -c app --tail=80 2>/dev/null \
