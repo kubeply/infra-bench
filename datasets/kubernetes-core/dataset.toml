@@ -124,6 +124,10 @@ name = "kubeply/restore-worker-config-access"
 digest = "sha256:cd780ecabe049ad97e65dbd4ae86434cca355f7c0756866d41bafda4017bebf2"
 
 [[tasks]]
+name = "kubeply/prepare-node-drain-with-pdb"
+digest = "sha256:4ebc7a639c9f9e1a95bbd8f612fab773a7814ff9e77224a5371c199e5a21c525"
+
+[[tasks]]
 name = "kubeply/repair-worker-hpa-scaling-inputs"
 digest = "sha256:36ad98fd586a1d640504c3da020800987d65db8b434c86038b6ab00816f8b201"
 
