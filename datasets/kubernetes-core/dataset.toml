@@ -109,7 +109,7 @@ digest = "sha256:23035e2bf05bd4c283e44544b368d4771b1bb0cf77bc7b3fc8e4f2786dad9b0
 
 [[tasks]]
 name = "kubeply/recover-api-rollout-after-config-change"
-digest = "sha256:a5e2eb8955828edabdc722c4f42447904fee03a7ea27e0c60e187989f256c159"
+digest = "sha256:b3bc5e35224fb920c8399b310194e44136298e559c01b557b6fb9300ee238e64"
 
 [[tasks]]
 name = "kubeply/schedule-reporting-api-on-labeled-node"
@@ -125,11 +125,11 @@ digest = "sha256:cd780ecabe049ad97e65dbd4ae86434cca355f7c0756866d41bafda4017bebf
 
 [[tasks]]
 name = "kubeply/restore-metrics-controller-after-values-change"
-digest = "sha256:abf31c71782441c97c096d237492864e22d83cb4201cf0506e14ea995aa805c5"
+digest = "sha256:0cd32f7297433cf24031308ffbfc78ed7e5779326269019b7dc4a332a8d5f129"
 
 [[tasks]]
 name = "kubeply/prepare-node-drain-with-pdb"
-digest = "sha256:4ebc7a639c9f9e1a95bbd8f612fab773a7814ff9e77224a5371c199e5a21c525"
+digest = "sha256:78f15054154313a997b47750f9606f628ce8be5930b472b3769e010feda1988c"
 
 [[tasks]]
 name = "kubeply/repair-worker-hpa-scaling-inputs"
@@ -153,19 +153,19 @@ digest = "sha256:04214ec40c38fbcc77c6fc0a29d45bff277ab3fc18b272fb0f342878c4ff81c
 
 [[tasks]]
 name = "kubeply/clear-upgrade-blocking-apis"
-digest = "sha256:aa1955d20ac559b0322a950224be829589aaa0e2bef0f024af334b1ddda43664"
+digest = "sha256:790787ce06af11dd15cebe1b7909c7864892cd6d4844a27522ebc09be6ad4a02"
 
 [[tasks]]
 name = "kubeply/place-inference-canary-on-gpu-node"
-digest = "sha256:fde9620cd2163caa604319e8c201364e1ba5e8bca28a3a2cfd9aa3cfa839285c"
+digest = "sha256:b634d592c737e34208669b1c86ad53c5205560d936eb3cacc26b5d61835d27ce"
 
 [[tasks]]
 name = "kubeply/repair-sidecar-generated-config"
-digest = "sha256:15c740d6489abb53458a169b450d74415d34dc1d4cec0b027762f7aa9792aca5"
+digest = "sha256:426f288ea38ec9d7a8b22c14db28579020dd704a873dca610693cbf26d511a09"
 
 [[tasks]]
 name = "kubeply/repair-restricted-multi-container-pod"
-digest = "sha256:cc4e7d4ecec89d899f851a3b7cd68d9d131aeba821389b504cc7ab9d39d99033"
+digest = "sha256:aa21fbaa7a65648816295df74fc9790306b410cef4d74f8462f5e1e62788d610"
 
 [[tasks]]
 name = "kubeply/complete-staging-namespace-restore"
@@ -177,7 +177,7 @@ digest = "sha256:51daaf8a738933cc2c00e2f80c3744119cad80374942b3fe49b60ab600c5678
 
 [[tasks]]
 name = "kubeply/restore-grafana-logs-datasource"
-digest = "sha256:1b44a92ff9a87c21274c59eed3b74b805a8870dab08c67fb7937647cb4ded223"
+digest = "sha256:fac9b91bc25627f19209d9cb9050785afa46fbe51aec8660268b8e1f67f9aa3a"
 
 [[tasks]]
 name = "kubeply/recover-nightly-report-cronjob"
