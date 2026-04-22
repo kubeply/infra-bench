@@ -4,18 +4,23 @@ set -euo pipefail
 namespace="metrics-team"
 deployment="metrics-adapter"
 service="metrics-adapter"
+telemetry_deployment="telemetry-proxy"
+telemetry_service="telemetry-proxy"
 agent_secret="infra-bench-agent-token"
 
 prepare-kubeconfig
 
 kubectl apply -f /bootstrap/controller.yaml
 
-if ! kubectl -n "$namespace" rollout status deployment/"$deployment" --timeout=180s; then
+for rollout_deployment in "$deployment" "$telemetry_deployment"; do
+  if kubectl -n "$namespace" rollout status deployment/"$rollout_deployment" --timeout=180s; then
+    continue
+  fi
   kubectl -n "$namespace" get all,endpoints -o wide >&2 || true
-  kubectl -n "$namespace" describe deployment "$deployment" >&2 || true
+  kubectl -n "$namespace" describe deployment "$rollout_deployment" >&2 || true
   kubectl -n "$namespace" describe pods >&2 || true
   exit 1
-fi
+done
 
 for _ in $(seq 1 60); do
   endpoint_ips="$(kubectl -n "$namespace" get endpoints "$service" -o jsonpath='{.subsets[*].addresses[*].ip}' 2>/dev/null || true)"
@@ -32,16 +37,38 @@ if [[ -n "$endpoint_ips" ]]; then
   exit 1
 fi
 
+for _ in $(seq 1 60); do
+  telemetry_endpoint_ips="$(kubectl -n "$namespace" get endpoints "$telemetry_service" -o jsonpath='{.subsets[*].addresses[*].ip}' 2>/dev/null || true)"
+  telemetry_endpoint_port="$(kubectl -n "$namespace" get endpoints "$telemetry_service" -o jsonpath='{.subsets[0].ports[0].port}' 2>/dev/null || true)"
+
+  if [[ -n "$telemetry_endpoint_ips" && "$telemetry_endpoint_port" == "8443" ]]; then
+    break
+  fi
+
+  sleep 1
+done
+
+if [[ -z "${telemetry_endpoint_ips:-}" || "${telemetry_endpoint_port:-}" != "8443" ]]; then
+  echo "expected healthy telemetry service to have endpoints" >&2
+  kubectl -n "$namespace" get service "$telemetry_service" -o yaml >&2 || true
+  kubectl -n "$namespace" get endpoints "$telemetry_service" -o yaml >&2 || true
+  exit 1
+fi
+
 baseline_deployment_uid="$(kubectl -n "$namespace" get configmap infra-bench-baseline -o jsonpath='{.data.deployment_uid}')"
 baseline_service_uid="$(kubectl -n "$namespace" get configmap infra-bench-baseline -o jsonpath='{.data.service_uid}')"
 
 if [[ -z "$baseline_deployment_uid" || -z "$baseline_service_uid" ]]; then
   deployment_uid="$(kubectl -n "$namespace" get deployment "$deployment" -o jsonpath='{.metadata.uid}')"
   service_uid="$(kubectl -n "$namespace" get service "$service" -o jsonpath='{.metadata.uid}')"
+  values_uid="$(kubectl -n "$namespace" get configmap metrics-adapter-values -o jsonpath='{.metadata.uid}')"
+  telemetry_deployment_uid="$(kubectl -n "$namespace" get deployment "$telemetry_deployment" -o jsonpath='{.metadata.uid}')"
+  telemetry_service_uid="$(kubectl -n "$namespace" get service "$telemetry_service" -o jsonpath='{.metadata.uid}')"
+  telemetry_values_uid="$(kubectl -n "$namespace" get configmap telemetry-proxy-values -o jsonpath='{.metadata.uid}')"
 
   kubectl -n "$namespace" patch configmap infra-bench-baseline \
     --type merge \
-    --patch "{\"data\":{\"deployment_uid\":\"${deployment_uid}\",\"service_uid\":\"${service_uid}\"}}"
+    --patch "{\"data\":{\"deployment_uid\":\"${deployment_uid}\",\"service_uid\":\"${service_uid}\",\"values_uid\":\"${values_uid}\",\"telemetry_deployment_uid\":\"${telemetry_deployment_uid}\",\"telemetry_service_uid\":\"${telemetry_service_uid}\",\"telemetry_values_uid\":\"${telemetry_values_uid}\"}}"
 fi
 
 for _ in $(seq 1 60); do
