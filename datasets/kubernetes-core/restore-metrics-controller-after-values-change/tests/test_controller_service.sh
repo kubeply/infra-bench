@@ -6,6 +6,10 @@ prepare-kubeconfig
 namespace="metrics-team"
 deployment="metrics-adapter"
 service="metrics-adapter"
+values_configmap="metrics-adapter-values"
+telemetry_deployment="telemetry-proxy"
+telemetry_service="telemetry-proxy"
+telemetry_values_configmap="telemetry-proxy-values"
 
 dump_debug() {
   echo "--- namespace resources ---"
@@ -22,26 +26,51 @@ dump_debug() {
   kubectl -n "$namespace" get events --sort-by=.lastTimestamp || true
 }
 
-if ! kubectl -n "$namespace" rollout status deployment/"$deployment" --timeout=180s; then
+for rollout_deployment in "$deployment" "$telemetry_deployment"; do
+  if kubectl -n "$namespace" rollout status deployment/"$rollout_deployment" --timeout=180s; then
+    continue
+  fi
   dump_debug
   exit 1
-fi
+done
 
 deployment_uid="$(kubectl -n "$namespace" get deployment "$deployment" -o jsonpath='{.metadata.uid}')"
 service_uid="$(kubectl -n "$namespace" get service "$service" -o jsonpath='{.metadata.uid}')"
+values_uid="$(kubectl -n "$namespace" get configmap "$values_configmap" -o jsonpath='{.metadata.uid}')"
+telemetry_deployment_uid="$(kubectl -n "$namespace" get deployment "$telemetry_deployment" -o jsonpath='{.metadata.uid}')"
+telemetry_service_uid="$(kubectl -n "$namespace" get service "$telemetry_service" -o jsonpath='{.metadata.uid}')"
+telemetry_values_uid="$(kubectl -n "$namespace" get configmap "$telemetry_values_configmap" -o jsonpath='{.metadata.uid}')"
 baseline_deployment_uid="$(kubectl -n "$namespace" get configmap infra-bench-baseline -o jsonpath='{.data.deployment_uid}')"
 baseline_service_uid="$(kubectl -n "$namespace" get configmap infra-bench-baseline -o jsonpath='{.data.service_uid}')"
+baseline_values_uid="$(kubectl -n "$namespace" get configmap infra-bench-baseline -o jsonpath='{.data.values_uid}')"
+baseline_telemetry_deployment_uid="$(kubectl -n "$namespace" get configmap infra-bench-baseline -o jsonpath='{.data.telemetry_deployment_uid}')"
+baseline_telemetry_service_uid="$(kubectl -n "$namespace" get configmap infra-bench-baseline -o jsonpath='{.data.telemetry_service_uid}')"
+baseline_telemetry_values_uid="$(kubectl -n "$namespace" get configmap infra-bench-baseline -o jsonpath='{.data.telemetry_values_uid}')"
 
-if [[ -z "$baseline_deployment_uid" || -z "$baseline_service_uid" ]]; then
+if [[ -z "$baseline_deployment_uid" \
+  || -z "$baseline_service_uid" \
+  || -z "$baseline_values_uid" \
+  || -z "$baseline_telemetry_deployment_uid" \
+  || -z "$baseline_telemetry_service_uid" \
+  || -z "$baseline_telemetry_values_uid" ]]; then
   echo "Baseline ConfigMap is missing resource UIDs" >&2
   kubectl -n "$namespace" get configmap infra-bench-baseline -o yaml || true
   exit 1
 fi
 
-if [[ "$deployment_uid" != "$baseline_deployment_uid" || "$service_uid" != "$baseline_service_uid" ]]; then
-  echo "Deployment or Service was replaced" >&2
+if [[ "$deployment_uid" != "$baseline_deployment_uid" \
+  || "$service_uid" != "$baseline_service_uid" \
+  || "$values_uid" != "$baseline_values_uid" \
+  || "$telemetry_deployment_uid" != "$baseline_telemetry_deployment_uid" \
+  || "$telemetry_service_uid" != "$baseline_telemetry_service_uid" \
+  || "$telemetry_values_uid" != "$baseline_telemetry_values_uid" ]]; then
+  echo "A preserved resource was replaced" >&2
   echo "deployment expected=${baseline_deployment_uid} got=${deployment_uid}" >&2
   echo "service expected=${baseline_service_uid} got=${service_uid}" >&2
+  echo "values expected=${baseline_values_uid} got=${values_uid}" >&2
+  echo "telemetry deployment expected=${baseline_telemetry_deployment_uid} got=${telemetry_deployment_uid}" >&2
+  echo "telemetry service expected=${baseline_telemetry_service_uid} got=${telemetry_service_uid}" >&2
+  echo "telemetry values expected=${baseline_telemetry_values_uid} got=${telemetry_values_uid}" >&2
   exit 1
 fi
 
@@ -49,12 +78,12 @@ deployment_names="$(kubectl -n "$namespace" get deployments -o jsonpath='{range 
 service_names="$(kubectl -n "$namespace" get services -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' | sort)"
 configmap_names="$(kubectl -n "$namespace" get configmaps -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' | sort)"
 
-if [[ "$deployment_names" != "$deployment" || "$service_names" != "$service" ]]; then
+if [[ "$deployment_names" != $'metrics-adapter\ntelemetry-proxy' || "$service_names" != $'metrics-adapter\ntelemetry-proxy' ]]; then
   echo "Unexpected Deployment or Service set: deployments=${deployment_names} services=${service_names}" >&2
   exit 1
 fi
 
-if [[ "$configmap_names" != $'infra-bench-baseline\nkube-root-ca.crt' ]]; then
+if [[ "$configmap_names" != $'infra-bench-baseline\nkube-root-ca.crt\nmetrics-adapter-values\ntelemetry-proxy-values' ]]; then
   echo "Unexpected ConfigMap set in $namespace: $configmap_names" >&2
   exit 1
 fi
@@ -107,7 +136,7 @@ if [[ "$service_selector_name" != "$deployment" || "$service_selector_component"
   exit 1
 fi
 
-if [[ "$container_names" != "$deployment" || "$container_image" != "nginx:1.27" || "$container_port_name" != "https" || "$container_port" != "8443" ]]; then
+if [[ "$container_names" != "$deployment" || "$container_image" != "busybox:1.36" || "$container_port_name" != "https" || "$container_port" != "8443" ]]; then
   echo "Controller container changed; names=${container_names} image=${container_image} port=${container_port_name}:${container_port}" >&2
   exit 1
 fi
@@ -122,18 +151,60 @@ if [[ "$replicas" != "2" || "$ready_replicas" != "2" ]]; then
   exit 1
 fi
 
+telemetry_selector_name="$(kubectl -n "$namespace" get service "$telemetry_service" -o jsonpath='{.spec.selector.app\.kubernetes\.io/name}')"
+telemetry_selector_component="$(kubectl -n "$namespace" get service "$telemetry_service" -o jsonpath='{.spec.selector.app\.kubernetes\.io/component}')"
+telemetry_image="$(kubectl -n "$namespace" get deployment "$telemetry_deployment" -o jsonpath='{.spec.template.spec.containers[0].image}')"
+telemetry_replicas="$(kubectl -n "$namespace" get deployment "$telemetry_deployment" -o jsonpath='{.spec.replicas}')"
+telemetry_ready_replicas="$(kubectl -n "$namespace" get deployment "$telemetry_deployment" -o jsonpath='{.status.readyReplicas}')"
+telemetry_service_port="$(kubectl -n "$namespace" get service "$telemetry_service" -o jsonpath='{.spec.ports[0].port}')"
+telemetry_target_port="$(kubectl -n "$namespace" get service "$telemetry_service" -o jsonpath='{.spec.ports[0].targetPort}')"
+values_release="$(kubectl -n "$namespace" get configmap "$values_configmap" -o jsonpath='{.data.values\.yaml}' | grep -c 'release: platform-metrics' || true)"
+telemetry_values_release="$(kubectl -n "$namespace" get configmap "$telemetry_values_configmap" -o jsonpath='{.data.values\.yaml}' | grep -c 'release: telemetry-stack' || true)"
+
+if [[ "$telemetry_selector_name" != "$telemetry_deployment" || "$telemetry_selector_component" != "controller" ]]; then
+  echo "Healthy telemetry Service selector changed" >&2
+  exit 1
+fi
+
+if [[ "$telemetry_image" != "busybox:1.36" || "$telemetry_replicas" != "1" || "$telemetry_ready_replicas" != "1" ]]; then
+  echo "Healthy telemetry Deployment changed; image=${telemetry_image} spec=${telemetry_replicas} ready=${telemetry_ready_replicas}" >&2
+  exit 1
+fi
+
+if [[ "$telemetry_service_port" != "443" || "$telemetry_target_port" != "https" ]]; then
+  echo "Healthy telemetry Service port changed" >&2
+  exit 1
+fi
+
+if [[ "$values_release" != "1" || "$telemetry_values_release" != "1" ]]; then
+  echo "Chart-style values ConfigMaps were modified unexpectedly" >&2
+  exit 1
+fi
+
 for _ in $(seq 1 60); do
   endpoint_ips="$(kubectl -n "$namespace" get endpoints "$service" -o jsonpath='{.subsets[*].addresses[*].ip}' 2>/dev/null || true)"
   endpoint_port="$(kubectl -n "$namespace" get endpoints "$service" -o jsonpath='{.subsets[0].ports[0].port}' 2>/dev/null || true)"
 
   if [[ -n "$endpoint_ips" && "$endpoint_port" == "8443" ]]; then
-    echo "Service $service has controller endpoints: $endpoint_ips"
-    exit 0
+    break
   fi
 
   sleep 1
 done
 
-echo "Service $service has no ready controller endpoints on port 8443" >&2
-dump_debug
-exit 1
+if [[ -z "${endpoint_ips:-}" || "${endpoint_port:-}" != "8443" ]]; then
+  echo "Service $service has no ready controller endpoints on port 8443" >&2
+  dump_debug
+  exit 1
+fi
+
+telemetry_endpoint_ips="$(kubectl -n "$namespace" get endpoints "$telemetry_service" -o jsonpath='{.subsets[*].addresses[*].ip}' 2>/dev/null || true)"
+telemetry_endpoint_port="$(kubectl -n "$namespace" get endpoints "$telemetry_service" -o jsonpath='{.subsets[0].ports[0].port}' 2>/dev/null || true)"
+
+if [[ -z "$telemetry_endpoint_ips" || "$telemetry_endpoint_port" != "8443" ]]; then
+  echo "Healthy telemetry Service lost its endpoints" >&2
+  dump_debug
+  exit 1
+fi
+
+echo "Service $service has controller endpoints: $endpoint_ips"
