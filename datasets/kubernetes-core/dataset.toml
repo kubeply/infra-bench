@@ -161,7 +161,7 @@ digest = "sha256:fde9620cd2163caa604319e8c201364e1ba5e8bca28a3a2cfd9aa3cfa839285
 
 [[tasks]]
 name = "kubeply/recover-nightly-report-cronjob"
-digest = "sha256:6b9933550307157c0a90fe326c472494d9aa6aafc99519037cccc577168ceb27"
+digest = "sha256:d0d528d26b8bbe03039ef842854b0b6ac20834d54c427b2365484436cdedd9b4"
 
 [[tasks]]
 name = "kubeply/repair-report-custom-resource-status"
