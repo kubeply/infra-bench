@@ -124,6 +124,26 @@ name = "kubeply/restore-worker-config-access"
 digest = "sha256:cd780ecabe049ad97e65dbd4ae86434cca355f7c0756866d41bafda4017bebf2"
 
 [[tasks]]
+name = "kubeply/restore-metrics-controller-after-values-change"
+digest = "sha256:abf31c71782441c97c096d237492864e22d83cb4201cf0506e14ea995aa805c5"
+
+[[tasks]]
+name = "kubeply/prepare-node-drain-with-pdb"
+digest = "sha256:4ebc7a639c9f9e1a95bbd8f612fab773a7814ff9e77224a5371c199e5a21c525"
+
+[[tasks]]
+name = "kubeply/repair-worker-hpa-scaling-inputs"
+digest = "sha256:36ad98fd586a1d640504c3da020800987d65db8b434c86038b6ab00816f8b201"
+
+[[tasks]]
+name = "kubeply/repair-cross-namespace-service-discovery"
+digest = "sha256:0735beab1c2974d7556efa17d135056f1be4f36ae5559751313d889f42679289"
+
+[[tasks]]
+name = "kubeply/repair-cache-volume-binding"
+digest = "sha256:2f8e4588de540b6576eaabddda6d3d4052bb6add3502f2e499fb0da3a35f71dd"
+
+[[tasks]]
 name = "kubeply/restore-checkout-network-path"
 digest = "sha256:16483bfceefab0046f52ad350bc69368ebdd85259f05c94652d9911fa8d78775"
 
@@ -142,6 +162,11 @@ digest = "sha256:fde9620cd2163caa604319e8c201364e1ba5e8bca28a3a2cfd9aa3cfa839285
 [[tasks]]
 name = "kubeply/recover-nightly-report-cronjob"
 digest = "sha256:6b9933550307157c0a90fe326c472494d9aa6aafc99519037cccc577168ceb27"
+
+[[tasks]]
+name = "kubeply/repair-report-custom-resource-status"
+digest = "sha256:14e970e26f77541f7b81977ca91fa0d66b35c1d5c52205258ed03f22364cd99f"
+
 
 [[files]]
 path = "metric.py"
