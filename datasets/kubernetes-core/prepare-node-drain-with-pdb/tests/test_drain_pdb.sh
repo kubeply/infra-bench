@@ -102,11 +102,14 @@ general_node="$(baseline general_node_name)"
 expect_uid deployment orders-api orders_deployment_uid
 expect_uid deployment docs docs_deployment_uid
 expect_uid deployment background-worker worker_deployment_uid
+expect_uid deployment reporting-api reporting_deployment_uid
 expect_uid service orders-api orders_service_uid
 expect_uid service docs docs_service_uid
 expect_uid service background-worker worker_service_uid
+expect_uid service reporting-api reporting_service_uid
 expect_uid pdb orders-api orders_pdb_uid
 expect_uid pdb background-worker worker_pdb_uid
+expect_uid pdb reporting-api reporting_pdb_uid
 
 maintenance_label="$(kubectl get node "$maintenance_node" -o jsonpath='{.metadata.labels.infra-bench/node-pool}')"
 general_label="$(kubectl get node "$general_node" -o jsonpath='{.metadata.labels.infra-bench/node-pool}')"
@@ -120,9 +123,9 @@ service_names="$(kubectl -n "$namespace" get services -o jsonpath='{range .items
 pdb_names="$(kubectl -n "$namespace" get pdb -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' | sort)"
 configmap_names="$(kubectl -n "$namespace" get configmaps -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' | sort)"
 
-[[ "$deployment_names" == $'background-worker\ndocs\norders-api' ]] || fail "unexpected deployments: $deployment_names"
-[[ "$service_names" == $'background-worker\ndocs\norders-api' ]] || fail "unexpected services: $service_names"
-[[ "$pdb_names" == $'background-worker\norders-api' ]] || fail "unexpected PDBs: $pdb_names"
+[[ "$deployment_names" == $'background-worker\ndocs\norders-api\nreporting-api' ]] || fail "unexpected deployments: $deployment_names"
+[[ "$service_names" == $'background-worker\ndocs\norders-api\nreporting-api' ]] || fail "unexpected services: $service_names"
+[[ "$pdb_names" == $'background-worker\norders-api\nreporting-api' ]] || fail "unexpected PDBs: $pdb_names"
 [[ "$configmap_names" == $'infra-bench-baseline\nkube-root-ca.crt' ]] || fail "unexpected configmaps: $configmap_names"
 
 unexpected_workloads="$(
@@ -138,9 +141,11 @@ unexpected_workloads="$(
 expect_deployment_common orders-api 3
 expect_deployment_common docs 1
 expect_deployment_common background-worker 2
+expect_deployment_common reporting-api 3
 expect_service orders-api
 expect_service docs
 expect_service background-worker
+expect_service reporting-api
 
 orders_selector_count="$(kubectl -n "$namespace" get deployment orders-api -o go-template='{{if .spec.template.spec.nodeSelector}}{{len .spec.template.spec.nodeSelector}}{{else}}0{{end}}')"
 orders_pdb_min="$(kubectl -n "$namespace" get pdb orders-api -o jsonpath='{.spec.minAvailable}')"
@@ -149,11 +154,15 @@ orders_pdb_selector="$(kubectl -n "$namespace" get pdb orders-api -o jsonpath='{
 orders_allowed="$(kubectl -n "$namespace" get pdb orders-api -o jsonpath='{.status.disruptionsAllowed}')"
 worker_pdb_max="$(kubectl -n "$namespace" get pdb background-worker -o jsonpath='{.spec.maxUnavailable}')"
 worker_pdb_selector="$(kubectl -n "$namespace" get pdb background-worker -o jsonpath='{.spec.selector.matchLabels.app}')"
+reporting_pdb_max="$(kubectl -n "$namespace" get pdb reporting-api -o jsonpath='{.spec.maxUnavailable}')"
+reporting_pdb_selector="$(kubectl -n "$namespace" get pdb reporting-api -o jsonpath='{.spec.selector.matchLabels.app}')"
+reporting_allowed="$(kubectl -n "$namespace" get pdb reporting-api -o jsonpath='{.status.disruptionsAllowed}')"
 
 [[ "$orders_selector_count" == "0" ]] || fail "orders-api still has maintenance-only nodeSelector"
 [[ "$orders_pdb_min" == "2" && -z "$orders_pdb_max" && "$orders_pdb_selector" == "orders-api" ]] || fail "orders-api PDB was weakened or retargeted"
 [[ "$orders_allowed" -ge 1 ]] || fail "orders-api PDB still does not allow one disruption"
 [[ "$worker_pdb_max" == "1" && "$worker_pdb_selector" == "background-worker" ]] || fail "background-worker PDB changed"
+[[ "$reporting_pdb_max" == "1" && "$reporting_pdb_selector" == "reporting-api" && "$reporting_allowed" -ge 1 ]] || fail "reporting-api PDB changed"
 
 general_orders="$(
   kubectl -n "$namespace" get pods -l app=orders-api \
@@ -162,7 +171,7 @@ general_orders="$(
 )"
 [[ "$general_orders" -ge 1 ]] || fail "orders-api did not schedule any pod outside the maintenance node"
 
-for service in orders-api docs background-worker; do
+for service in orders-api docs background-worker reporting-api; do
   endpoints="$(kubectl -n "$namespace" get endpoints "$service" -o jsonpath='{.subsets[*].addresses[*].ip}' 2>/dev/null || true)"
   [[ -n "$endpoints" ]] || fail "service/$service has no ready endpoints"
 done
