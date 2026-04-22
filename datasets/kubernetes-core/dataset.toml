@@ -125,7 +125,7 @@ digest = "sha256:cd780ecabe049ad97e65dbd4ae86434cca355f7c0756866d41bafda4017bebf
 
 [[tasks]]
 name = "kubeply/restore-metrics-controller-after-values-change"
-digest = "sha256:2a3ac237e01088d6ca8f86af04c26d139bd02a369217f9999ec0dc9def2622d7"
+digest = "sha256:abf31c71782441c97c096d237492864e22d83cb4201cf0506e14ea995aa805c5"
 
 [[tasks]]
 name = "kubeply/prepare-node-drain-with-pdb"
