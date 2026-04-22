@@ -11,7 +11,7 @@ kubectl -n "$namespace" patch deployment checkout-worker --type=json \
 kubectl -n "$namespace" rollout status deployment/checkout-worker --timeout=180s
 
 for _ in $(seq 1 60); do
-  if kubectl -n "$namespace" logs deployment/checkout-worker --tail=40 2>/dev/null | grep -q "processed checkout order"; then
+  if kubectl -n "$namespace" logs deployment/checkout-worker --tail=40 2>/dev/null | grep -q "processed checkout order checkout-order-1842"; then
     exit 0
   fi
   sleep 1

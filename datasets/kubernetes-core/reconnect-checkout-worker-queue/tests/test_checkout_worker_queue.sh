@@ -113,6 +113,8 @@ inventory_worker_url="$(kubectl -n "$namespace" get deployment inventory-worker 
 checkout_worker_sa="$(kubectl -n "$namespace" get deployment checkout-worker -o jsonpath='{.spec.template.spec.serviceAccountName}')"
 checkout_worker_image="$(kubectl -n "$namespace" get deployment checkout-worker -o jsonpath='{.spec.template.spec.containers[0].image}')"
 inventory_worker_image="$(kubectl -n "$namespace" get deployment inventory-worker -o jsonpath='{.spec.template.spec.containers[0].image}')"
+checkout_queue_command="$(kubectl -n "$namespace" get deployment checkout-queue -o jsonpath='{.spec.template.spec.containers[0].command}')"
+checkout_api_command="$(kubectl -n "$namespace" get deployment checkout-api -o jsonpath='{.spec.template.spec.containers[0].command}')"
 
 [[ "$checkout_queue_port" == "5673" && "$checkout_queue_target" == "queue" ]] \
   || fail "checkout queue Service port relationship changed"
@@ -124,6 +126,11 @@ inventory_worker_image="$(kubectl -n "$namespace" get deployment inventory-worke
 [[ "$checkout_worker_sa" == "checkout-runner" ]] || fail "checkout worker ServiceAccount changed"
 [[ "$checkout_worker_image" == "busybox:1.36.1" && "$inventory_worker_image" == "busybox:1.36.1" ]] \
   || fail "worker images changed"
+
+grep -q "checkout-order-1842:pending" <<< "$checkout_queue_command" \
+  || fail "checkout queue payload changed"
+grep -q "checkout-order-1842 waiting-for-worker" <<< "$checkout_api_command" \
+  || fail "checkout API order state changed"
 
 if grep -Eq 'https?://(localhost|127\.0\.0\.1|host\.docker\.internal|[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+|[^. ]+\.com)' <<< "$checkout_worker_url"; then
   fail "checkout worker uses an external or host-local queue endpoint"
@@ -139,14 +146,14 @@ done
 
 for _ in $(seq 1 90); do
   if kubectl -n "$namespace" logs deployment/checkout-worker --tail=80 2>/dev/null \
-    | grep -q "processed checkout order through http://checkout-queue.retail-stack.svc.cluster.local:5673/process"; then
+    | grep -q "processed checkout order checkout-order-1842 through http://checkout-queue.retail-stack.svc.cluster.local:5673/process"; then
     break
   fi
   sleep 1
 done
 
 if ! kubectl -n "$namespace" logs deployment/checkout-worker --tail=100 2>/dev/null \
-  | grep -q "processed checkout order through http://checkout-queue.retail-stack.svc.cluster.local:5673/process"; then
+  | grep -q "processed checkout order checkout-order-1842 through http://checkout-queue.retail-stack.svc.cluster.local:5673/process"; then
   fail "checkout worker did not process through the repaired queue path"
 fi
 

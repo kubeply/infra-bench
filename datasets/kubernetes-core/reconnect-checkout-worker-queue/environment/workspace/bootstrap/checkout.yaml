@@ -118,7 +118,7 @@ spec:
             - -c
             - |
               mkdir -p /www
-              echo "checkout-queue-ok" > /www/process
+              echo "checkout-order-1842:pending" > /www/process
               httpd -f -p 5672 -h /www
           ports:
             - name: queue
@@ -169,8 +169,8 @@ spec:
             - |
               set -eu
               while true; do
-                if wget -qO- "${QUEUE_URL}" 2>/dev/null | grep -q "checkout-queue-ok"; then
-                  echo "processed checkout order through ${QUEUE_URL}"
+                if wget -qO- "${QUEUE_URL}" 2>/dev/null | grep -q "checkout-order-1842:pending"; then
+                  echo "processed checkout order checkout-order-1842 through ${QUEUE_URL}"
                 else
                   echo "checkout worker queue connection failed for ${QUEUE_URL}" >&2
                 fi
@@ -203,6 +203,7 @@ spec:
             - |
               mkdir -p /www
               echo "checkout-api-ok" > /www/ready
+              echo "checkout-order-1842 waiting-for-worker" > /www/orders
               httpd -f -p 8080 -h /www
           ports:
             - name: http
