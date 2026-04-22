@@ -160,6 +160,10 @@ name = "kubeply/place-inference-canary-on-gpu-node"
 digest = "sha256:fde9620cd2163caa604319e8c201364e1ba5e8bca28a3a2cfd9aa3cfa839285c"
 
 [[tasks]]
+name = "kubeply/repair-sidecar-generated-config"
+digest = "sha256:15c740d6489abb53458a169b450d74415d34dc1d4cec0b027762f7aa9792aca5"
+
+[[tasks]]
 name = "kubeply/repair-restricted-multi-container-pod"
 digest = "sha256:cc4e7d4ecec89d899f851a3b7cd68d9d131aeba821389b504cc7ab9d39d99033"
 
