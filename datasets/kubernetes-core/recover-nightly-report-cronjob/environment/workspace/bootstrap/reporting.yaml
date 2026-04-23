@@ -104,6 +104,14 @@ metadata:
 data:
   ready: report-api-ok
 ---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: report-archive-content
+  namespace: finance-ops
+data:
+  archive: report-archive-ready
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -146,6 +154,53 @@ metadata:
 spec:
   selector:
     app: report-api
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: report-archive
+  namespace: finance-ops
+  labels:
+    app: report-archive
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: report-archive
+  template:
+    metadata:
+      labels:
+        app: report-archive
+    spec:
+      containers:
+        - name: report-archive
+          image: nginx:1.27
+          ports:
+            - name: http
+              containerPort: 80
+          volumeMounts:
+            - name: report-archive-content
+              mountPath: /usr/share/nginx/html
+              readOnly: true
+      volumes:
+        - name: report-archive-content
+          configMap:
+            name: report-archive-content
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: report-archive
+  namespace: finance-ops
+  labels:
+    app: report-archive
+spec:
+  selector:
+    app: report-archive
   ports:
     - name: http
       port: 80
@@ -234,6 +289,9 @@ spec:
                   fi
                   response="$(wget -qO- "${REPORT_API_URL}")"
                   echo "$response" | grep -q "report-api-ok"
+                  archive_response="$(wget -qO- "http://report-archive.finance-ops.svc.cluster.local/archive")"
+                  echo "$archive_response" | grep -q "report-archive-ready"
+                  echo "nightly report archived"
                   echo "nightly report completed"
               env:
                 - name: REPORT_API_URL

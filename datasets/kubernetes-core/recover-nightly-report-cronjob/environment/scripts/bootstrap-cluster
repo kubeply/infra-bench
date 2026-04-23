@@ -12,7 +12,7 @@ prepare-kubeconfig
 
 kubectl apply -f /bootstrap/reporting.yaml
 
-for deployment in report-api docs; do
+for deployment in report-api report-archive docs; do
   if ! kubectl -n "$namespace" rollout status deployment/"$deployment" --timeout=240s; then
     kubectl -n "$namespace" get all,configmaps,secrets -o wide >&2 || true
     kubectl -n "$namespace" describe deployment "$deployment" >&2 || true
@@ -20,7 +20,7 @@ for deployment in report-api docs; do
   fi
 done
 
-for service in report-api docs; do
+for service in report-api report-archive docs; do
   for _ in $(seq 1 60); do
     endpoints="$(kubectl -n "$namespace" get endpoints "$service" -o jsonpath='{.subsets[*].addresses[*].ip}' 2>/dev/null || true)"
     if [[ -n "$endpoints" ]]; then
@@ -78,9 +78,12 @@ report_runner_uid="$(kubectl -n "$namespace" get serviceaccount report-runner -o
 report_api_config_uid="$(kubectl -n "$namespace" get configmap report-api-config -o jsonpath='{.metadata.uid}')"
 old_report_api_config_uid="$(kubectl -n "$namespace" get configmap report-api-config-old -o jsonpath='{.metadata.uid}')"
 report_api_content_uid="$(kubectl -n "$namespace" get configmap report-api-content -o jsonpath='{.metadata.uid}')"
+report_archive_content_uid="$(kubectl -n "$namespace" get configmap report-archive-content -o jsonpath='{.metadata.uid}')"
 report_api_token_uid="$(kubectl -n "$namespace" get secret report-api-token -o jsonpath='{.metadata.uid}')"
 report_api_deployment_uid="$(kubectl -n "$namespace" get deployment report-api -o jsonpath='{.metadata.uid}')"
 report_api_service_uid="$(kubectl -n "$namespace" get service report-api -o jsonpath='{.metadata.uid}')"
+report_archive_deployment_uid="$(kubectl -n "$namespace" get deployment report-archive -o jsonpath='{.metadata.uid}')"
+report_archive_service_uid="$(kubectl -n "$namespace" get service report-archive -o jsonpath='{.metadata.uid}')"
 docs_deployment_uid="$(kubectl -n "$namespace" get deployment docs -o jsonpath='{.metadata.uid}')"
 docs_service_uid="$(kubectl -n "$namespace" get service docs -o jsonpath='{.metadata.uid}')"
 
@@ -93,9 +96,12 @@ kubectl -n "$namespace" create configmap infra-bench-baseline \
   --from-literal=report_api_config_uid="$report_api_config_uid" \
   --from-literal=old_report_api_config_uid="$old_report_api_config_uid" \
   --from-literal=report_api_content_uid="$report_api_content_uid" \
+  --from-literal=report_archive_content_uid="$report_archive_content_uid" \
   --from-literal=report_api_token_uid="$report_api_token_uid" \
   --from-literal=report_api_deployment_uid="$report_api_deployment_uid" \
   --from-literal=report_api_service_uid="$report_api_service_uid" \
+  --from-literal=report_archive_deployment_uid="$report_archive_deployment_uid" \
+  --from-literal=report_archive_service_uid="$report_archive_service_uid" \
   --from-literal=docs_deployment_uid="$docs_deployment_uid" \
   --from-literal=docs_service_uid="$docs_service_uid"
 

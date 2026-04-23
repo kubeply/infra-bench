@@ -83,6 +83,7 @@ metadata:
 data:
   ui_deployment_uid: ""
   ui_service_uid: ""
+  incident_monitor_deployment_uid: ""
   logs_backend_deployment_uid: ""
   logs_backend_service_uid: ""
   docs_deployment_uid: ""
@@ -301,6 +302,41 @@ spec:
     - name: http
       port: 3000
       targetPort: http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: incident-monitor
+  namespace: product-observability
+  labels:
+    app: incident-monitor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: incident-monitor
+  template:
+    metadata:
+      labels:
+        app: incident-monitor
+    spec:
+      containers:
+        - name: incident-monitor
+          image: busybox:1.36.1
+          command:
+            - /bin/sh
+            - -c
+            - |
+              set -eu
+              ui_url="http://observability-ui.product-observability.svc.cluster.local:3000/panels"
+              while true; do
+                if wget -qO- "$ui_url" 2>/dev/null | grep -q "logs-ready"; then
+                  echo "incident monitor confirmed log panels via ${ui_url}"
+                else
+                  echo "incident monitor waiting for log panels via ${ui_url}" >&2
+                fi
+                sleep 4
+              done
 ---
 apiVersion: apps/v1
 kind: Deployment

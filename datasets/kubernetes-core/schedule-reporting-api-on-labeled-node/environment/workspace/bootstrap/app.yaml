@@ -179,10 +179,22 @@ spec:
             - /bin/sh
             - -c
             - |
+              set -eu
               mkdir -p /www
               echo "ok" > /www/ready
-              echo "web api healthy"
-              httpd -f -p 8080 -h /www
+              echo "reporting pages unavailable" > /www/status
+              httpd -f -p 8080 -h /www &
+              reporting_url="http://reporting-api.analytics-platform.svc.cluster.local/ready"
+              while true; do
+                if wget -qO- "$reporting_url" 2>/dev/null | grep -q '^ok$'; then
+                  echo "reporting pages ready" > /www/status
+                  echo "web api serving reporting pages via ${reporting_url}"
+                else
+                  echo "reporting pages unavailable" > /www/status
+                  echo "web api waiting for reporting pages via ${reporting_url}" >&2
+                fi
+                sleep 4
+              done
           ports:
             - name: http
               containerPort: 8080

@@ -8,7 +8,7 @@ prepare-kubeconfig
 
 kubectl apply -f /bootstrap/app.yaml
 
-for deployment in docs-api audit-api; do
+for deployment in docs-api audit-api status-api; do
   kubectl -n "$namespace" rollout status "deployment/${deployment}" --timeout=180s
 done
 
@@ -26,6 +26,9 @@ docs_deployment_uid="$(
 audit_deployment_uid="$(
   kubectl -n "$namespace" get deployment audit-api -o jsonpath='{.metadata.uid}'
 )"
+status_deployment_uid="$(
+  kubectl -n "$namespace" get deployment status-api -o jsonpath='{.metadata.uid}'
+)"
 worker_service_uid="$(
   kubectl -n "$namespace" get service fulfillment-worker -o jsonpath='{.metadata.uid}'
 )"
@@ -34,6 +37,9 @@ docs_service_uid="$(
 )"
 audit_service_uid="$(
   kubectl -n "$namespace" get service audit-api -o jsonpath='{.metadata.uid}'
+)"
+status_service_uid="$(
+  kubectl -n "$namespace" get service status-api -o jsonpath='{.metadata.uid}'
 )"
 worker_sa_uid="$(
   kubectl -n "$namespace" get serviceaccount fulfillment-worker -o jsonpath='{.metadata.uid}'
@@ -54,6 +60,14 @@ binding_uid="$(
   kubectl -n "$namespace" get rolebinding fulfillment-runtime-reader -o jsonpath='{.metadata.uid}'
 )"
 
+for _ in $(seq 1 60); do
+  if kubectl -n "$namespace" logs deployment/status-api --tail=20 2>/dev/null \
+    | grep -q 'fulfillment jobs stuck via http://fulfillment-worker.fulfillment-platform.svc.cluster.local/ready'; then
+    break
+  fi
+  sleep 1
+done
+
 kubectl -n "$namespace" patch configmap infra-bench-baseline \
   --type merge \
   --patch "$(cat <<PATCH
@@ -62,9 +76,11 @@ kubectl -n "$namespace" patch configmap infra-bench-baseline \
     "worker_deployment_uid": "${worker_deployment_uid}",
     "docs_deployment_uid": "${docs_deployment_uid}",
     "audit_deployment_uid": "${audit_deployment_uid}",
+    "status_deployment_uid": "${status_deployment_uid}",
     "worker_service_uid": "${worker_service_uid}",
     "docs_service_uid": "${docs_service_uid}",
     "audit_service_uid": "${audit_service_uid}",
+    "status_service_uid": "${status_service_uid}",
     "worker_sa_uid": "${worker_sa_uid}",
     "admin_sa_uid": "${admin_sa_uid}",
     "runtime_config_uid": "${runtime_config_uid}",

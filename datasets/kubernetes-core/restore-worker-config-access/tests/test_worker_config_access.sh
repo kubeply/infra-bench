@@ -56,9 +56,11 @@ expect_uid() {
 expect_uid deployment fulfillment-worker worker_deployment_uid
 expect_uid deployment docs-api docs_deployment_uid
 expect_uid deployment audit-api audit_deployment_uid
+expect_uid deployment status-api status_deployment_uid
 expect_uid service fulfillment-worker worker_service_uid
 expect_uid service docs-api docs_service_uid
 expect_uid service audit-api audit_service_uid
+expect_uid service status-api status_service_uid
 expect_uid serviceaccount fulfillment-worker worker_sa_uid
 expect_uid serviceaccount fulfillment-admin admin_sa_uid
 expect_uid configmap worker-runtime runtime_config_uid
@@ -67,10 +69,10 @@ expect_uid role fulfillment-runtime-reader role_uid
 expect_uid rolebinding fulfillment-runtime-reader binding_uid
 
 deployments="$(kubectl -n "$namespace" get deployments -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' | sort | tr '\n' ' ')"
-[[ "$deployments" == "audit-api docs-api fulfillment-worker " ]] || fail "unexpected Deployments: $deployments"
+[[ "$deployments" == "audit-api docs-api fulfillment-worker status-api " ]] || fail "unexpected Deployments: $deployments"
 
 services="$(kubectl -n "$namespace" get services -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' | sort | tr '\n' ' ')"
-[[ "$services" == "audit-api docs-api fulfillment-worker " ]] || fail "unexpected Services: $services"
+[[ "$services" == "audit-api docs-api fulfillment-worker status-api " ]] || fail "unexpected Services: $services"
 
 for resource in statefulsets daemonsets jobs cronjobs; do
   count="$(kubectl -n "$namespace" get "$resource" -o name | wc -l | tr -d ' ')"
@@ -114,24 +116,35 @@ role_ref_name="$(kubectl -n "$namespace" get rolebinding fulfillment-runtime-rea
   || fail "RoleBinding must reference the intended Role"
 
 
-for deployment in fulfillment-worker docs-api audit-api; do
+for deployment in fulfillment-worker docs-api audit-api status-api; do
   kubectl -n "$namespace" rollout status "deployment/${deployment}" --timeout=120s \
     || fail "deployment/${deployment} did not complete rollout"
 done
 
-for deployment in fulfillment-worker docs-api audit-api; do
+for deployment in fulfillment-worker docs-api audit-api status-api; do
   desired="$(kubectl -n "$namespace" get deployment "$deployment" -o jsonpath='{.spec.replicas}')"
   ready="$(kubectl -n "$namespace" get deployment "$deployment" -o jsonpath='{.status.readyReplicas}')"
   [[ "${ready:-0}" == "$desired" ]] || fail "$deployment has $ready/$desired ready replicas"
 done
 
-for service in fulfillment-worker docs-api audit-api; do
+for service in fulfillment-worker docs-api audit-api status-api; do
   endpoints="$(kubectl -n "$namespace" get endpoints "$service" -o jsonpath='{.subsets[*].addresses[*].ip}')"
   [[ -n "$endpoints" ]] || fail "service/$service has no ready endpoints"
 done
 
 if ! kubectl -n "$namespace" logs deployment/fulfillment-worker --tail=40 | grep -q 'loaded runtime profile'; then
   fail "worker logs do not show resumed processing"
+fi
+
+status_selector="$(kubectl -n "$namespace" get service status-api -o jsonpath='{.spec.selector.app}')"
+status_target_port="$(kubectl -n "$namespace" get service status-api -o jsonpath='{.spec.ports[0].targetPort}')"
+status_image="$(kubectl -n "$namespace" get deployment status-api -o jsonpath='{.spec.template.spec.containers[0].image}')"
+[[ "$status_selector" == "status-api" && "$status_target_port" == "http" && "$status_image" == "busybox:1.36.1" ]] \
+  || fail "status-api app or Service changed unexpectedly"
+
+if ! kubectl -n "$namespace" logs deployment/status-api --tail=60 2>/dev/null \
+  | grep -q 'fulfillment jobs draining via http://fulfillment-worker.fulfillment-platform.svc.cluster.local/ready'; then
+  fail "status-api logs do not show downstream recovery through the worker Service"
 fi
 
 echo "fulfillment worker recovered with minimal runtime ConfigMap access"

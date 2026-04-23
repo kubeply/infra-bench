@@ -34,14 +34,14 @@ baseline_value() {
   kubectl -n "$namespace" get configmap "$baseline_configmap" -o jsonpath="{.data.$1}"
 }
 
-for deployment in report-api docs; do
+for deployment in report-api report-archive docs; do
   if ! kubectl -n "$namespace" rollout status deployment/"$deployment" --timeout=180s; then
     dump_debug
     exit 1
   fi
 done
 
-for service in report-api docs; do
+for service in report-api report-archive docs; do
   endpoints="$(kubectl -n "$namespace" get endpoints "$service" -o jsonpath='{.subsets[*].addresses[*].ip}' 2>/dev/null || true)"
   if [[ -z "$endpoints" ]]; then
     echo "Service $service has no endpoints" >&2
@@ -50,7 +50,7 @@ for service in report-api docs; do
   fi
 done
 
-for key in nightly_report_uid nightly_backup_uid failed_job_uid backup_job_uid report_runner_uid report_api_config_uid old_report_api_config_uid report_api_content_uid report_api_token_uid report_api_deployment_uid report_api_service_uid docs_deployment_uid docs_service_uid; do
+for key in nightly_report_uid nightly_backup_uid failed_job_uid backup_job_uid report_runner_uid report_api_config_uid old_report_api_config_uid report_api_content_uid report_archive_content_uid report_api_token_uid report_api_deployment_uid report_api_service_uid report_archive_deployment_uid report_archive_service_uid docs_deployment_uid docs_service_uid; do
   if [[ -z "$(baseline_value "$key")" ]]; then
     echo "Baseline ConfigMap is missing $key" >&2
     kubectl -n "$namespace" get configmap "$baseline_configmap" -o yaml || true
@@ -78,9 +78,12 @@ check_uid "ServiceAccount report-runner" "$(kubectl -n "$namespace" get servicea
 check_uid "ConfigMap report-api-config" "$(kubectl -n "$namespace" get configmap report-api-config -o jsonpath='{.metadata.uid}')" report_api_config_uid
 check_uid "ConfigMap report-api-config-old" "$(kubectl -n "$namespace" get configmap report-api-config-old -o jsonpath='{.metadata.uid}')" old_report_api_config_uid
 check_uid "ConfigMap report-api-content" "$(kubectl -n "$namespace" get configmap report-api-content -o jsonpath='{.metadata.uid}')" report_api_content_uid
+check_uid "ConfigMap report-archive-content" "$(kubectl -n "$namespace" get configmap report-archive-content -o jsonpath='{.metadata.uid}')" report_archive_content_uid
 check_uid "Secret report-api-token" "$(kubectl -n "$namespace" get secret report-api-token -o jsonpath='{.metadata.uid}')" report_api_token_uid
 check_uid "Deployment report-api" "$(kubectl -n "$namespace" get deployment report-api -o jsonpath='{.metadata.uid}')" report_api_deployment_uid
 check_uid "Service report-api" "$(kubectl -n "$namespace" get service report-api -o jsonpath='{.metadata.uid}')" report_api_service_uid
+check_uid "Deployment report-archive" "$(kubectl -n "$namespace" get deployment report-archive -o jsonpath='{.metadata.uid}')" report_archive_deployment_uid
+check_uid "Service report-archive" "$(kubectl -n "$namespace" get service report-archive -o jsonpath='{.metadata.uid}')" report_archive_service_uid
 check_uid "Deployment docs" "$(kubectl -n "$namespace" get deployment docs -o jsonpath='{.metadata.uid}')" docs_deployment_uid
 check_uid "Service docs" "$(kubectl -n "$namespace" get service docs -o jsonpath='{.metadata.uid}')" docs_service_uid
 
@@ -98,12 +101,12 @@ if [[ "$cronjob_names" != $'nightly-backup\nnightly-report' ]]; then
   exit 1
 fi
 
-if [[ "$deployment_names" != $'docs\nreport-api' || "$service_names" != $'docs\nreport-api' ]]; then
+if [[ "$deployment_names" != $'docs\nreport-api\nreport-archive' || "$service_names" != $'docs\nreport-api\nreport-archive' ]]; then
   echo "Unexpected app resources: deployments=${deployment_names} services=${service_names}" >&2
   exit 1
 fi
 
-expected_configmaps=$'infra-bench-baseline\nkube-root-ca.crt\nreport-api-config\nreport-api-config-old\nreport-api-content'
+expected_configmaps=$'infra-bench-baseline\nkube-root-ca.crt\nreport-api-config\nreport-api-config-old\nreport-api-content\nreport-archive-content'
 if [[ "$configmap_names" != "$expected_configmaps" ]]; then
   echo "Unexpected ConfigMap set: $configmap_names" >&2
   exit 1
@@ -175,6 +178,13 @@ if [[ "$report_container" != "$report_cronjob" \
   exit 1
 fi
 
+archive_image="$(kubectl -n "$namespace" get deployment report-archive -o jsonpath='{.spec.template.spec.containers[0].image}')"
+archive_service_target="$(kubectl -n "$namespace" get service report-archive -o jsonpath='{.spec.ports[0].targetPort}')"
+if [[ "$archive_image" != "nginx:1.27" || "$archive_service_target" != "http" ]]; then
+  echo "Report archive deployment or Service changed unexpectedly" >&2
+  exit 1
+fi
+
 backup_schedule="$(kubectl -n "$namespace" get cronjob "$backup_cronjob" -o jsonpath='{.spec.schedule}')"
 backup_config="$(kubectl -n "$namespace" get cronjob "$backup_cronjob" -o jsonpath='{.spec.jobTemplate.spec.template.spec.containers[0].name}')"
 backup_job_succeeded="$(kubectl -n "$namespace" get job "$backup_job" -o jsonpath='{.status.succeeded}')"
@@ -224,7 +234,9 @@ while IFS= read -r job_name; do
     continue
   fi
 
-  if [[ "$job_config_ref" == "report-api-config" && "$job_succeeded" == "1" ]] && grep -q "nightly report completed" <<< "$job_log"; then
+  if [[ "$job_config_ref" == "report-api-config" && "$job_succeeded" == "1" ]] \
+    && grep -q "nightly report archived" <<< "$job_log" \
+    && grep -q "nightly report completed" <<< "$job_log"; then
     successful_report_jobs=$((successful_report_jobs + 1))
   elif [[ "$job_config_ref" == "report-api-config-old" && "$job_failed" == "1" ]]; then
     :
@@ -244,4 +256,4 @@ if [[ "$successful_report_jobs" -lt 1 ]]; then
   exit 1
 fi
 
-echo "Nightly report CronJob produced a successful run with preserved history"
+echo "Nightly report CronJob produced a successful archived report with preserved history"

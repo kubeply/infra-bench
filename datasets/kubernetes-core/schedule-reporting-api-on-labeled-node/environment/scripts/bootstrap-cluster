@@ -21,6 +21,14 @@ if kubectl -n "$namespace" rollout status deployment/reporting-api --timeout=20s
   exit 1
 fi
 
+for _ in $(seq 1 60); do
+  if kubectl -n "$namespace" logs deployment/web-api --tail=20 2>/dev/null \
+    | grep -q 'web api waiting for reporting pages via http://reporting-api.analytics-platform.svc.cluster.local/ready'; then
+    break
+  fi
+  sleep 1
+done
+
 reporting_deployment_uid="$(
   kubectl -n "$namespace" get deployment reporting-api -o jsonpath='{.metadata.uid}'
 )"
