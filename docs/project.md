@@ -34,3 +34,21 @@ minimal change, and leave the system in a verifiably correct condition.
 
 Prefer a small number of high-signal tasks over a large catalog of shallow
 examples.
+
+## Planning Workflow
+
+Plan dataset releases deliberately instead of adding benchmark tasks ad hoc.
+
+- Define scenario sets before implementation starts, especially when planning a
+  new dataset version or a new difficulty tier.
+- Use one planning issue per dataset release and difficulty tier so the intended
+  task matrix is visible before implementation begins.
+- Track each approved scenario in its own issue with a task design brief before
+  opening implementation PRs.
+- Label task-planning issues with the release label, the difficulty label, and
+  one dataset-specific coverage-area label such as `area:service-routing`.
+- Attach scenario issues as sub-issues of the relevant planning issue so GitHub
+  reflects the intended hierarchy.
+
+Keep this planning workflow repository-wide. Domain-specific difficulty
+calibration and authoring rules still belong in `docs/task-rules/<domain>.md`.
