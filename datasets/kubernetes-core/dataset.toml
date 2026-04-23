@@ -187,6 +187,9 @@ digest = "sha256:540d3cb6836ae79b5e03507622ee1669a7bc094db39e1a6eb018ad243783c39
 name = "kubeply/repair-report-custom-resource-status"
 digest = "sha256:d7734749a8c6b65dc0885beb8ee23e739d2cbee068e87f1f78dd42c84bafb594"
 
+[[tasks]]
+name = "kubeply/repair-statefulset-headless-service-identity"
+digest = "sha256:5bf45c8488a032fb648b39d27344d331ff6d12fe234dd4f8bdef4673a1dc6e8f"
 
 [[files]]
 path = "metric.py"
