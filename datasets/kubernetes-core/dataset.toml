@@ -5,7 +5,7 @@
 [dataset]
 name = "kubeply/kubernetes-core"
 description = "Kubernetes-first infrastructure benchmark scenarios for AI agents."
-keywords = [ "kubernetes", "infrastructure", "benchmark", "agents",]
+keywords = ["kubernetes", "infrastructure", "benchmark", "agents"]
 [[dataset.authors]]
 name = "Kubeply"
 email = "thomas@kubeply.com"
