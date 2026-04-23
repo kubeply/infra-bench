@@ -121,7 +121,7 @@ digest = "sha256:23d08f4bae84323d6440087983475c28a90bb794151035f28249cd50d5c155b
 
 [[tasks]]
 name = "kubeply/restore-worker-config-access"
-digest = "sha256:cd780ecabe049ad97e65dbd4ae86434cca355f7c0756866d41bafda4017bebf2"
+digest = "sha256:61a55edf1e05c33031fa49cb49a36e05fe8b85ec5f77eadb6e16002aad1c4fd8"
 
 [[tasks]]
 name = "kubeply/restore-metrics-controller-after-values-change"
