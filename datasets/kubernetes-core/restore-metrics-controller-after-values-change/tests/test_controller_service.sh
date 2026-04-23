@@ -10,6 +10,8 @@ values_configmap="metrics-adapter-values"
 telemetry_deployment="telemetry-proxy"
 telemetry_service="telemetry-proxy"
 telemetry_values_configmap="telemetry-proxy-values"
+dashboard_deployment="metrics-dashboard"
+dashboard_service="metrics-dashboard"
 
 dump_debug() {
   echo "--- namespace resources ---"
@@ -20,13 +22,15 @@ dump_debug() {
   kubectl -n "$namespace" get endpoints "$service" -o yaml || true
   echo "--- deployment yaml ---"
   kubectl -n "$namespace" get deployment "$deployment" -o yaml || true
+  echo "--- dashboard logs ---"
+  kubectl -n "$namespace" logs deployment/"$dashboard_deployment" --tail=120 || true
   echo "--- pod describe ---"
   kubectl -n "$namespace" describe pods || true
   echo "--- recent events ---"
   kubectl -n "$namespace" get events --sort-by=.lastTimestamp || true
 }
 
-for rollout_deployment in "$deployment" "$telemetry_deployment"; do
+for rollout_deployment in "$deployment" "$telemetry_deployment" "$dashboard_deployment"; do
   if kubectl -n "$namespace" rollout status deployment/"$rollout_deployment" --timeout=180s; then
     continue
   fi
@@ -40,16 +44,22 @@ values_uid="$(kubectl -n "$namespace" get configmap "$values_configmap" -o jsonp
 telemetry_deployment_uid="$(kubectl -n "$namespace" get deployment "$telemetry_deployment" -o jsonpath='{.metadata.uid}')"
 telemetry_service_uid="$(kubectl -n "$namespace" get service "$telemetry_service" -o jsonpath='{.metadata.uid}')"
 telemetry_values_uid="$(kubectl -n "$namespace" get configmap "$telemetry_values_configmap" -o jsonpath='{.metadata.uid}')"
+dashboard_deployment_uid="$(kubectl -n "$namespace" get deployment "$dashboard_deployment" -o jsonpath='{.metadata.uid}')"
+dashboard_service_uid="$(kubectl -n "$namespace" get service "$dashboard_service" -o jsonpath='{.metadata.uid}')"
 baseline_deployment_uid="$(kubectl -n "$namespace" get configmap infra-bench-baseline -o jsonpath='{.data.deployment_uid}')"
 baseline_service_uid="$(kubectl -n "$namespace" get configmap infra-bench-baseline -o jsonpath='{.data.service_uid}')"
 baseline_values_uid="$(kubectl -n "$namespace" get configmap infra-bench-baseline -o jsonpath='{.data.values_uid}')"
 baseline_telemetry_deployment_uid="$(kubectl -n "$namespace" get configmap infra-bench-baseline -o jsonpath='{.data.telemetry_deployment_uid}')"
 baseline_telemetry_service_uid="$(kubectl -n "$namespace" get configmap infra-bench-baseline -o jsonpath='{.data.telemetry_service_uid}')"
 baseline_telemetry_values_uid="$(kubectl -n "$namespace" get configmap infra-bench-baseline -o jsonpath='{.data.telemetry_values_uid}')"
+baseline_dashboard_deployment_uid="$(kubectl -n "$namespace" get configmap infra-bench-baseline -o jsonpath='{.data.dashboard_deployment_uid}')"
+baseline_dashboard_service_uid="$(kubectl -n "$namespace" get configmap infra-bench-baseline -o jsonpath='{.data.dashboard_service_uid}')"
 
 if [[ -z "$baseline_deployment_uid" \
   || -z "$baseline_service_uid" \
   || -z "$baseline_values_uid" \
+  || -z "$baseline_dashboard_deployment_uid" \
+  || -z "$baseline_dashboard_service_uid" \
   || -z "$baseline_telemetry_deployment_uid" \
   || -z "$baseline_telemetry_service_uid" \
   || -z "$baseline_telemetry_values_uid" ]]; then
@@ -61,6 +71,8 @@ fi
 if [[ "$deployment_uid" != "$baseline_deployment_uid" \
   || "$service_uid" != "$baseline_service_uid" \
   || "$values_uid" != "$baseline_values_uid" \
+  || "$dashboard_deployment_uid" != "$baseline_dashboard_deployment_uid" \
+  || "$dashboard_service_uid" != "$baseline_dashboard_service_uid" \
   || "$telemetry_deployment_uid" != "$baseline_telemetry_deployment_uid" \
   || "$telemetry_service_uid" != "$baseline_telemetry_service_uid" \
   || "$telemetry_values_uid" != "$baseline_telemetry_values_uid" ]]; then
@@ -68,6 +80,8 @@ if [[ "$deployment_uid" != "$baseline_deployment_uid" \
   echo "deployment expected=${baseline_deployment_uid} got=${deployment_uid}" >&2
   echo "service expected=${baseline_service_uid} got=${service_uid}" >&2
   echo "values expected=${baseline_values_uid} got=${values_uid}" >&2
+  echo "dashboard deployment expected=${baseline_dashboard_deployment_uid} got=${dashboard_deployment_uid}" >&2
+  echo "dashboard service expected=${baseline_dashboard_service_uid} got=${dashboard_service_uid}" >&2
   echo "telemetry deployment expected=${baseline_telemetry_deployment_uid} got=${telemetry_deployment_uid}" >&2
   echo "telemetry service expected=${baseline_telemetry_service_uid} got=${telemetry_service_uid}" >&2
   echo "telemetry values expected=${baseline_telemetry_values_uid} got=${telemetry_values_uid}" >&2
@@ -78,7 +92,7 @@ deployment_names="$(kubectl -n "$namespace" get deployments -o jsonpath='{range 
 service_names="$(kubectl -n "$namespace" get services -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' | sort)"
 configmap_names="$(kubectl -n "$namespace" get configmaps -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' | sort)"
 
-if [[ "$deployment_names" != $'metrics-adapter\ntelemetry-proxy' || "$service_names" != $'metrics-adapter\ntelemetry-proxy' ]]; then
+if [[ "$deployment_names" != $'metrics-adapter\nmetrics-dashboard\ntelemetry-proxy' || "$service_names" != $'metrics-adapter\nmetrics-dashboard\ntelemetry-proxy' ]]; then
   echo "Unexpected Deployment or Service set: deployments=${deployment_names} services=${service_names}" >&2
   exit 1
 fi
@@ -158,6 +172,14 @@ telemetry_replicas="$(kubectl -n "$namespace" get deployment "$telemetry_deploym
 telemetry_ready_replicas="$(kubectl -n "$namespace" get deployment "$telemetry_deployment" -o jsonpath='{.status.readyReplicas}')"
 telemetry_service_port="$(kubectl -n "$namespace" get service "$telemetry_service" -o jsonpath='{.spec.ports[0].port}')"
 telemetry_target_port="$(kubectl -n "$namespace" get service "$telemetry_service" -o jsonpath='{.spec.ports[0].targetPort}')"
+dashboard_selector_name="$(kubectl -n "$namespace" get service "$dashboard_service" -o jsonpath='{.spec.selector.app\.kubernetes\.io/name}')"
+dashboard_selector_component="$(kubectl -n "$namespace" get service "$dashboard_service" -o jsonpath='{.spec.selector.app\.kubernetes\.io/component}')"
+dashboard_image="$(kubectl -n "$namespace" get deployment "$dashboard_deployment" -o jsonpath='{.spec.template.spec.containers[0].image}')"
+dashboard_replicas="$(kubectl -n "$namespace" get deployment "$dashboard_deployment" -o jsonpath='{.spec.replicas}')"
+dashboard_ready_replicas="$(kubectl -n "$namespace" get deployment "$dashboard_deployment" -o jsonpath='{.status.readyReplicas}')"
+dashboard_url="$(kubectl -n "$namespace" get deployment "$dashboard_deployment" -o jsonpath='{.spec.template.spec.containers[0].env[?(@.name=="METRICS_URL")].value}')"
+dashboard_service_port="$(kubectl -n "$namespace" get service "$dashboard_service" -o jsonpath='{.spec.ports[0].port}')"
+dashboard_target_port="$(kubectl -n "$namespace" get service "$dashboard_service" -o jsonpath='{.spec.ports[0].targetPort}')"
 values_release="$(kubectl -n "$namespace" get configmap "$values_configmap" -o jsonpath='{.data.values\.yaml}' | grep -c 'release: platform-metrics' || true)"
 telemetry_values_release="$(kubectl -n "$namespace" get configmap "$telemetry_values_configmap" -o jsonpath='{.data.values\.yaml}' | grep -c 'release: telemetry-stack' || true)"
 
@@ -173,6 +195,26 @@ fi
 
 if [[ "$telemetry_service_port" != "443" || "$telemetry_target_port" != "https" ]]; then
   echo "Healthy telemetry Service port changed" >&2
+  exit 1
+fi
+
+if [[ "$dashboard_selector_name" != "$dashboard_deployment" || "$dashboard_selector_component" != "client" ]]; then
+  echo "Metrics dashboard Service selector changed" >&2
+  exit 1
+fi
+
+if [[ "$dashboard_image" != "busybox:1.36" || "$dashboard_replicas" != "1" || "$dashboard_ready_replicas" != "1" ]]; then
+  echo "Metrics dashboard did not recover; image=${dashboard_image} spec=${dashboard_replicas} ready=${dashboard_ready_replicas}" >&2
+  exit 1
+fi
+
+if [[ "$dashboard_url" != "http://metrics-adapter.metrics-team.svc.cluster.local:443/ready" ]]; then
+  echo "Metrics dashboard dependency URL changed: ${dashboard_url}" >&2
+  exit 1
+fi
+
+if [[ "$dashboard_service_port" != "80" || "$dashboard_target_port" != "http" ]]; then
+  echo "Metrics dashboard Service port changed" >&2
   exit 1
 fi
 
@@ -203,6 +245,13 @@ telemetry_endpoint_port="$(kubectl -n "$namespace" get endpoints "$telemetry_ser
 
 if [[ -z "$telemetry_endpoint_ips" || "$telemetry_endpoint_port" != "8443" ]]; then
   echo "Healthy telemetry Service lost its endpoints" >&2
+  dump_debug
+  exit 1
+fi
+
+dashboard_log="$(kubectl -n "$namespace" logs deployment/"$dashboard_deployment" --tail=120 2>/dev/null || true)"
+if ! grep -q "metrics dashboard reached metrics-adapter" <<< "$dashboard_log"; then
+  echo "Metrics dashboard did not reach the repaired metrics-adapter Service" >&2
   dump_debug
   exit 1
 fi
