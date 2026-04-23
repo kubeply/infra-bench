@@ -8,7 +8,7 @@ prepare-kubeconfig
 
 kubectl apply -f /bootstrap/observability.yaml
 
-for deployment in logs-backend metrics-backend observability-ui docs demo-api; do
+for deployment in logs-backend metrics-backend observability-ui incident-monitor docs demo-api; do
   if ! kubectl -n "$namespace" rollout status deployment/"$deployment" --timeout=240s; then
     kubectl -n "$namespace" get all,configmaps,secrets -o wide >&2 || true
     kubectl -n "$namespace" describe deployment "$deployment" >&2 || true
@@ -46,6 +46,7 @@ fi
 
 ui_deployment_uid="$(kubectl -n "$namespace" get deployment observability-ui -o jsonpath='{.metadata.uid}')"
 ui_service_uid="$(kubectl -n "$namespace" get service observability-ui -o jsonpath='{.metadata.uid}')"
+incident_monitor_deployment_uid="$(kubectl -n "$namespace" get deployment incident-monitor -o jsonpath='{.metadata.uid}')"
 logs_backend_deployment_uid="$(kubectl -n "$namespace" get deployment logs-backend -o jsonpath='{.metadata.uid}')"
 logs_backend_service_uid="$(kubectl -n "$namespace" get service logs-backend -o jsonpath='{.metadata.uid}')"
 docs_deployment_uid="$(kubectl -n "$namespace" get deployment docs -o jsonpath='{.metadata.uid}')"
@@ -66,6 +67,7 @@ kubectl -n "$namespace" patch configmap infra-bench-baseline \
   "data": {
     "ui_deployment_uid": "${ui_deployment_uid}",
     "ui_service_uid": "${ui_service_uid}",
+    "incident_monitor_deployment_uid": "${incident_monitor_deployment_uid}",
     "logs_backend_deployment_uid": "${logs_backend_deployment_uid}",
     "logs_backend_service_uid": "${logs_backend_service_uid}",
     "docs_deployment_uid": "${docs_deployment_uid}",
