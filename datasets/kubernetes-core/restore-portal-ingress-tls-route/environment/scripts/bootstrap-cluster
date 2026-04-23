@@ -46,7 +46,9 @@ for _ in $(seq 1 120); do
   if kubectl -n "$namespace" exec "$client_pod" -- wget -qO- -T 3 --header "Host: docs.example.test" http://traefik.kube-system.svc.cluster.local/ >/tmp/docs.out 2>/tmp/docs.err \
     && grep -q "docs route healthy" /tmp/docs.out \
     && kubectl -n "$namespace" exec "$client_pod" -- wget -qO- -T 3 http://internal-api:80/ >/tmp/internal-api.out 2>/tmp/internal-api.err \
-    && grep -q "internal api healthy" /tmp/internal-api.out; then
+    && grep -q "internal api healthy" /tmp/internal-api.out \
+    && kubectl -n "$namespace" logs deployment/ingress-client --tail=80 2>/tmp/client.err | grep -q "docs ingress check ok" \
+    && kubectl -n "$namespace" logs deployment/ingress-client --tail=80 2>/tmp/client.err | grep -q "internal service check ok"; then
     break
   fi
 
@@ -82,13 +84,14 @@ internal_service_uid="$(kubectl -n "$namespace" get service internal-api -o json
 portal_deployment_uid="$(kubectl -n "$namespace" get deployment portal -o jsonpath='{.metadata.uid}')"
 docs_deployment_uid="$(kubectl -n "$namespace" get deployment docs -o jsonpath='{.metadata.uid}')"
 internal_deployment_uid="$(kubectl -n "$namespace" get deployment internal-api -o jsonpath='{.metadata.uid}')"
+client_deployment_uid="$(kubectl -n "$namespace" get deployment ingress-client -o jsonpath='{.metadata.uid}')"
 portal_secret_uid="$(kubectl -n "$namespace" get secret portal-tls -o jsonpath='{.metadata.uid}')"
 portal_old_secret_uid="$(kubectl -n "$namespace" get secret portal-old-tls -o jsonpath='{.metadata.uid}')"
 docs_secret_uid="$(kubectl -n "$namespace" get secret docs-tls -o jsonpath='{.metadata.uid}')"
 
 kubectl -n "$namespace" patch configmap infra-bench-baseline \
   --type merge \
-  --patch "{\"data\":{\"portal_ingress_uid\":\"${portal_ingress_uid}\",\"docs_ingress_uid\":\"${docs_ingress_uid}\",\"portal_service_uid\":\"${portal_service_uid}\",\"docs_service_uid\":\"${docs_service_uid}\",\"internal_service_uid\":\"${internal_service_uid}\",\"portal_deployment_uid\":\"${portal_deployment_uid}\",\"docs_deployment_uid\":\"${docs_deployment_uid}\",\"internal_deployment_uid\":\"${internal_deployment_uid}\",\"portal_secret_uid\":\"${portal_secret_uid}\",\"portal_old_secret_uid\":\"${portal_old_secret_uid}\",\"docs_secret_uid\":\"${docs_secret_uid}\"}}"
+  --patch "{\"data\":{\"portal_ingress_uid\":\"${portal_ingress_uid}\",\"docs_ingress_uid\":\"${docs_ingress_uid}\",\"portal_service_uid\":\"${portal_service_uid}\",\"docs_service_uid\":\"${docs_service_uid}\",\"internal_service_uid\":\"${internal_service_uid}\",\"portal_deployment_uid\":\"${portal_deployment_uid}\",\"docs_deployment_uid\":\"${docs_deployment_uid}\",\"internal_deployment_uid\":\"${internal_deployment_uid}\",\"client_deployment_uid\":\"${client_deployment_uid}\",\"portal_secret_uid\":\"${portal_secret_uid}\",\"portal_old_secret_uid\":\"${portal_old_secret_uid}\",\"docs_secret_uid\":\"${docs_secret_uid}\"}}"
 
 for _ in $(seq 1 60); do
   token_data="$(kubectl -n "$namespace" get secret "$agent_secret" -o jsonpath='{.data.token}' 2>/dev/null || true)"
