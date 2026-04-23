@@ -21,6 +21,9 @@ dump_debug() {
     echo "### reporting pods"
     kubectl -n "$namespace" describe pods -l app=reporting-api || true
     echo
+    echo "### web-api logs"
+    kubectl -n "$namespace" logs deployment/web-api --tail=120 || true
+    echo
     echo "### events"
     kubectl -n "$namespace" get events --sort-by=.lastTimestamp || true
   } > /logs/verifier/debug.log 2>&1
@@ -91,6 +94,7 @@ cpu_request="$(kubectl -n "$namespace" get deployment reporting-api -o jsonpath=
 memory_request="$(kubectl -n "$namespace" get deployment reporting-api -o jsonpath='{.spec.template.spec.containers[0].resources.requests.memory}')"
 node_selector="$(kubectl -n "$namespace" get deployment reporting-api -o go-template='{{ index .spec.template.spec.nodeSelector "kubeply.node/pool" }}')"
 toleration="$(kubectl -n "$namespace" get deployment reporting-api -o jsonpath='{range .spec.template.spec.tolerations[*]}{.key}={.value}:{.effect}{"\n"}{end}')"
+web_command="$(kubectl -n "$namespace" get deployment web-api -o jsonpath='{.spec.template.spec.containers[0].command[*]}')"
 
 [[ "$image" == "busybox:1.36.1" ]] || fail "reporting image changed"
 [[ "$replicas" == "2" ]] || fail "reporting replica count changed"
@@ -100,6 +104,8 @@ toleration="$(kubectl -n "$namespace" get deployment reporting-api -o jsonpath='
 [[ "$node_selector" == "reporting" ]] || fail "reporting node selector was not repaired"
 echo "$toleration" | grep -qx 'kubeply.node/pool=reporting:NoSchedule' \
   || fail "reporting toleration was not repaired"
+grep -q 'reporting-api.analytics-platform.svc.cluster.local/ready' <<< "$web_command" \
+  || fail "web-api reporting dependency path changed"
 
 for deployment in reporting-api web-api docs-api; do
   kubectl -n "$namespace" rollout status "deployment/${deployment}" --timeout=120s \
@@ -124,4 +130,17 @@ for service in reporting-api web-api docs-api; do
   [[ -n "$endpoints" ]] || fail "service/$service has no ready endpoints"
 done
 
-echo "reporting-api scheduled on the intended node"
+for _ in $(seq 1 90); do
+  if kubectl -n "$namespace" logs deployment/web-api --tail=80 2>/dev/null \
+    | grep -q 'web api serving reporting pages via http://reporting-api.analytics-platform.svc.cluster.local/ready'; then
+    break
+  fi
+  sleep 1
+done
+
+if ! kubectl -n "$namespace" logs deployment/web-api --tail=100 2>/dev/null \
+  | grep -q 'web api serving reporting pages via http://reporting-api.analytics-platform.svc.cluster.local/ready'; then
+  fail "web-api logs do not show restored reporting pages through the reporting-api Service"
+fi
+
+echo "reporting-api scheduled on the intended node and reporting pages recovered"
