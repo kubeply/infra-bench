@@ -133,7 +133,7 @@ digest = "sha256:69764053c8cb4b6f170260a77c33dd4ccc90d2d1d471a2581547c273a566e3f
 
 [[tasks]]
 name = "kubeply/repair-worker-hpa-scaling-inputs"
-digest = "sha256:36ad98fd586a1d640504c3da020800987d65db8b434c86038b6ab00816f8b201"
+digest = "sha256:27fdc522043c2da10750e4006d1b9c929ebf57cda6a3774ff1edd7f6e3b73267"
 
 [[tasks]]
 name = "kubeply/repair-cross-namespace-service-discovery"

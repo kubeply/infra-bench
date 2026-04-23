@@ -69,6 +69,7 @@ data:
   worker_deployment_uid: ""
   api_deployment_uid: ""
   docs_deployment_uid: ""
+  worker_loadgen_deployment_uid: ""
   worker_service_uid: ""
   api_service_uid: ""
   docs_service_uid: ""
@@ -102,8 +103,16 @@ spec:
             - sh
             - -c
             - |
-              mkdir -p /www
+              mkdir -p /www/cgi-bin
               echo "worker ready" > /www/ready
+              cat > /www/cgi-bin/work <<'EOF'
+              #!/bin/sh
+              head -c 12000000 /dev/zero | sha256sum >/dev/null
+              echo "Content-Type: text/plain"
+              echo
+              echo "processed"
+              EOF
+              chmod +x /www/cgi-bin/work
               exec httpd -f -p 8080 -h /www
           ports:
             - name: http
@@ -239,6 +248,39 @@ spec:
         target:
           type: Utilization
           averageUtilization: 70
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: worker-loadgen
+  namespace: processing-team
+  labels:
+    app: worker-loadgen
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: worker-loadgen
+  template:
+    metadata:
+      labels:
+        app: worker-loadgen
+    spec:
+      containers:
+        - name: loadgen
+          image: busybox:1.36
+          imagePullPolicy: IfNotPresent
+          command:
+            - sh
+            - -c
+            - |
+              target="http://worker.processing-team.svc.cluster.local/cgi-bin/work"
+              while true; do
+                for _ in 1 2 3 4; do
+                  wget -qO- "$target" >/dev/null 2>&1 || true &
+                done
+                wait
+              done
 ---
 apiVersion: apps/v1
 kind: Deployment
