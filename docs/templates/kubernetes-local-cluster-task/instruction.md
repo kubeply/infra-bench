@@ -1,4 +1,4 @@
-<infra-bench-canary: TODO_UUID>
+<!-- kubernetes-core GUID TODO_UUID -->
 
 You are working in `/app`; the problem to fix is in the live Kubernetes
 cluster.
