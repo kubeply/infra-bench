@@ -17,8 +17,6 @@ concurrency:
 env:
   # renovate: datasource=github-releases depName=rhysd/actionlint
   ACTIONLINT_VERSION: v1.7.12
-  # renovate: datasource=npm depName=@taplo/cli
-  TAPLO_VERSION: 0.7.0
 
 jobs:
   actionlint:
@@ -87,9 +85,4 @@ jobs:
         run: python3 scripts/lint-kubernetes-rbac.py
 
       - name: Verify dataset manifests are synchronized
-        run: |
-          set -euo pipefail
-          uvx --from harbor harbor sync datasets/kubernetes-core
-          uvx --from harbor harbor sync datasets/terraform-core
-          bunx "@taplo/cli@${TAPLO_VERSION}" fmt "**/*.toml" "!jobs/**"
-          git diff --exit-code
+        run: python3 scripts/check-dataset-manifests.py
