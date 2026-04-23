@@ -113,7 +113,7 @@ digest = "sha256:277074c8abeeb7ad119faf54e5d9e66d0eaeb76506da7f7559c9d35187837ba
 
 [[tasks]]
 name = "kubeply/schedule-reporting-api-on-labeled-node"
-digest = "sha256:ed4387d266f68bac86e26ecf23d67ef32c8cae13deeb180843015507a71efe6f"
+digest = "sha256:cc30c51599f18c8e6a081104ba76d4a3be54223022fe4cd88bbc685031c35317"
 
 [[tasks]]
 name = "kubeply/stabilize-cpu-throttled-worker"
