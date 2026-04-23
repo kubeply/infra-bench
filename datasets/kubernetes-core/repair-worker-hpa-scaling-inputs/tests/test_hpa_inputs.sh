@@ -81,7 +81,9 @@ expect_deployment() {
   [[ "$label" == "$name" && "$selector" == "$name" ]] || fail "deployment/$name labels changed"
   [[ "$image" == "busybox:1.36" ]] || fail "deployment/$name image changed"
   [[ "$port_name" == "http" && "$port" == "8080" ]] || fail "deployment/$name port changed"
-  [[ "$spec_replicas" == "$replicas" && "$ready_replicas" == "$replicas" ]] || fail "deployment/$name replica state changed"
+  if [[ "$replicas" != "dynamic" ]]; then
+    [[ "$spec_replicas" == "$replicas" && "$ready_replicas" == "$replicas" ]] || fail "deployment/$name replica state changed"
+  fi
   [[ "$request_cpu" == "$cpu_request" && "$request_memory" == "$memory_request" ]] || fail "deployment/$name requests changed to ${request_cpu}/${request_memory}"
   [[ "$limit_cpu" == "$cpu_limit" && "$limit_memory" == "$memory_limit" ]] || fail "deployment/$name limits changed to ${limit_cpu}/${limit_memory}"
 }
@@ -143,6 +145,7 @@ done
 expect_uid deployment worker worker_deployment_uid
 expect_uid deployment api api_deployment_uid
 expect_uid deployment docs docs_deployment_uid
+expect_uid deployment worker-loadgen worker_loadgen_deployment_uid
 expect_uid service worker worker_service_uid
 expect_uid service api api_service_uid
 expect_uid service docs docs_service_uid
@@ -154,7 +157,7 @@ service_names="$(kubectl -n "$namespace" get services -o jsonpath='{range .items
 hpa_names="$(kubectl -n "$namespace" get hpa -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' | sort)"
 configmap_names="$(kubectl -n "$namespace" get configmaps -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' | sort)"
 
-[[ "$deployment_names" == $'api\ndocs\nworker' ]] || fail "unexpected deployments: $deployment_names"
+[[ "$deployment_names" == $'api\ndocs\nworker\nworker-loadgen' ]] || fail "unexpected deployments: $deployment_names"
 [[ "$service_names" == $'api\ndocs\nworker' ]] || fail "unexpected services: $service_names"
 [[ "$hpa_names" == $'api\nworker' ]] || fail "unexpected HPAs: $hpa_names"
 [[ "$configmap_names" == $'infra-bench-baseline\nkube-root-ca.crt' ]] || fail "unexpected configmaps: $configmap_names"
@@ -169,7 +172,7 @@ unexpected_workloads="$(
 )"
 [[ -z "$unexpected_workloads" ]] || fail "unexpected replacement workloads: $unexpected_workloads"
 
-expect_deployment worker 2 100m 64Mi 500m 128Mi
+expect_deployment worker dynamic 100m 64Mi 500m 128Mi
 expect_deployment api 1 50m 64Mi 250m 128Mi
 expect_deployment docs 1 20m 32Mi 100m 128Mi
 expect_service worker
@@ -177,6 +180,14 @@ expect_service api
 expect_service docs
 expect_hpa worker 2 5 worker 60
 expect_hpa api 1 3 api 70
+
+loadgen_image="$(kubectl -n "$namespace" get deployment worker-loadgen -o jsonpath='{.spec.template.spec.containers[0].image}')"
+loadgen_command="$(kubectl -n "$namespace" get deployment worker-loadgen -o jsonpath='{.spec.template.spec.containers[0].command[*]}')"
+worker_command="$(kubectl -n "$namespace" get deployment worker -o jsonpath='{.spec.template.spec.containers[0].command[*]}')"
+[[ "$loadgen_image" == "busybox:1.36" ]] || fail "worker-loadgen image changed"
+grep -q 'worker.processing-team.svc.cluster.local/cgi-bin/work' <<< "$loadgen_command" \
+  || fail "worker-loadgen target changed"
+grep -q '/www/cgi-bin/work' <<< "$worker_command" || fail "worker workload endpoint changed"
 
 for service in worker api docs; do
   endpoints="$(kubectl -n "$namespace" get endpoints "$service" -o jsonpath='{.subsets[*].addresses[*].ip}' 2>/dev/null || true)"
@@ -188,7 +199,7 @@ while IFS='|' read -r pod_name pod_app owner_kind; do
 
   [[ "$owner_kind" == "ReplicaSet" ]] || fail "unexpected pod ownership for $pod_name"
   case "$pod_app" in
-    worker | api | docs) ;;
+    worker | api | docs | worker-loadgen) ;;
     *) fail "unexpected pod app label for $pod_name: $pod_app" ;;
   esac
 done < <(
@@ -202,14 +213,15 @@ for _ in $(seq 1 90); do
   worker_metric="$(kubectl -n "$namespace" get hpa worker -o jsonpath='{.status.currentMetrics[0].resource.current.averageUtilization}' 2>/dev/null || true)"
   worker_current="$(kubectl -n "$namespace" get hpa worker -o jsonpath='{.status.currentReplicas}' 2>/dev/null || true)"
   worker_desired="$(kubectl -n "$namespace" get hpa worker -o jsonpath='{.status.desiredReplicas}' 2>/dev/null || true)"
+  worker_ready="$(kubectl -n "$namespace" get deployment worker -o jsonpath='{.status.readyReplicas}' 2>/dev/null || true)"
   api_active="$(kubectl -n "$namespace" get hpa api -o jsonpath='{.status.conditions[?(@.type=="ScalingActive")].status}' 2>/dev/null || true)"
 
-  if [[ "$worker_active" == "True" && "$worker_able" == "True" && -n "$worker_metric" && "$worker_current" == "2" && "$worker_desired" == "2" && "$api_active" == "True" ]]; then
-    echo "Worker HPA can evaluate CPU inputs and the healthy API HPA remains active"
+  if [[ "$worker_active" == "True" && "$worker_able" == "True" && -n "$worker_metric" && "${worker_desired:-0}" -ge 3 && "${worker_ready:-0}" -ge 3 && "$api_active" == "True" ]]; then
+    echo "Worker HPA scales the existing worker under load and the healthy API HPA remains active"
     exit 0
   fi
 
   sleep 2
 done
 
-fail "worker HPA did not become active with CPU metrics; active=${worker_active} able=${worker_able} metric=${worker_metric} current=${worker_current} desired=${worker_desired} apiActive=${api_active}"
+fail "worker HPA did not scale under load; active=${worker_active} able=${worker_able} metric=${worker_metric} current=${worker_current} desired=${worker_desired} ready=${worker_ready} apiActive=${api_active}"

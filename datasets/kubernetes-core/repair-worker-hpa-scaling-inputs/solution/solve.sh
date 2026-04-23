@@ -20,12 +20,24 @@ for _ in $(seq 1 90); do
     kubectl -n "$namespace" get hpa worker \
       -o jsonpath='{.status.conditions[?(@.type=="ScalingActive")].status}' 2>/dev/null || true
   )"
+  able_to_scale="$(
+    kubectl -n "$namespace" get hpa worker \
+      -o jsonpath='{.status.conditions[?(@.type=="AbleToScale")].status}' 2>/dev/null || true
+  )"
   current_metric="$(
     kubectl -n "$namespace" get hpa worker \
       -o jsonpath='{.status.currentMetrics[0].resource.current.averageUtilization}' 2>/dev/null || true
   )"
+  desired_replicas="$(
+    kubectl -n "$namespace" get hpa worker \
+      -o jsonpath='{.status.desiredReplicas}' 2>/dev/null || true
+  )"
+  ready_replicas="$(
+    kubectl -n "$namespace" get deployment worker \
+      -o jsonpath='{.status.readyReplicas}' 2>/dev/null || true
+  )"
 
-  if [[ "$scaling_active" == "True" && -n "$current_metric" ]]; then
+  if [[ "$scaling_active" == "True" && "$able_to_scale" == "True" && -n "$current_metric" && "${desired_replicas:-0}" -ge 3 && "${ready_replicas:-0}" -ge 3 ]]; then
     exit 0
   fi
 
@@ -33,4 +45,5 @@ for _ in $(seq 1 90); do
 done
 
 kubectl -n "$namespace" describe hpa worker >&2 || true
+kubectl -n "$namespace" get deployment worker -o yaml >&2 || true
 exit 1

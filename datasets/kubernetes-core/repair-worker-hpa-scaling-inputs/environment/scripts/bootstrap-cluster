@@ -8,7 +8,7 @@ prepare-kubeconfig
 
 kubectl apply -f /bootstrap/autoscaling.yaml
 
-for deployment in worker api docs; do
+for deployment in worker api worker-loadgen docs; do
   if ! kubectl -n "$namespace" rollout status deployment/"$deployment" --timeout=180s; then
     kubectl -n "$namespace" get all,hpa -o wide >&2 || true
     kubectl -n "$namespace" describe deployment "$deployment" >&2 || true
@@ -52,6 +52,7 @@ fi
 worker_deployment_uid="$(kubectl -n "$namespace" get deployment worker -o jsonpath='{.metadata.uid}')"
 api_deployment_uid="$(kubectl -n "$namespace" get deployment api -o jsonpath='{.metadata.uid}')"
 docs_deployment_uid="$(kubectl -n "$namespace" get deployment docs -o jsonpath='{.metadata.uid}')"
+worker_loadgen_deployment_uid="$(kubectl -n "$namespace" get deployment worker-loadgen -o jsonpath='{.metadata.uid}')"
 worker_service_uid="$(kubectl -n "$namespace" get service worker -o jsonpath='{.metadata.uid}')"
 api_service_uid="$(kubectl -n "$namespace" get service api -o jsonpath='{.metadata.uid}')"
 docs_service_uid="$(kubectl -n "$namespace" get service docs -o jsonpath='{.metadata.uid}')"
@@ -60,7 +61,7 @@ api_hpa_uid="$(kubectl -n "$namespace" get hpa api -o jsonpath='{.metadata.uid}'
 
 kubectl -n "$namespace" patch configmap infra-bench-baseline \
   --type merge \
-  --patch "{\"data\":{\"worker_deployment_uid\":\"${worker_deployment_uid}\",\"api_deployment_uid\":\"${api_deployment_uid}\",\"docs_deployment_uid\":\"${docs_deployment_uid}\",\"worker_service_uid\":\"${worker_service_uid}\",\"api_service_uid\":\"${api_service_uid}\",\"docs_service_uid\":\"${docs_service_uid}\",\"worker_hpa_uid\":\"${worker_hpa_uid}\",\"api_hpa_uid\":\"${api_hpa_uid}\"}}"
+  --patch "{\"data\":{\"worker_deployment_uid\":\"${worker_deployment_uid}\",\"api_deployment_uid\":\"${api_deployment_uid}\",\"docs_deployment_uid\":\"${docs_deployment_uid}\",\"worker_loadgen_deployment_uid\":\"${worker_loadgen_deployment_uid}\",\"worker_service_uid\":\"${worker_service_uid}\",\"api_service_uid\":\"${api_service_uid}\",\"docs_service_uid\":\"${docs_service_uid}\",\"worker_hpa_uid\":\"${worker_hpa_uid}\",\"api_hpa_uid\":\"${api_hpa_uid}\"}}"
 
 for _ in $(seq 1 60); do
   token_data="$(kubectl -n "$namespace" get secret "$agent_secret" -o jsonpath='{.data.token}' 2>/dev/null || true)"
