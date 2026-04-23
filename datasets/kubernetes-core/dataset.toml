@@ -177,7 +177,7 @@ digest = "sha256:0b315dc0dee39ee268ab4e1bd33df566400abb2628fc75dae7ea560ba869f42
 
 [[tasks]]
 name = "kubeply/restore-grafana-logs-datasource"
-digest = "sha256:a22d062edf9109abf20c87e6a5d3145523edd796eee2ad51d186abe49b9329d1"
+digest = "sha256:4162d0d73da85f799ca68e6f6256769c8022c1d4568f2d2f982fd2041c3c882b"
 
 [[tasks]]
 name = "kubeply/recover-nightly-report-cronjob"
