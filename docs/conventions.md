@@ -19,7 +19,7 @@ Every `task.toml` `[task]` section should include:
 Every `task.toml` `[metadata]` section should include:
 
 - `canary`: same full string as the first line of `instruction.md`, formatted
-  as `<infra-bench-canary: UUID>`.
+  as `<!-- dataset-name GUID UUID -->`.
 - `difficulty`: one of `easy`, `medium`, `hard`.
 - `expert_time_estimate_min` and `junior_time_estimate_min`.
 
@@ -52,13 +52,13 @@ Use difficulty to describe expected operator complexity, not line count.
 The first line of `instruction.md` must be the task canary:
 
 ```md
-<infra-bench-canary: UUID>
+<!-- kubernetes-core GUID UUID -->
 ```
 
 Generate it with:
 
 ```bash
-python3 -c 'import uuid; print(f"<infra-bench-canary: {uuid.uuid4()}>")'
+python3 -c 'import uuid; dataset="kubernetes-core"; print(f"<!-- {dataset} GUID {uuid.uuid4()} -->")'
 ```
 
 After the canary, `instruction.md` should tell the agent:

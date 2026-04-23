@@ -93,9 +93,10 @@ import re
 import tomllib
 
 CANARY_RE = re.compile(
-    r"^<infra-bench-canary: "
-    r"[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}"
-    r">$"
+    r"^<!-- "
+    r"(?P<dataset>[a-z0-9][a-z0-9-]*) GUID "
+    r"(?P<uuid>[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})"
+    r" -->$"
 )
 
 for path in sorted(Path("datasets").glob("*/dataset.toml")):
@@ -107,6 +108,7 @@ for path in sorted(Path("datasets").glob("*/dataset.toml")):
 seen_canaries = {}
 
 for path in sorted(Path("datasets").glob("*/*/task.toml")):
+    dataset_name = path.parent.parent.name
     data = tomllib.loads(path.read_text())
     task = data.get("task", {})
     if not task.get("name"):
@@ -128,9 +130,14 @@ for path in sorted(Path("datasets").glob("*/*/task.toml")):
     canary = metadata.get("canary")
     if not isinstance(canary, str):
         raise SystemExit(f"{path}: missing metadata.canary")
-    if not CANARY_RE.fullmatch(canary):
+    canary_match = CANARY_RE.fullmatch(canary)
+    if not canary_match:
         raise SystemExit(
-            f"{path}: metadata.canary must match '<infra-bench-canary: UUIDv4>'"
+            f"{path}: metadata.canary must match '<!-- {dataset_name} GUID UUIDv4 -->'"
+        )
+    if canary_match.group("dataset") != dataset_name:
+        raise SystemExit(
+            f"{path}: metadata.canary dataset must match parent dataset '{dataset_name}'"
         )
     if canary in seen_canaries:
         raise SystemExit(

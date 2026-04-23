@@ -39,7 +39,7 @@ failure mode, intended fix, or benchmark coverage area.
 Run:
 
 ```bash
-python3 -c 'import uuid; print(f"<infra-bench-canary: {uuid.uuid4()}>")'
+python3 -c 'import uuid; dataset="kubernetes-core"; print(f"<!-- {dataset} GUID {uuid.uuid4()} -->")'
 ```
 
 Add the generated canary as the first line of `instruction.md` and store the

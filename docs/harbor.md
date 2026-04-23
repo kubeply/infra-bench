@@ -177,7 +177,7 @@ Common fields:
 
 | Field | Type | Values |
 | --- | --- | --- |
-| `canary` | string | Same value as the first line of `instruction.md`, using `<infra-bench-canary: UUID>`. |
+| `canary` | string | Same value as the first line of `instruction.md`, using `<!-- dataset-name GUID UUID -->`. |
 | `difficulty` | string | `easy`, `medium`, or `hard`. |
 | `difficulty_explanation` | string | Short reason for the chosen difficulty. |
 | `expert_time_estimate_min` | number | Expected expert completion time in minutes. |
@@ -208,13 +208,13 @@ corpora.
 Generate the canary with:
 
 ```bash
-python3 -c 'import uuid; print(f"<infra-bench-canary: {uuid.uuid4()}>")'
+python3 -c 'import uuid; dataset="kubernetes-core"; print(f"<!-- {dataset} GUID {uuid.uuid4()} -->")'
 ```
 
 Add the generated line as the first line of `instruction.md`:
 
 ```md
-<infra-bench-canary: 7f7e9f1e-8e4e-4d47-a42f-2a5a5f2b7c11>
+<!-- kubernetes-core GUID 7f7e9f1e-8e4e-4d47-a42f-2a5a5f2b7c11 -->
 
 You are working in /app...
 ```
@@ -223,7 +223,7 @@ Store the same full string in `task.toml` metadata:
 
 ```toml
 [metadata]
-canary = "<infra-bench-canary: 7f7e9f1e-8e4e-4d47-a42f-2a5a5f2b7c11>"
+canary = "<!-- kubernetes-core GUID 7f7e9f1e-8e4e-4d47-a42f-2a5a5f2b7c11 -->"
 ```
 
 The value in `instruction.md` and `task.toml` must match exactly. Do not reuse
