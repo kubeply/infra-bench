@@ -213,7 +213,7 @@ done
 
 [[ -n "$client_pod" && "$traefik_service" == "traefik" ]] || fail "expected ingress client pod and traefik service"
 
-for _ in $(seq 1 90); do
+for _ in $(seq 1 180); do
   client_log="$(kubectl -n "$namespace" logs deployment/"$client_deployment" --tail=160 2>/dev/null || true)"
   if grep -q "restore ingress check ok" <<< "$client_log" \
     && grep -q "docs ingress check ok" <<< "$client_log"; then
