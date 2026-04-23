@@ -173,7 +173,7 @@ digest = "sha256:0a6778afe4d65eeda407f008cd80e8be2fb07df8f346acac9055464111cbf27
 
 [[tasks]]
 name = "kubeply/reconnect-checkout-worker-queue"
-digest = "sha256:51daaf8a738933cc2c00e2f80c3744119cad80374942b3fe49b60ab600c56784"
+digest = "sha256:0b315dc0dee39ee268ab4e1bd33df566400abb2628fc75dae7ea560ba869f424"
 
 [[tasks]]
 name = "kubeply/restore-grafana-logs-datasource"
