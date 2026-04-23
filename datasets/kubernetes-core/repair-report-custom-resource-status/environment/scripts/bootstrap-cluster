@@ -8,6 +8,8 @@ target_report="sales-summary"
 healthy_report="traffic-summary"
 docs_deployment="docs"
 docs_service="docs"
+publisher_deployment="report-publisher"
+publisher_service="report-publisher"
 agent_secret="infra-bench-agent-token"
 
 prepare-kubeconfig
@@ -27,6 +29,21 @@ fi
 if ! kubectl -n "$namespace" rollout status deployment/"$docs_deployment" --timeout=240s; then
   kubectl -n "$namespace" get all -o wide >&2 || true
   kubectl -n "$namespace" describe deployment "$docs_deployment" >&2 || true
+  exit 1
+fi
+
+for _ in $(seq 1 60); do
+  publisher_ready="$(kubectl -n "$namespace" get deployment "$publisher_deployment" -o jsonpath='{.status.readyReplicas}' 2>/dev/null || true)"
+  if [[ "${publisher_ready:-0}" == "0" ]]; then
+    break
+  fi
+  sleep 1
+done
+
+if [[ "${publisher_ready:-0}" != "0" ]]; then
+  echo "expected report publisher to start unready before the sales report output exists" >&2
+  kubectl -n "$namespace" get deployment "$publisher_deployment" -o yaml >&2 || true
+  kubectl -n "$namespace" logs deployment/"$publisher_deployment" --tail=100 >&2 || true
   exit 1
 fi
 
@@ -84,13 +101,15 @@ crd_uid="$(kubectl get crd "$crd" -o jsonpath='{.metadata.uid}')"
 controller_uid="$(kubectl -n "$namespace" get deployment "$controller" -o jsonpath='{.metadata.uid}')"
 docs_deployment_uid="$(kubectl -n "$namespace" get deployment "$docs_deployment" -o jsonpath='{.metadata.uid}')"
 docs_service_uid="$(kubectl -n "$namespace" get service "$docs_service" -o jsonpath='{.metadata.uid}')"
+publisher_deployment_uid="$(kubectl -n "$namespace" get deployment "$publisher_deployment" -o jsonpath='{.metadata.uid}')"
+publisher_service_uid="$(kubectl -n "$namespace" get service "$publisher_service" -o jsonpath='{.metadata.uid}')"
 sales_config_uid="$(kubectl -n "$namespace" get configmap sales-report-template -o jsonpath='{.metadata.uid}')"
 traffic_config_uid="$(kubectl -n "$namespace" get configmap traffic-report-template -o jsonpath='{.metadata.uid}')"
 healthy_output_uid="$(kubectl -n "$namespace" get configmap report-output-traffic-summary -o jsonpath='{.metadata.uid}')"
 
 kubectl -n "$namespace" patch configmap infra-bench-baseline \
   --type merge \
-  --patch "{\"data\":{\"crd_uid\":\"${crd_uid}\",\"controller_uid\":\"${controller_uid}\",\"docs_deployment_uid\":\"${docs_deployment_uid}\",\"docs_service_uid\":\"${docs_service_uid}\",\"healthy_report_uid\":\"${healthy_report_uid}\",\"healthy_output_uid\":\"${healthy_output_uid}\",\"sales_config_uid\":\"${sales_config_uid}\",\"target_report_uid\":\"${target_report_uid}\",\"traffic_config_uid\":\"${traffic_config_uid}\"}}"
+  --patch "{\"data\":{\"crd_uid\":\"${crd_uid}\",\"controller_uid\":\"${controller_uid}\",\"docs_deployment_uid\":\"${docs_deployment_uid}\",\"docs_service_uid\":\"${docs_service_uid}\",\"publisher_deployment_uid\":\"${publisher_deployment_uid}\",\"publisher_service_uid\":\"${publisher_service_uid}\",\"healthy_report_uid\":\"${healthy_report_uid}\",\"healthy_output_uid\":\"${healthy_output_uid}\",\"sales_config_uid\":\"${sales_config_uid}\",\"target_report_uid\":\"${target_report_uid}\",\"traffic_config_uid\":\"${traffic_config_uid}\"}}"
 
 for _ in $(seq 1 60); do
   token_data="$(kubectl -n "$namespace" get secret "$agent_secret" -o jsonpath='{.data.token}' 2>/dev/null || true)"

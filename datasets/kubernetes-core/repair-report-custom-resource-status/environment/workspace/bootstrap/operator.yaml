@@ -252,6 +252,77 @@ spec:
       port: 80
       targetPort: http
 ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: report-publisher
+  namespace: analytics-team
+  labels:
+    app: report-publisher
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: report-publisher
+  template:
+    metadata:
+      labels:
+        app: report-publisher
+    spec:
+      containers:
+        - name: report-publisher
+          image: busybox:1.36.1
+          command:
+            - /bin/sh
+            - -c
+            - |
+              mkdir -p /www
+              httpd -p 8080 -h /www &
+              while true; do
+                source="$(cat /report/sourceConfig 2>/dev/null || true)"
+                template="$(cat /report/template 2>/dev/null || true)"
+                if [ "$source" = "sales-report-template" ] && [ "$template" = "sales-v1" ]; then
+                  echo "ready" > /www/ready
+                  echo "published sales report from ${source}"
+                else
+                  rm -f /www/ready
+                  echo "sales report output is not publishable yet" >&2
+                fi
+                sleep 3
+              done
+          ports:
+            - name: http
+              containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: http
+            initialDelaySeconds: 2
+            periodSeconds: 5
+          volumeMounts:
+            - name: report-output
+              mountPath: /report
+              readOnly: true
+      volumes:
+        - name: report-output
+          configMap:
+            name: report-output-sales-summary
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: report-publisher
+  namespace: analytics-team
+  labels:
+    app: report-publisher
+spec:
+  selector:
+    app: report-publisher
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -316,6 +387,8 @@ data:
   controller_uid: ""
   docs_deployment_uid: ""
   docs_service_uid: ""
+  publisher_deployment_uid: ""
+  publisher_service_uid: ""
   healthy_report_uid: ""
   healthy_output_uid: ""
   sales_config_uid: ""

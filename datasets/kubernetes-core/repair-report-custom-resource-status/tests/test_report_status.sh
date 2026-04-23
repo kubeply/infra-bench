@@ -8,6 +8,8 @@ crd="reports.platform.infra-bench.dev"
 controller="report-controller"
 docs_deployment="docs"
 docs_service="docs"
+publisher_deployment="report-publisher"
+publisher_service="report-publisher"
 target_report="sales-summary"
 healthy_report="traffic-summary"
 target_output="report-output-sales-summary"
@@ -30,6 +32,8 @@ dump_debug() {
   kubectl -n "$namespace" get deployment "$controller" -o yaml || true
   echo "--- controller logs ---"
   kubectl -n "$namespace" logs deployment/"$controller" --tail=150 || true
+  echo "--- publisher logs ---"
+  kubectl -n "$namespace" logs deployment/"$publisher_deployment" --tail=150 || true
   echo "--- recent events ---"
   kubectl -n "$namespace" get events --sort-by=.lastTimestamp || true
 }
@@ -44,6 +48,11 @@ if ! kubectl -n "$namespace" rollout status deployment/"$docs_deployment" --time
   exit 1
 fi
 
+if ! kubectl -n "$namespace" rollout status deployment/"$publisher_deployment" --timeout=180s; then
+  dump_debug
+  exit 1
+fi
+
 baseline_value() {
   kubectl -n "$namespace" get configmap infra-bench-baseline -o jsonpath="{.data.$1}"
 }
@@ -52,13 +61,15 @@ crd_uid="$(kubectl get crd "$crd" -o jsonpath='{.metadata.uid}')"
 controller_uid="$(kubectl -n "$namespace" get deployment "$controller" -o jsonpath='{.metadata.uid}')"
 docs_deployment_uid="$(kubectl -n "$namespace" get deployment "$docs_deployment" -o jsonpath='{.metadata.uid}')"
 docs_service_uid="$(kubectl -n "$namespace" get service "$docs_service" -o jsonpath='{.metadata.uid}')"
+publisher_deployment_uid="$(kubectl -n "$namespace" get deployment "$publisher_deployment" -o jsonpath='{.metadata.uid}')"
+publisher_service_uid="$(kubectl -n "$namespace" get service "$publisher_service" -o jsonpath='{.metadata.uid}')"
 target_report_uid="$(kubectl -n "$namespace" get report "$target_report" -o jsonpath='{.metadata.uid}')"
 healthy_report_uid="$(kubectl -n "$namespace" get report "$healthy_report" -o jsonpath='{.metadata.uid}')"
 sales_config_uid="$(kubectl -n "$namespace" get configmap sales-report-template -o jsonpath='{.metadata.uid}')"
 traffic_config_uid="$(kubectl -n "$namespace" get configmap traffic-report-template -o jsonpath='{.metadata.uid}')"
 healthy_output_uid="$(kubectl -n "$namespace" get configmap "$healthy_output" -o jsonpath='{.metadata.uid}')"
 
-for key in crd_uid controller_uid docs_deployment_uid docs_service_uid target_report_uid healthy_report_uid sales_config_uid traffic_config_uid healthy_output_uid; do
+for key in crd_uid controller_uid docs_deployment_uid docs_service_uid publisher_deployment_uid publisher_service_uid target_report_uid healthy_report_uid sales_config_uid traffic_config_uid healthy_output_uid; do
   if [[ -z "$(baseline_value "$key")" ]]; then
     echo "Baseline ConfigMap is missing $key" >&2
     kubectl -n "$namespace" get configmap infra-bench-baseline -o yaml || true
@@ -70,6 +81,8 @@ if [[ "$crd_uid" != "$(baseline_value crd_uid)" \
   || "$controller_uid" != "$(baseline_value controller_uid)" \
   || "$docs_deployment_uid" != "$(baseline_value docs_deployment_uid)" \
   || "$docs_service_uid" != "$(baseline_value docs_service_uid)" \
+  || "$publisher_deployment_uid" != "$(baseline_value publisher_deployment_uid)" \
+  || "$publisher_service_uid" != "$(baseline_value publisher_service_uid)" \
   || "$target_report_uid" != "$(baseline_value target_report_uid)" \
   || "$healthy_report_uid" != "$(baseline_value healthy_report_uid)" \
   || "$sales_config_uid" != "$(baseline_value sales_config_uid)" \
@@ -80,6 +93,8 @@ if [[ "$crd_uid" != "$(baseline_value crd_uid)" \
   echo "controller expected=$(baseline_value controller_uid) got=$controller_uid" >&2
   echo "docs deployment expected=$(baseline_value docs_deployment_uid) got=$docs_deployment_uid" >&2
   echo "docs service expected=$(baseline_value docs_service_uid) got=$docs_service_uid" >&2
+  echo "publisher deployment expected=$(baseline_value publisher_deployment_uid) got=$publisher_deployment_uid" >&2
+  echo "publisher service expected=$(baseline_value publisher_service_uid) got=$publisher_service_uid" >&2
   echo "target report expected=$(baseline_value target_report_uid) got=$target_report_uid" >&2
   echo "healthy report expected=$(baseline_value healthy_report_uid) got=$healthy_report_uid" >&2
   exit 1
@@ -95,7 +110,7 @@ if [[ "$report_names" != $'sales-summary\ntraffic-summary' ]]; then
   exit 1
 fi
 
-if [[ "$deployment_names" != $'docs\nreport-controller' || "$service_names" != "$docs_service" ]]; then
+if [[ "$deployment_names" != $'docs\nreport-controller\nreport-publisher' || "$service_names" != $'docs\nreport-publisher' ]]; then
   echo "Unexpected workload or Service set: deployments=${deployment_names} services=${service_names}" >&2
   exit 1
 fi
@@ -214,6 +229,13 @@ controller_ready_replicas="$(kubectl -n "$namespace" get deployment "$controller
 docs_image="$(kubectl -n "$namespace" get deployment "$docs_deployment" -o jsonpath='{.spec.template.spec.containers[0].image}')"
 docs_selector="$(kubectl -n "$namespace" get service "$docs_service" -o jsonpath='{.spec.selector.app}')"
 docs_endpoints="$(kubectl -n "$namespace" get endpoints "$docs_service" -o jsonpath='{.subsets[*].addresses[*].ip}')"
+publisher_image="$(kubectl -n "$namespace" get deployment "$publisher_deployment" -o jsonpath='{.spec.template.spec.containers[0].image}')"
+publisher_replicas="$(kubectl -n "$namespace" get deployment "$publisher_deployment" -o jsonpath='{.spec.replicas}')"
+publisher_ready_replicas="$(kubectl -n "$namespace" get deployment "$publisher_deployment" -o jsonpath='{.status.readyReplicas}')"
+publisher_selector="$(kubectl -n "$namespace" get service "$publisher_service" -o jsonpath='{.spec.selector.app}')"
+publisher_endpoints="$(kubectl -n "$namespace" get endpoints "$publisher_service" -o jsonpath='{.subsets[*].addresses[*].ip}')"
+publisher_volume="$(kubectl -n "$namespace" get deployment "$publisher_deployment" -o jsonpath='{.spec.template.spec.volumes[0].configMap.name}')"
+publisher_log="$(kubectl -n "$namespace" logs deployment/"$publisher_deployment" --tail=150 2>/dev/null || true)"
 crd_group="$(kubectl get crd "$crd" -o jsonpath='{.spec.group}')"
 crd_kind="$(kubectl get crd "$crd" -o jsonpath='{.spec.names.kind}')"
 crd_status_subresource="$(kubectl get crd "$crd" -o jsonpath='{.spec.versions[?(@.name=="v1alpha1")].subresources.status}')"
@@ -228,6 +250,22 @@ fi
 
 if [[ "$docs_image" != "nginx:1.27" || "$docs_selector" != "docs" || -z "$docs_endpoints" ]]; then
   echo "Docs service changed or lost endpoints; image=${docs_image} selector=${docs_selector} endpoints=${docs_endpoints}" >&2
+  exit 1
+fi
+
+if [[ "$publisher_image" != "busybox:1.36.1" \
+  || "$publisher_replicas" != "1" \
+  || "$publisher_ready_replicas" != "1" \
+  || "$publisher_selector" != "$publisher_deployment" \
+  || -z "$publisher_endpoints" \
+  || "$publisher_volume" != "$target_output" ]]; then
+  echo "Report publisher did not recover or its wiring changed; image=${publisher_image} spec=${publisher_replicas} ready=${publisher_ready_replicas} selector=${publisher_selector} endpoints=${publisher_endpoints} volume=${publisher_volume}" >&2
+  exit 1
+fi
+
+if ! grep -q "published sales report from sales-report-template" <<< "$publisher_log"; then
+  echo "Report publisher did not consume the generated sales report output" >&2
+  dump_debug
   exit 1
 fi
 
