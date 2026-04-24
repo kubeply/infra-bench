@@ -4,8 +4,13 @@ schema_version = "1.1"
 name = "kubeply/harden-payments-stack-without-breaking-runtime"
 description = "Restore a live payments stack so it satisfies restricted security posture without breaking runtime behavior."
 category = "kubernetes"
-keywords = ["kubernetes", "security-posture", "network-policy", "rbac-access", "kubectl"]
-
+keywords = [
+  "kubernetes",
+  "security-posture",
+  "network-policy",
+  "rbac-access",
+  "kubectl",
+]
 [[task.authors]]
 name = "Kubeply"
 email = "thomas@kubeply.com"
