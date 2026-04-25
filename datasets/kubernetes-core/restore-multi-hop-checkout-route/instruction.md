@@ -20,5 +20,5 @@ Constraints:
   cluster, or edit verifier artifacts.
 - Do not broaden access between unrelated components.
 
-Success means the original checkout path works again while the unrelated
-healthy paths continue to work.
+Success means checkout requests work again through the original application path
+without weakening existing isolation or disrupting unrelated workloads.
