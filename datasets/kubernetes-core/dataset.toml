@@ -213,7 +213,7 @@ digest = "sha256:0ee7c767000aa9f32049fe174ef8483ee825118e559a4f308b2c575ef6bb698
 
 [[tasks]]
 name = "kubeply/repair-report-operator-finalizer-reconcile"
-digest = "sha256:e17fe1ffd02a55838c1fdd5a7424ae5d47f7903f8132536a150e19a5618e74c3"
+digest = "sha256:ed7a7ea2441ca9a7ff0b4bcb148b736e418f6d9e311da47991ec50c705c4be0c"
 
 [[tasks]]
 name = "kubeply/stabilize-checkout-autoscaling-under-load"
