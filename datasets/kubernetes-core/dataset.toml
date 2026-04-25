@@ -193,7 +193,19 @@ digest = "sha256:b30ba32baa867b501c3924776635927e3dc9bf2ddc8bee2c828554ce9550136
 
 [[tasks]]
 name = "kubeply/restore-alert-signal-after-telemetry-split"
-digest = "sha256:f12821cd3d47659638cd2eddb2fd62c38b92b928928c15f319e62c69dbc17c71"
+digest = "sha256:c898ee0778e2bdbc7cc6424dd4202a0c08a14b40cbe482ce336db87bcae15493"
+
+[[tasks]]
+name = "kubeply/complete-namespace-restore-preserving-state"
+digest = "sha256:9d47388960a2bf7d8c72dbee85bc35f9272953bb5fb5cc6d829c65eafc6d590c"
+
+[[tasks]]
+name = "kubeply/harden-payments-stack-without-breaking-runtime"
+digest = "sha256:7dc7e3a3cef66871d53559757b62a672554d8ae06a9af57cf505b771ea6dbe3e"
+
+[[tasks]]
+name = "kubeply/restore-order-pipeline-after-queue-migration"
+digest = "sha256:0ee7c767000aa9f32049fe174ef8483ee825118e559a4f308b2c575ef6bb698a"
 
 
 [[files]]
