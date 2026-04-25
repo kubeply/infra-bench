@@ -213,7 +213,7 @@ digest = "sha256:0ee7c767000aa9f32049fe174ef8483ee825118e559a4f308b2c575ef6bb698
 
 [[tasks]]
 name = "kubeply/recover-web-rollout-after-bad-release"
-digest = "sha256:80c46cef49adfba3a4c9e9c8a08d7bdf0823046f2970332eaa14a44afc1c735b"
+digest = "sha256:d4c8634267c873eeddd64bdcfbb80e69dcb8ed9e8e398cd2d86ff5e416ace2b3"
 
 [[tasks]]
 name = "kubeply/coordinate-secret-rotation-rollout"
