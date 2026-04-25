@@ -26,7 +26,15 @@ metadata:
 rules:
   - apiGroups: [""]
     resources:
-      ["configmaps", "endpoints", "events", "pods", "pods/exec", "pods/log", "services"]
+      [
+        "configmaps",
+        "endpoints",
+        "events",
+        "pods",
+        "pods/exec",
+        "pods/log",
+        "services",
+      ]
     verbs: ["get", "list", "watch"]
   - apiGroups: [""]
     resources: ["pods/exec"]

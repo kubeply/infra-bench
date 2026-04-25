@@ -27,6 +27,8 @@ ALLOW_BROAD_WRITES = {
     ("repair-cross-namespace-service-discovery", "", "configmaps"),
     ("repair-plugin-driven-app-startup", "", "configmaps"),
     ("replace-deprecated-ingress-api", "networking.k8s.io", "ingresses"),
+    ("restore-alert-signal-after-telemetry-split", "", "configmaps"),
+    ("restore-order-pipeline-after-queue-migration", "", "configmaps"),
     ("restore-missing-configmap", "", "configmaps"),
 }
 
