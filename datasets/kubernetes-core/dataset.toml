@@ -211,6 +211,10 @@ digest = "sha256:319eb531e33b3af84e265a023067486a136bc0a380f0daf81c96d541a62170c
 name = "kubeply/restore-order-pipeline-after-queue-migration"
 digest = "sha256:0ee7c767000aa9f32049fe174ef8483ee825118e559a4f308b2c575ef6bb698a"
 
+[[tasks]]
+name = "kubeply/restore-stateful-cache-identity"
+digest = "sha256:ef4d6b37eef530a801f7582e595b2e9c26a8d6b25667790f32ded7abb3adbc1c"
+
 
 [[files]]
 path = "metric.py"
