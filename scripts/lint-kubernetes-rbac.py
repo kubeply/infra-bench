@@ -26,6 +26,7 @@ ALLOW_BROAD_WRITES = {
     ("fix-job-command-argument", "batch", "jobs"),
     ("repair-cross-namespace-service-discovery", "", "configmaps"),
     ("replace-deprecated-ingress-api", "networking.k8s.io", "ingresses"),
+    ("restore-alert-signal-after-telemetry-split", "", "configmaps"),
     ("restore-order-pipeline-after-queue-migration", "", "configmaps"),
     ("restore-missing-configmap", "", "configmaps"),
 }
