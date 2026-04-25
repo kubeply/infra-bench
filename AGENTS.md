@@ -67,6 +67,12 @@ docs/
     `-- kubernetes.md
 ```
 
+## Commit Messages
+
+Use Conventional Commits for all commits. Prefer scopes that match the area
+being changed, such as `feat(kubernetes-core): ...`, `fix(kubernetes-core): ...`,
+`chore(deps): ...`, or `docs: ...`.
+
 ## Validation
 
 Before considering a change complete:
