@@ -152,7 +152,8 @@ metadata:
   namespace: catalog-east
 rules:
   - apiGroups: [""]
-    resources: ["endpoints", "events", "pods", "pods/log", "pods/exec", "services"]
+    resources:
+      ["endpoints", "events", "pods", "pods/log", "pods/exec", "services"]
     verbs: ["get", "list", "watch"]
   - apiGroups: [""]
     resources: ["pods/exec"]

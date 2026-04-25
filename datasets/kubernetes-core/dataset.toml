@@ -213,7 +213,7 @@ digest = "sha256:0ee7c767000aa9f32049fe174ef8483ee825118e559a4f308b2c575ef6bb698
 
 [[tasks]]
 name = "kubeply/repair-payment-tenant-network-boundary"
-digest = "sha256:1471e6bfac96873b6d3dfe6446cdb0c4065eea1a260d467738f26438f4b3f8e1"
+digest = "sha256:448e9f357d2b13cc6157af0b5b9c09e032aa8f4c719d7486c415c0bd268b2d56"
 
 [[tasks]]
 name = "kubeply/recover-web-rollout-after-bad-release"
