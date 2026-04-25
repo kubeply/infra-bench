@@ -103,6 +103,12 @@ expect_single_container_deployment() {
   [[ "$affinity_pool" == "$node_pool" ]] || fail "deployment/$name affinity changed to $affinity_pool"
 }
 
+non_daemon_pods_on_retiring_node() {
+  kubectl -n "$namespace" get pods \
+    -o jsonpath='{range .items[*]}{.metadata.name}{"|"}{.metadata.ownerReferences[0].kind}{"|"}{.spec.nodeName}{"\n"}{end}' \
+    | awk -F'|' -v node="$retiring_node" '$3 == node && $2 != "DaemonSet" {print $1}'
+}
+
 for deployment in checkout-api catalog-api docs; do
   kubectl -n "$namespace" rollout status deployment/"$deployment" --timeout=240s \
     || fail "deployment/$deployment is not ready"
@@ -220,6 +226,8 @@ checkout_on_target="$(
 )"
 [[ "$checkout_on_retiring" == "0" ]] || fail "checkout-api still has pods on $retiring_node"
 [[ "$checkout_on_target" == "3" ]] || fail "checkout-api pods did not settle on the target pool"
+remaining_retiring_pods="$(non_daemon_pods_on_retiring_node)"
+[[ -z "$remaining_retiring_pods" ]] || fail "non-DaemonSet pods still remain on $retiring_node: $remaining_retiring_pods"
 
 for service in checkout-api catalog-api docs; do
   endpoints="$(kubectl -n "$namespace" get endpoints "$service" -o jsonpath='{.subsets[*].addresses[*].ip}' 2>/dev/null || true)"
@@ -249,8 +257,9 @@ for _ in $(seq 1 150); do
       -o jsonpath='{range .items[*]}{.spec.nodeName}{"\n"}{end}' \
       | grep -c "^${retiring_node}$" || true
   )"
+  remaining_retiring_pods="$(non_daemon_pods_on_retiring_node)"
 
-  if [[ "$ready_replicas" == "3" && "$checkout_allowed" -ge 1 && "$total_checkout" == "3" && "$checkout_on_retiring" == "0" ]]; then
+  if [[ "$ready_replicas" == "3" && "$checkout_allowed" -ge 1 && "$total_checkout" == "3" && "$checkout_on_retiring" == "0" && -z "$remaining_retiring_pods" ]]; then
     echo "checkout-api migrated off the retiring node, tolerated one eviction, and returned to full readiness"
     exit 0
   fi
@@ -258,4 +267,4 @@ for _ in $(seq 1 150); do
   sleep 2
 done
 
-fail "checkout-api did not recover to full readiness on the target pool after one allowed eviction"
+fail "checkout-api did not recover to full readiness on the target pool after one allowed eviction; remaining_retiring_pods=${remaining_retiring_pods}"

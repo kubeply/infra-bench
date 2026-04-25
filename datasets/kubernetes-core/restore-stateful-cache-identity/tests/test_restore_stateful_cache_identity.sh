@@ -147,6 +147,10 @@ cache_limit_cpu="$(kubectl -n "$namespace" get statefulset "$statefulset" -o jso
 cache_limit_memory="$(kubectl -n "$namespace" get statefulset "$statefulset" -o jsonpath='{.spec.template.spec.containers[0].resources.limits.memory}')"
 cache_mount_name="$(kubectl -n "$namespace" get statefulset "$statefulset" -o jsonpath='{.spec.template.spec.containers[0].volumeMounts[0].name}')"
 cache_mount_path="$(kubectl -n "$namespace" get statefulset "$statefulset" -o jsonpath='{.spec.template.spec.containers[0].volumeMounts[0].mountPath}')"
+cache_command_shell="$(kubectl -n "$namespace" get statefulset "$statefulset" -o jsonpath='{.spec.template.spec.containers[0].command[0]}')"
+cache_command_script="$(kubectl -n "$namespace" get statefulset "$statefulset" -o jsonpath='{.spec.template.spec.containers[0].command[1]}')"
+cache_script_mount="$(kubectl -n "$namespace" get statefulset "$statefulset" -o jsonpath='{.spec.template.spec.containers[0].volumeMounts[?(@.name=="scripts")].mountPath}')"
+cache_script_volume="$(kubectl -n "$namespace" get statefulset "$statefulset" -o jsonpath='{.spec.template.spec.volumes[?(@.name=="scripts")].configMap.name}')"
 claim_template_names="$(kubectl -n "$namespace" get statefulset "$statefulset" -o jsonpath='{range .spec.volumeClaimTemplates[*]}{.metadata.name}{" "}{end}')"
 
 [[ "$cache_replicas" == "3" && "${cache_ready:-0}" == "3" ]] || fail "cache replica state incorrect"
@@ -157,6 +161,8 @@ claim_template_names="$(kubectl -n "$namespace" get statefulset "$statefulset" -
 [[ "$cache_request_cpu" == "50m" && "$cache_request_memory" == "64Mi" ]] || fail "StatefulSet resource requests changed"
 [[ "$cache_limit_cpu" == "150m" && "$cache_limit_memory" == "128Mi" ]] || fail "StatefulSet resource limits changed"
 [[ "$cache_mount_name" == "data" && "$cache_mount_path" == "/var/lib/session-cache" ]] || fail "cache does not mount the preserved data template"
+[[ "$cache_command_shell" == "/bin/sh" && "$cache_command_script" == "/opt/session-cache/cache.sh" ]] || fail "cache command was changed"
+[[ "$cache_script_mount" == "/opt/session-cache" && "$cache_script_volume" == "session-cache-scripts" ]] || fail "cache script wiring changed"
 [[ "$claim_template_names" == "data restore-data " ]] || fail "volume claim template identities changed"
 
 headless_cluster_ip="$(kubectl -n "$namespace" get service session-cache-peers -o jsonpath='{.spec.clusterIP}')"
@@ -203,10 +209,16 @@ checkout_port_name="$(kubectl -n "$namespace" get deployment checkout-api -o jso
 checkout_port="$(kubectl -n "$namespace" get deployment checkout-api -o jsonpath='{.spec.template.spec.containers[0].ports[0].containerPort}')"
 checkout_selector="$(kubectl -n "$namespace" get service checkout-api -o jsonpath='{.spec.selector.app}')"
 checkout_target_port="$(kubectl -n "$namespace" get service checkout-api -o jsonpath='{.spec.ports[0].targetPort}')"
+checkout_command_shell="$(kubectl -n "$namespace" get deployment checkout-api -o jsonpath='{.spec.template.spec.containers[0].command[0]}')"
+checkout_command_script="$(kubectl -n "$namespace" get deployment checkout-api -o jsonpath='{.spec.template.spec.containers[0].command[1]}')"
+checkout_script_mount="$(kubectl -n "$namespace" get deployment checkout-api -o jsonpath='{.spec.template.spec.containers[0].volumeMounts[?(@.name=="scripts")].mountPath}')"
+checkout_script_volume="$(kubectl -n "$namespace" get deployment checkout-api -o jsonpath='{.spec.template.spec.volumes[?(@.name=="scripts")].configMap.name}')"
 
 [[ "${checkout_ready:-0}" == "1" ]] || fail "checkout-api is not Ready"
 [[ "$checkout_image" == "busybox:1.36.1" && "$checkout_port_name" == "http" && "$checkout_port" == "8080" ]] || fail "checkout-api container changed"
 [[ "$checkout_selector" == "checkout-api" && "$checkout_target_port" == "http" ]] || fail "checkout-api Service changed"
+[[ "$checkout_command_shell" == "/bin/sh" && "$checkout_command_script" == "/opt/checkout/checkout.sh" ]] || fail "checkout-api command was changed"
+[[ "$checkout_script_mount" == "/opt/checkout" && "$checkout_script_volume" == "checkout-api-scripts" ]] || fail "checkout-api script wiring changed"
 
 checkout_endpoints="$(kubectl -n "$namespace" get endpoints checkout-api -o jsonpath='{.subsets[*].addresses[*].ip}')"
 docs_endpoints="$(kubectl -n "$namespace" get endpoints docs-site -o jsonpath='{.subsets[*].addresses[*].ip}')"
