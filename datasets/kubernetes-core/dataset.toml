@@ -212,6 +212,10 @@ name = "kubeply/restore-order-pipeline-after-queue-migration"
 digest = "sha256:0ee7c767000aa9f32049fe174ef8483ee825118e559a4f308b2c575ef6bb698a"
 
 [[tasks]]
+name = "kubeply/repair-report-operator-finalizer-reconcile"
+digest = "sha256:ed7a7ea2441ca9a7ff0b4bcb148b736e418f6d9e311da47991ec50c705c4be0c"
+
+[[tasks]]
 name = "kubeply/stabilize-checkout-autoscaling-under-load"
 digest = "sha256:0a8638a6384ae4a26bc5891d809a98c1be180311e4a562abe36a505386291a33"
 
