@@ -83,7 +83,7 @@ metadata:
   name: plugin-app-template
   namespace: plugin-lab
 data:
-  plugin_name: analytics
+  plugin_name: catalog
   config_output: /generated/runtime/app.conf
 ---
 apiVersion: v1
