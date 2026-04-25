@@ -7,7 +7,7 @@ services:
       - agent-kubeconfig:/kube:ro
 
   k3s:
-    image: rancher/k3s:v1.30.6-k3s1
+    image: rancher/k3s:v1.35.3-k3s1
     privileged: true
     command:
       - server
@@ -31,7 +31,7 @@ services:
       start_period: 20s
 
   k3s-agent:
-    image: rancher/k3s:v1.30.6-k3s1
+    image: rancher/k3s:v1.35.3-k3s1
     privileged: true
     depends_on:
       k3s:
