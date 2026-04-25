@@ -4,7 +4,13 @@ schema_version = "1.1"
 name = "kubeply/stabilize-checkout-autoscaling-under-load"
 description = "Stabilize a live Kubernetes checkout rollout so autoscaled capacity becomes usable under load."
 category = "kubernetes"
-keywords = ["kubernetes", "autoscaling", "cpu-operations", "rollout-readiness", "kubectl"]
+keywords = [
+  "kubernetes",
+  "autoscaling",
+  "cpu-operations",
+  "rollout-readiness",
+  "kubectl",
+]
 [[task.authors]]
 name = "Kubeply"
 email = "thomas@kubeply.com"

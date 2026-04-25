@@ -213,7 +213,7 @@ digest = "sha256:0ee7c767000aa9f32049fe174ef8483ee825118e559a4f308b2c575ef6bb698
 
 [[tasks]]
 name = "kubeply/stabilize-checkout-autoscaling-under-load"
-digest = "sha256:dc2a165697e22c894fd8f9c11d43231bb4cb595545aef8eaad83ad5389d340df"
+digest = "sha256:0a8638a6384ae4a26bc5891d809a98c1be180311e4a562abe36a505386291a33"
 
 [[tasks]]
 name = "kubeply/complete-node-pool-drain-migration"
