@@ -212,6 +212,10 @@ name = "kubeply/restore-order-pipeline-after-queue-migration"
 digest = "sha256:0ee7c767000aa9f32049fe174ef8483ee825118e559a4f308b2c575ef6bb698a"
 
 [[tasks]]
+name = "kubeply/repair-payment-tenant-network-boundary"
+digest = "sha256:448e9f357d2b13cc6157af0b5b9c09e032aa8f4c719d7486c415c0bd268b2d56"
+
+[[tasks]]
 name = "kubeply/recover-web-rollout-after-bad-release"
 digest = "sha256:d4c8634267c873eeddd64bdcfbb80e69dcb8ed9e8e398cd2d86ff5e416ace2b3"
 
