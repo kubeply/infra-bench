@@ -129,6 +129,20 @@ web_port="$(kubectl -n "$namespace" get deployment web -o jsonpath='{.spec.templ
 readiness_path="$(kubectl -n "$namespace" get deployment web -o jsonpath='{.spec.template.spec.containers[0].readinessProbe.httpGet.path}')"
 readiness_port="$(kubectl -n "$namespace" get deployment web -o jsonpath='{.spec.template.spec.containers[0].readinessProbe.httpGet.port}')"
 readiness_exec="$(kubectl -n "$namespace" get deployment web -o jsonpath='{.spec.template.spec.containers[0].readinessProbe.exec.command}' 2>/dev/null || true)"
+web_command_shell="$(kubectl -n "$namespace" get deployment web -o jsonpath='{.spec.template.spec.containers[0].command[0]}')"
+web_command_flag="$(kubectl -n "$namespace" get deployment web -o jsonpath='{.spec.template.spec.containers[0].command[1]}')"
+web_command_script="$(kubectl -n "$namespace" get deployment web -o jsonpath='{.spec.template.spec.containers[0].command[2]}')"
+expected_web_command_script="$(
+  cat <<'EOF'
+release="${WEB_RELEASE:-v1}"
+path="${HEALTH_PATH#/}"
+mkdir -p /www
+printf 'web release %s ok\n' "${release}" > /www/index.html
+printf 'web release %s ok\n' "${release}" > "/www/${path}"
+printf 'web release %s health endpoint is /%s\n' "${release}" "${path}"
+exec httpd -f -p 8080 -h /www
+EOF
+)"
 health_path="$(kubectl -n "$namespace" get configmap web-config -o jsonpath='{.data.health_path}')"
 release_id="$(kubectl -n "$namespace" get deployment web -o jsonpath='{.spec.template.metadata.annotations.release-id}')"
 config_revision="$(kubectl -n "$namespace" get deployment web -o jsonpath='{.spec.template.metadata.annotations.config-revision}')"
@@ -156,6 +170,11 @@ fi
 
 if [[ -n "$readiness_exec" ]]; then
   echo "web readiness probe was replaced with exec" >&2
+  exit 1
+fi
+
+if [[ "$web_command_shell" != "/bin/sh" || "$web_command_flag" != "-c" || "$web_command_script" != "$expected_web_command_script" ]]; then
+  echo "web container command changed unexpectedly" >&2
   exit 1
 fi
 

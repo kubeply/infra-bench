@@ -213,7 +213,7 @@ digest = "sha256:0ee7c767000aa9f32049fe174ef8483ee825118e559a4f308b2c575ef6bb698
 
 [[tasks]]
 name = "kubeply/repair-report-operator-finalizer-reconcile"
-digest = "sha256:ed7a7ea2441ca9a7ff0b4bcb148b736e418f6d9e311da47991ec50c705c4be0c"
+digest = "sha256:5d83a5bd9ddeb89e648a41fe03d91dfef15fafc2c50c77b693e6365b4f18ad90"
 
 [[tasks]]
 name = "kubeply/stabilize-checkout-autoscaling-under-load"
@@ -221,19 +221,19 @@ digest = "sha256:0a8638a6384ae4a26bc5891d809a98c1be180311e4a562abe36a505386291a3
 
 [[tasks]]
 name = "kubeply/complete-node-pool-drain-migration"
-digest = "sha256:33b8bb3bc03060a9002ec7c6e86e78158679dcd7a7862efd642ca04f56b55e12"
+digest = "sha256:0a0ea268ff771afab5946e078453374b0cebe2097eb2f35293dad0e3d10d74c9"
 
 [[tasks]]
 name = "kubeply/restore-stateful-cache-identity"
-digest = "sha256:ef4d6b37eef530a801f7582e595b2e9c26a8d6b25667790f32ded7abb3adbc1c"
+digest = "sha256:bf1d9f828a3ef905d6e3acc92dfe61bff5b637859fc29681a9a571919b049e17"
 
 [[tasks]]
 name = "kubeply/repair-payment-tenant-network-boundary"
-digest = "sha256:448e9f357d2b13cc6157af0b5b9c09e032aa8f4c719d7486c415c0bd268b2d56"
+digest = "sha256:b853b0c2a658eab7f027a8644efd1abdf0fb732acccba8f80e2e53526f038572"
 
 [[tasks]]
 name = "kubeply/recover-web-rollout-after-bad-release"
-digest = "sha256:d4c8634267c873eeddd64bdcfbb80e69dcb8ed9e8e398cd2d86ff5e416ace2b3"
+digest = "sha256:0cdc801d11ca776300b9eaf3ba00d162a100682278fef982032aa59ac892fc09"
 
 [[tasks]]
 name = "kubeply/coordinate-secret-rotation-rollout"

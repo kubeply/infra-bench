@@ -239,20 +239,31 @@ grep -q "reconciled Report ${target_report} into ConfigMap ${target_output}" <<<
 
 controller_subject="$(kubectl -n "$namespace" get rolebinding "$controller" -o jsonpath='{.subjects[0].kind}/{.subjects[0].name}')"
 controller_role_ref="$(kubectl -n "$namespace" get rolebinding "$controller" -o jsonpath='{.roleRef.kind}/{.roleRef.name}')"
-controller_configmap_resources="$(kubectl -n "$namespace" get role "$controller" -o jsonpath='{.rules[2].resources[*]}' | tr ' ' '\n' | sort | tr '\n' ' ')"
-controller_configmap_verbs="$(kubectl -n "$namespace" get role "$controller" -o jsonpath='{.rules[2].verbs[*]}' | tr ' ' '\n' | sort | tr '\n' ' ')"
-agent_status_rules="$(kubectl -n "$namespace" get role infra-bench-agent -o jsonpath='{range .rules[?(@.resources[0]=="reports/status")]}{.verbs[*]}{end}' 2>/dev/null || true)"
-agent_configmap_write="$(kubectl -n "$namespace" get role infra-bench-agent -o jsonpath='{.rules[0].verbs[*]}' | tr ' ' '\n' | grep -E '^(create|patch|update|delete|\*)$' || true)"
+controller_rule_count="$(kubectl -n "$namespace" get role "$controller" -o go-template='{{len .rules}}')"
+controller_rules="$(
+  kubectl -n "$namespace" get role "$controller" -o go-template='{{range .rules}}{{range .apiGroups}}{{printf "api:%s;" .}}{{end}}{{range .resources}}{{printf "res:%s;" .}}{{end}}{{range .verbs}}{{printf "verb:%s;" .}}{{end}}{{printf "\n"}}{{end}}' \
+    | sort
+)"
+expected_controller_rules="$(
+  cat <<'EOF'
+api:;res:configmaps;verb:get;verb:list;verb:watch;verb:create;verb:patch;verb:update;verb:delete;
+api:;res:events;verb:create;verb:patch;
+api:platform.infra-bench.dev;res:reports/status;verb:get;verb:patch;verb:update;
+api:platform.infra-bench.dev;res:reports;verb:get;verb:list;verb:watch;verb:patch;verb:update;
+EOF
+)"
+agent_bypass_rules="$(
+  kubectl -n "$namespace" get role infra-bench-agent -o go-template='{{range .rules}}{{range .resources}}{{printf "res:%s;" .}}{{end}}{{range .verbs}}{{printf "verb:%s;" .}}{{end}}{{printf "\n"}}{{end}}' \
+    | awk '/res:reports\/status/ || (/res:configmaps/ && /verb:(create|patch|update|delete|\*)/) {print}' || true
+)"
 extra_controller_clusterrole="$(kubectl get clusterrole report-controller -o name 2>/dev/null || true)"
 extra_controller_clusterrolebinding="$(kubectl get clusterrolebinding report-controller -o name 2>/dev/null || true)"
 
 [[ "$controller_subject" == "ServiceAccount/report-controller" && "$controller_role_ref" == "Role/report-controller" ]] \
   || fail "controller RoleBinding must remain namespaced and bound only to the controller ServiceAccount"
-[[ "$controller_configmap_resources" == "configmaps " ]] \
-  || fail "controller ConfigMap rule must stay scoped to ConfigMaps"
-[[ "$controller_configmap_verbs" == "create delete get list patch update watch " ]] \
-  || fail "controller ConfigMap verbs must be least-privilege, not broad: $controller_configmap_verbs"
-[[ -z "$agent_status_rules" && -z "$agent_configmap_write" ]] \
+[[ "$controller_rule_count" == "4" && "$controller_rules" == "$expected_controller_rules" ]] \
+  || fail "controller Role rules must stay least-privilege and exact; got: $controller_rules"
+[[ -z "$agent_bypass_rules" ]] \
   || fail "agent Role was broadened to bypass controller reconciliation"
 [[ -z "$extra_controller_clusterrole" && -z "$extra_controller_clusterrolebinding" ]] \
   || fail "controller RBAC was broadened to cluster scope"

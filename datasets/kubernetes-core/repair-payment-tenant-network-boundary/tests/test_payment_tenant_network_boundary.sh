@@ -154,23 +154,23 @@ done
 payment_policy_target="$(kubectl -n "$payment_namespace" get networkpolicy "$payment_policy" -o jsonpath='{.spec.podSelector.matchLabels.app}')"
 payment_policy_types="$(kubectl -n "$payment_namespace" get networkpolicy "$payment_policy" -o jsonpath='{.spec.policyTypes[*]}')"
 payment_egress_count="$(kubectl -n "$payment_namespace" get networkpolicy "$payment_policy" -o go-template='{{len .spec.egress}}')"
-payment_empty_to="$(kubectl -n "$payment_namespace" get networkpolicy "$payment_policy" -o go-template='{{range .spec.egress}}{{if not .to}}empty{{end}}{{end}}')"
-payment_ip_blocks="$(
-  kubectl -n "$payment_namespace" get networkpolicy "$payment_policy" \
-    -o jsonpath='{range .spec.egress[*].to[*]}{.ipBlock.cidr}{" "}{end}' \
-    | tr -d '[:space:]'
+payment_egress_summary="$(
+  # shellcheck disable=SC2016
+  kubectl -n "$payment_namespace" get networkpolicy "$payment_policy" -o go-template='{{range .spec.egress}}{{range .to}}{{if .namespaceSelector}}{{range $k, $v := .namespaceSelector.matchLabels}}{{printf "ns:%s=%s;" $k $v}}{{end}}{{end}}{{if .podSelector}}{{range $k, $v := .podSelector.matchLabels}}{{printf "pod:%s=%s;" $k $v}}{{end}}{{end}}{{if .ipBlock}}{{printf "ip:%s;" .ipBlock.cidr}}{{end}}{{end}}{{range .ports}}{{printf "port:%s/%v;" .protocol .port}}{{end}}{{printf "\n"}}{{end}}' \
+    | sort
 )"
-payment_ledger_namespace="$(kubectl -n "$payment_namespace" get networkpolicy "$payment_policy" -o jsonpath='{.spec.egress[0].to[0].namespaceSelector.matchLabels.tenant\.kubeply\.io/name}')"
-payment_ledger_app="$(kubectl -n "$payment_namespace" get networkpolicy "$payment_policy" -o jsonpath='{.spec.egress[0].to[0].podSelector.matchLabels.app}')"
-payment_ledger_port="$(kubectl -n "$payment_namespace" get networkpolicy "$payment_policy" -o jsonpath='{.spec.egress[0].ports[0].port}')"
+expected_payment_egress_summary="$(
+  cat <<'EOF'
+ns:kubernetes.io/metadata.name=kube-system;pod:k8s-app=kube-dns;port:UDP/53;port:TCP/53;
+ns:tenant.kubeply.io/name=payments;pod:app=ledger-api;port:TCP/8080;
+EOF
+)"
 [[ "$payment_policy_target" == "payment-worker" && "$payment_policy_types" == "Egress" ]] \
   || fail "payment egress policy target or type changed"
-[[ "$payment_egress_count" -ge 2 && "$payment_egress_count" -le 3 ]] \
-  || fail "payment egress policy should contain only ledger and DNS egress rules"
-[[ -z "$payment_empty_to" && -z "$payment_ip_blocks" ]] \
-  || fail "payment egress policy was broadened"
-[[ "$payment_ledger_namespace" == "payments" && "$payment_ledger_app" == "ledger-api" && "$payment_ledger_port" == "8080" ]] \
-  || fail "payment egress policy no longer targets the intended ledger backend narrowly"
+[[ "$payment_egress_count" == "2" ]] \
+  || fail "payment egress policy should contain exactly ledger and DNS egress rules"
+[[ "$payment_egress_summary" == "$expected_payment_egress_summary" ]] \
+  || fail "payment egress policy was broadened or no longer targets only ledger and DNS; got: $payment_egress_summary"
 
 ledger_policy_target="$(kubectl -n "$ledger_namespace" get networkpolicy "$ledger_policy" -o jsonpath='{.spec.podSelector.matchLabels.app}')"
 ledger_policy_types="$(kubectl -n "$ledger_namespace" get networkpolicy "$ledger_policy" -o jsonpath='{.spec.policyTypes[*]}')"
