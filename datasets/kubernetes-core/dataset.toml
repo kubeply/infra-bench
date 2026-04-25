@@ -215,6 +215,30 @@ digest = "sha256:0ee7c767000aa9f32049fe174ef8483ee825118e559a4f308b2c575ef6bb698
 name = "kubeply/stabilize-checkout-autoscaling-under-load"
 digest = "sha256:dc2a165697e22c894fd8f9c11d43231bb4cb595545aef8eaad83ad5389d340df"
 
+[[tasks]]
+name = "kubeply/complete-node-pool-drain-migration"
+digest = "sha256:33b8bb3bc03060a9002ec7c6e86e78158679dcd7a7862efd642ca04f56b55e12"
+
+[[tasks]]
+name = "kubeply/restore-stateful-cache-identity"
+digest = "sha256:ef4d6b37eef530a801f7582e595b2e9c26a8d6b25667790f32ded7abb3adbc1c"
+
+[[tasks]]
+name = "kubeply/repair-payment-tenant-network-boundary"
+digest = "sha256:448e9f357d2b13cc6157af0b5b9c09e032aa8f4c719d7486c415c0bd268b2d56"
+
+[[tasks]]
+name = "kubeply/recover-web-rollout-after-bad-release"
+digest = "sha256:d4c8634267c873eeddd64bdcfbb80e69dcb8ed9e8e398cd2d86ff5e416ace2b3"
+
+[[tasks]]
+name = "kubeply/coordinate-secret-rotation-rollout"
+digest = "sha256:dda0027409c9b9980d427c4eeebc53c26d22c917495cab9a5c240720f4968c6a"
+
+[[tasks]]
+name = "kubeply/restore-multi-hop-checkout-route"
+digest = "sha256:0673f0bc46c3c07a349d132f9ec460bad77bdd34d49b6a6e2a6dc18ba99a8d72"
+
 
 [[files]]
 path = "metric.py"
