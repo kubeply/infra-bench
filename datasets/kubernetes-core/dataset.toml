@@ -212,6 +212,10 @@ name = "kubeply/restore-order-pipeline-after-queue-migration"
 digest = "sha256:0ee7c767000aa9f32049fe174ef8483ee825118e559a4f308b2c575ef6bb698a"
 
 [[tasks]]
+name = "kubeply/recover-web-rollout-after-bad-release"
+digest = "sha256:80c46cef49adfba3a4c9e9c8a08d7bdf0823046f2970332eaa14a44afc1c735b"
+
+[[tasks]]
 name = "kubeply/coordinate-secret-rotation-rollout"
 digest = "sha256:dda0027409c9b9980d427c4eeebc53c26d22c917495cab9a5c240720f4968c6a"
 
