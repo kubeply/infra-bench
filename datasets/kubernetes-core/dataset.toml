@@ -213,7 +213,7 @@ digest = "sha256:0ee7c767000aa9f32049fe174ef8483ee825118e559a4f308b2c575ef6bb698
 
 [[tasks]]
 name = "kubeply/complete-node-pool-drain-migration"
-digest = "sha256:5cd13c4f5b024b690aba488fa86528f38fc52d237905838b610f19d4bd10fec9"
+digest = "sha256:33b8bb3bc03060a9002ec7c6e86e78158679dcd7a7862efd642ca04f56b55e12"
 
 [[tasks]]
 name = "kubeply/restore-stateful-cache-identity"

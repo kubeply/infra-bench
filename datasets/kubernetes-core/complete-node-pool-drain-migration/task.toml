@@ -4,7 +4,13 @@ schema_version = "1.1"
 name = "kubeply/complete-node-pool-drain-migration"
 description = "Complete a live Kubernetes node-pool maintenance migration while preserving disruption guarantees."
 category = "kubernetes"
-keywords = ["kubernetes", "node-migration", "scheduling-capacity", "rollout-readiness", "kubectl"]
+keywords = [
+  "kubernetes",
+  "node-migration",
+  "scheduling-capacity",
+  "rollout-readiness",
+  "kubectl",
+]
 [[task.authors]]
 name = "Kubeply"
 email = "thomas@kubeply.com"
