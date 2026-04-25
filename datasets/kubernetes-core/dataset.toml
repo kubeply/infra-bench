@@ -211,6 +211,10 @@ digest = "sha256:319eb531e33b3af84e265a023067486a136bc0a380f0daf81c96d541a62170c
 name = "kubeply/restore-order-pipeline-after-queue-migration"
 digest = "sha256:0ee7c767000aa9f32049fe174ef8483ee825118e559a4f308b2c575ef6bb698a"
 
+[[tasks]]
+name = "kubeply/restore-multi-hop-checkout-route"
+digest = "sha256:0673f0bc46c3c07a349d132f9ec460bad77bdd34d49b6a6e2a6dc18ba99a8d72"
+
 
 [[files]]
 path = "metric.py"
