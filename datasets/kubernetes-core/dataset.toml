@@ -211,6 +211,10 @@ digest = "sha256:319eb531e33b3af84e265a023067486a136bc0a380f0daf81c96d541a62170c
 name = "kubeply/restore-order-pipeline-after-queue-migration"
 digest = "sha256:0ee7c767000aa9f32049fe174ef8483ee825118e559a4f308b2c575ef6bb698a"
 
+[[tasks]]
+name = "kubeply/coordinate-secret-rotation-rollout"
+digest = "sha256:dda0027409c9b9980d427c4eeebc53c26d22c917495cab9a5c240720f4968c6a"
+
 
 [[files]]
 path = "metric.py"
