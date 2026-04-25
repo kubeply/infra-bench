@@ -30,7 +30,7 @@ TAPLO_VERSION="0.7.0"
 # renovate: datasource=npm depName=prettier
 PRETTIER_VERSION="3.8.3"
 # renovate: datasource=pypi depName=ruff
-RUFF_VERSION="0.15.11"
+RUFF_VERSION="0.15.12"
 
 toml_files=()
 while IFS= read -r -d "" path; do

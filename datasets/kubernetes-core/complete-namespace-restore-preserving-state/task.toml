@@ -4,7 +4,13 @@ schema_version = "1.1"
 name = "kubeply/complete-namespace-restore-preserving-state"
 description = "Complete a restored Kubernetes namespace so traffic uses preserved state without changing the source namespace."
 category = "kubernetes"
-keywords = ["kubernetes", "backup-restore-migration", "storage-stateful", "ingress-tls", "kubectl"]
+keywords = [
+  "kubernetes",
+  "backup-restore-migration",
+  "storage-stateful",
+  "ingress-tls",
+  "kubectl",
+]
 
 [[task.authors]]
 name = "Kubeply"
