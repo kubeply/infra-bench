@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/kubeply/infra-bench/schemas/benchmark-results/results.schema.json",
+  "title": "InfraBench benchmark task results",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "run_id", "results"],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "task_name",
+          "task_slug",
+          "difficulty",
+          "category",
+          "keywords",
+          "passed",
+          "reward",
+          "score",
+          "duration_sec",
+          "cost_usd",
+          "started_at",
+          "finished_at",
+          "verifier_artifact_key",
+          "agent_artifact_key"
+        ],
+        "properties": {
+          "task_name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "task_slug": {
+            "type": "string",
+            "minLength": 1
+          },
+          "difficulty": {
+            "enum": ["easy", "medium", "hard"]
+          },
+          "category": {
+            "type": "string",
+            "minLength": 1
+          },
+          "keywords": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "passed": {
+            "type": "boolean"
+          },
+          "reward": {
+            "type": "number",
+            "minimum": 0
+          },
+          "score": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "duration_sec": {
+            "type": ["number", "null"],
+            "minimum": 0
+          },
+          "cost_usd": {
+            "type": ["number", "null"],
+            "minimum": 0
+          },
+          "started_at": {
+            "type": ["string", "null"]
+          },
+          "finished_at": {
+            "type": ["string", "null"]
+          },
+          "verifier_artifact_key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "agent_artifact_key": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}

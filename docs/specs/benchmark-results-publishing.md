@@ -2,7 +2,15 @@
 
 ## Status
 
-Proposed.
+Partially implemented.
+
+The first implementation slice includes normalized JSON schemas and a local
+dry-run normalizer:
+
+- `schemas/benchmark-results/run.schema.json`
+- `schemas/benchmark-results/results.schema.json`
+- `scripts/normalize-benchmark-run.py`
+- `scripts/test-benchmark-results-normalizer.py`
 
 ## Context
 
@@ -293,13 +301,13 @@ should consume only normalized D1 rows and R2 JSON summaries.
 
 ## Implementation Plan
 
-1. Add normalized JSON schema files for benchmark runs and task results.
+1. Add normalized JSON schema files for benchmark runs and task results. Done.
 2. Add a local normalizer that reads Harbor job folders and emits JSON without
-   uploading.
-3. Add fixture-based tests for normalizer behavior.
+   uploading. Done.
+3. Add fixture-based tests for normalizer behavior. Done.
 4. Add an R2 upload mode gated by explicit Cloudflare credentials.
 5. Add a D1 write mode gated by explicit Cloudflare credentials.
-6. Add a dry-run command for CI validation.
+6. Add a dry-run command for CI validation. Done.
 7. Add marketing repository bindings and a `/benchmarks` page that reads the
    normalized data contract.
 
