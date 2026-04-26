@@ -61,6 +61,9 @@ docs/
 |-- datasets.md
 |-- harbor.md
 |-- project.md
+|-- specs/
+|   |-- README.md
+|   `-- benchmark-results-publishing.md
 |-- task-design.md
 `-- task-rules/
     |-- README.md
