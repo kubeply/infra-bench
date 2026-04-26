@@ -9,6 +9,7 @@ dry-run normalizer:
 
 - `schemas/benchmark-results/run.schema.json`
 - `schemas/benchmark-results/results.schema.json`
+- `schemas/benchmark-results/d1.sql`
 - `scripts/normalize-benchmark-run.py`
 - `scripts/test-benchmark-results-normalizer.py`
 
@@ -306,7 +307,8 @@ should consume only normalized D1 rows and R2 JSON summaries.
    uploading. Done.
 3. Add fixture-based tests for normalizer behavior. Done.
 4. Add an R2 upload mode gated by explicit Cloudflare credentials.
-5. Add a D1 write mode gated by explicit Cloudflare credentials.
+5. Add a D1 write mode gated by explicit Cloudflare credentials. The local
+   normalizer already emits `d1-upsert.sql` for deterministic loading.
 6. Add a dry-run command for CI validation. Done.
 7. Add marketing repository bindings and a `/benchmarks` page that reads the
    normalized data contract.

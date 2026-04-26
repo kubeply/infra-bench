@@ -143,6 +143,10 @@ def test_normalizer_writes_public_contract() -> None:
         assert result["passed"] is True
         assert "/public/" in result["agent_artifact_key"]
         assert result["agent_artifact_key"].endswith("agent-summary.json")
+        assert (
+            "INSERT OR REPLACE INTO benchmark_runs"
+            in (output / "d1-upsert.sql").read_text()
+        )
         assert not (output / "public" / result["task_slug"] / "agent.log").exists()
 
 

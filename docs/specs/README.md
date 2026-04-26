@@ -31,3 +31,7 @@ scripts/normalize-benchmark-run.py \
 ```
 
 Use `--dry-run` to validate and print the normalized JSON without writing files.
+
+The normalizer writes `run.json`, `results.json`, `summary.json`, public
+per-task summaries, and `d1-upsert.sql`. Apply
+`schemas/benchmark-results/d1.sql` before loading generated D1 upsert files.
