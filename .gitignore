@@ -1,6 +1,12 @@
 # Harbor/local evaluation output
 jobs/
 .harbor/
+build/
+
+# Local secrets and deployment variables
+.env
+.env.*
+!.env.example
 
 # Python
 __pycache__/
