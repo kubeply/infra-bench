@@ -81,6 +81,9 @@ jobs:
       - name: Validate repository structure
         run: ./scripts/validate-structure.sh
 
+      - name: Test benchmark result normalizer
+        run: python3 scripts/test-benchmark-results-normalizer.py
+
       - name: Lint Kubernetes agent RBAC
         run: python3 scripts/lint-kubernetes-rbac.py
 
