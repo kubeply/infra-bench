@@ -54,8 +54,8 @@ R2 stores immutable evidence:
 - original Harbor job archive
 - normalized `run.json`
 - normalized `results.json`
-- verifier outputs
-- selected logs that are safe to publish
+- safe verifier summaries
+- selected redacted logs that are explicitly approved for publication
 - precomputed `summary.json` files for static or cached reads
 
 D1 stores compact query data:
@@ -102,8 +102,8 @@ latest summaries.
 benchmarks/runs/<run_id>/run.json
 benchmarks/runs/<run_id>/results.json
 benchmarks/runs/<run_id>/artifacts.tar.zst
-benchmarks/runs/<run_id>/logs/<task-slug>/verifier.log
-benchmarks/runs/<run_id>/logs/<task-slug>/agent.log
+benchmarks/runs/<run_id>/public/<task-slug>/verifier-summary.json
+benchmarks/runs/<run_id>/public/<task-slug>/agent-summary.json
 benchmarks/latest/<dataset>.json
 benchmarks/latest/<dataset>/<model-slug>.json
 ```
@@ -167,8 +167,8 @@ cache and must not be treated as the source of truth.
       "cost_usd": null,
       "started_at": "2026-04-26T12:04:00Z",
       "finished_at": "2026-04-26T12:09:12Z",
-      "verifier_artifact_key": "benchmarks/runs/<run_id>/logs/restore-multi-hop-checkout-route/verifier.log",
-      "agent_artifact_key": "benchmarks/runs/<run_id>/logs/restore-multi-hop-checkout-route/agent.log"
+      "verifier_artifact_key": "benchmarks/runs/<run_id>/public/restore-multi-hop-checkout-route/verifier-summary.json",
+      "agent_artifact_key": "benchmarks/runs/<run_id>/public/restore-multi-hop-checkout-route/agent-summary.json"
     }
   ]
 }
@@ -269,6 +269,11 @@ Before upload, the normalizer must redact or exclude:
 
 Public artifacts should favor verifier summaries and high-level logs over raw
 agent transcripts until transcript publication rules are defined.
+
+Raw Harbor job archives, full agent transcripts, and full verifier logs should
+not be exposed through public marketing links by default. They may still be
+uploaded to restricted storage for audit and debugging when access controls are
+configured outside this repository.
 
 ## Marketing Site Contract
 
