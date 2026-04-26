@@ -52,3 +52,6 @@ Plan dataset releases deliberately instead of adding benchmark tasks ad hoc.
 
 Keep this planning workflow repository-wide. Domain-specific difficulty
 calibration and authoring rules still belong in `docs/task-rules/<domain>.md`.
+
+Use `docs/specs/` for repository-level workflow changes and cross-repository
+contracts that are broader than one benchmark task design brief.
