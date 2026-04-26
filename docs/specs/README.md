@@ -18,8 +18,8 @@ Current specs:
 
 ## Local Normalization
 
-Use the benchmark result normalizer to turn a local Harbor job directory into
-the public JSON contract:
+Use the benchmark result normalizer uv script to turn a local Harbor job
+directory into the public JSON contract:
 
 ```bash
 scripts/normalize-benchmark-run.py \

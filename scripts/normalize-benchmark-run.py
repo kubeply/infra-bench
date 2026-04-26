@@ -1,19 +1,22 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.11"
+# ///
 """Normalize a Harbor job directory into InfraBench benchmark result JSON."""
 
 from __future__ import annotations
 
 import argparse
-from dataclasses import dataclass, replace
-from datetime import UTC, datetime
 import json
-from pathlib import Path
 import re
 import subprocess
 import sys
-import tomllib
+from dataclasses import dataclass, replace
+from datetime import UTC, datetime
+from pathlib import Path
 from typing import Any
 
+import tomllib
 
 SCHEMA_VERSION = "1.0"
 UTC_FORMAT = "%Y-%m-%dT%H%M%SZ"
@@ -21,6 +24,8 @@ UTC_FORMAT = "%Y-%m-%dT%H%M%SZ"
 
 @dataclass(frozen=True)
 class TaskMetadata:
+    """Hold public metadata for one benchmark task."""
+
     name: str
     slug: str
     difficulty: str
@@ -30,6 +35,8 @@ class TaskMetadata:
 
 @dataclass(frozen=True)
 class TrialResult:
+    """Hold one normalized Harbor trial result."""
+
     task_name: str
     task_slug: str
     difficulty: str
@@ -49,6 +56,8 @@ class TrialResult:
 
 
 def parse_args() -> argparse.Namespace:
+    """Parse command-line arguments for the normalizer."""
+
     parser = argparse.ArgumentParser(
         description="Convert a Harbor job folder into public InfraBench JSON."
     )
@@ -80,6 +89,8 @@ def parse_args() -> argparse.Namespace:
 
 
 def load_json(path: Path) -> dict[str, Any]:
+    """Load a JSON object from disk."""
+
     try:
         data = json.loads(path.read_text())
     except json.JSONDecodeError as exc:
@@ -90,12 +101,16 @@ def load_json(path: Path) -> dict[str, Any]:
 
 
 def read_json_if_present(path: Path) -> dict[str, Any]:
+    """Return a JSON object from a path when it exists."""
+
     if not path.exists():
         return {}
     return load_json(path)
 
 
 def load_dataset_name(dataset_path: Path) -> str:
+    """Read the Harbor dataset name from dataset.toml."""
+
     manifest = dataset_path / "dataset.toml"
     if not manifest.exists():
         raise SystemExit(f"{manifest}: dataset manifest not found")
@@ -108,6 +123,8 @@ def load_dataset_name(dataset_path: Path) -> str:
 
 
 def load_task_metadata(dataset_path: Path) -> dict[str, TaskMetadata]:
+    """Read task metadata for every task in a dataset directory."""
+
     tasks: dict[str, TaskMetadata] = {}
     for task_toml in sorted(dataset_path.glob("*/task.toml")):
         data = tomllib.loads(task_toml.read_text())
@@ -141,6 +158,8 @@ def load_task_metadata(dataset_path: Path) -> dict[str, TaskMetadata]:
 
 
 def recursive_values(data: Any, keys: set[str]) -> list[Any]:
+    """Collect values for matching keys from nested JSON-like data."""
+
     found: list[Any] = []
     if isinstance(data, dict):
         for key, value in data.items():
@@ -154,6 +173,8 @@ def recursive_values(data: Any, keys: set[str]) -> list[Any]:
 
 
 def first_string(data: Any, keys: set[str]) -> str | None:
+    """Return the first non-empty string for any matching key."""
+
     for value in recursive_values(data, keys):
         if isinstance(value, str) and value:
             return value
@@ -161,6 +182,8 @@ def first_string(data: Any, keys: set[str]) -> str | None:
 
 
 def first_number(data: Any, keys: set[str]) -> float | None:
+    """Return the first numeric value for any matching key."""
+
     for value in recursive_values(data, keys):
         number = coerce_float(value)
         if number is not None:
@@ -169,6 +192,8 @@ def first_number(data: Any, keys: set[str]) -> float | None:
 
 
 def first_bool(data: Any, keys: set[str]) -> bool | None:
+    """Return the first boolean value for any matching key."""
+
     for value in recursive_values(data, keys):
         if isinstance(value, bool):
             return value
@@ -176,6 +201,8 @@ def first_bool(data: Any, keys: set[str]) -> bool | None:
 
 
 def first_present(*values: float | None) -> float | None:
+    """Return the first value that is not None."""
+
     for value in values:
         if value is not None:
             return value
@@ -183,6 +210,8 @@ def first_present(*values: float | None) -> float | None:
 
 
 def coerce_float(value: Any) -> float | None:
+    """Convert a scalar value to float when possible."""
+
     if isinstance(value, bool):
         return None
     if isinstance(value, int | float):
@@ -196,6 +225,8 @@ def coerce_float(value: Any) -> float | None:
 
 
 def normalize_timestamp(value: str | None) -> str | None:
+    """Normalize a timestamp string to UTC ISO-8601 when possible."""
+
     if value is None:
         return None
     raw = value.strip()
@@ -213,17 +244,23 @@ def normalize_timestamp(value: str | None) -> str | None:
 
 
 def current_timestamp() -> str:
+    """Return the current UTC timestamp without microseconds."""
+
     return (
         datetime.now(tz=UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z")
     )
 
 
 def slugify(value: str) -> str:
+    """Convert arbitrary text into a stable lowercase slug."""
+
     slug = re.sub(r"[^a-z0-9]+", "-", value.lower()).strip("-")
     return slug or "unknown"
 
 
 def git_commit() -> str:
+    """Return the current repository commit SHA."""
+
     command = ["git", "rev-parse", "HEAD"]
     result = subprocess.run(command, check=False, capture_output=True, text=True)
     if result.returncode != 0:
@@ -237,6 +274,8 @@ def infer_task_name(
     trial_result: dict[str, Any],
     tasks: dict[str, TaskMetadata],
 ) -> str:
+    """Infer the Harbor task name for one trial directory."""
+
     candidates: list[str] = []
     for data in (trial_result, trial_config):
         candidates.extend(
@@ -273,6 +312,8 @@ def infer_task_name(
 
 
 def read_reward_from_verifier(trial_dir: Path) -> float | None:
+    """Read verifier reward output from a trial directory."""
+
     reward_txt = trial_dir / "verifier" / "reward.txt"
     if reward_txt.exists():
         return coerce_float(reward_txt.read_text().strip())
@@ -286,6 +327,8 @@ def read_reward_from_verifier(trial_dir: Path) -> float | None:
 
 
 def find_trial_dirs(job_dir: Path) -> list[Path]:
+    """Find Harbor trial directories below a job directory."""
+
     trial_dirs: list[Path] = []
     for result_path in sorted(job_dir.rglob("result.json")):
         if result_path.parent == job_dir:
@@ -297,6 +340,8 @@ def find_trial_dirs(job_dir: Path) -> list[Path]:
 
 
 def artifact_key(prefix: str, run_id: str, task_slug: str, filename: str) -> str:
+    """Build an R2 object key for a public task artifact."""
+
     return f"{prefix}/runs/{run_id}/public/{task_slug}/{filename}"
 
 
@@ -307,6 +352,8 @@ def normalize_trial(
     r2_prefix: str,
     cost_usd: float | None,
 ) -> TrialResult:
+    """Normalize one Harbor trial into the public task result shape."""
+
     trial_config = read_json_if_present(trial_dir / "config.json")
     trial_result = read_json_if_present(trial_dir / "result.json")
     combined = {"config": trial_config, "result": trial_result}
@@ -380,6 +427,8 @@ def make_run_id(
     model_name: str,
     commit: str,
 ) -> str:
+    """Build or return the stable benchmark run identifier."""
+
     if explicit_run_id:
         return explicit_run_id
     timestamp = normalize_timestamp(started_at) or current_timestamp()
@@ -394,6 +443,8 @@ def make_run_id(
 
 
 def result_to_json(result: TrialResult) -> dict[str, Any]:
+    """Convert a normalized trial result to JSON-compatible data."""
+
     return {
         "task_name": result.task_name,
         "task_slug": result.task_slug,
@@ -415,6 +466,8 @@ def result_to_json(result: TrialResult) -> dict[str, Any]:
 def build_documents(
     args: argparse.Namespace,
 ) -> tuple[dict[str, Any], dict[str, Any], list[TrialResult]]:
+    """Build run and results documents from CLI arguments."""
+
     job_dir = args.job_dir.resolve()
     dataset_path = args.dataset_path.resolve()
     if not job_dir.is_dir():
@@ -515,6 +568,8 @@ def build_documents(
 
 
 def validate_documents(run_doc: dict[str, Any], results_doc: dict[str, Any]) -> None:
+    """Validate the required fields in normalized documents."""
+
     required_run_keys = {
         "schema_version",
         "run_id",
@@ -570,11 +625,15 @@ def validate_documents(run_doc: dict[str, Any], results_doc: dict[str, Any]) -> 
 
 
 def write_json(path: Path, data: dict[str, Any]) -> None:
+    """Write a JSON document with stable formatting."""
+
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n")
 
 
 def sql_literal(value: Any) -> str:
+    """Convert a Python value into a SQLite SQL literal."""
+
     if value is None:
         return "NULL"
     if isinstance(value, bool):
@@ -586,6 +645,8 @@ def sql_literal(value: Any) -> str:
 
 
 def sql_values(values: list[Any]) -> str:
+    """Convert a sequence of Python values into SQL values text."""
+
     return ", ".join(sql_literal(value) for value in values)
 
 
@@ -594,6 +655,8 @@ def write_d1_sql(
     run_doc: dict[str, Any],
     results_doc: dict[str, Any],
 ) -> None:
+    """Write D1 upsert SQL for normalized benchmark results."""
+
     summary = run_doc["summary"]
     model = run_doc["model"]
     artifacts = run_doc["artifacts"]
@@ -623,6 +686,8 @@ def write_d1_sql(
 
 
 def write_archive(job_dir: Path, output_dir: Path) -> None:
+    """Write a zstd-compressed archive of the source Harbor job."""
+
     archive_path = output_dir / "artifacts.tar.zst"
     command = [
         "tar",
@@ -649,6 +714,8 @@ def write_outputs(
     include_archive: bool,
     job_dir: Path,
 ) -> None:
+    """Write all normalized benchmark output files."""
+
     write_json(output_dir / "run.json", run_doc)
     write_json(output_dir / "results.json", results_doc)
     write_d1_sql(output_dir, run_doc, results_doc)
@@ -669,6 +736,8 @@ def write_outputs(
 
 
 def main() -> int:
+    """Run the benchmark normalizer CLI."""
+
     args = parse_args()
     if not args.dry_run and args.output_dir is None:
         raise SystemExit("--output-dir is required unless --dry-run is set")

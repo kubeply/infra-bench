@@ -4,21 +4,24 @@
 from __future__ import annotations
 
 import json
-from pathlib import Path
 import subprocess
 import tempfile
-
+from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 NORMALIZER = ROOT / "scripts" / "normalize-benchmark-run.py"
 
 
 def write_json(path: Path, data: dict) -> None:
+    """Write fixture JSON data to disk."""
+
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(data, indent=2) + "\n")
 
 
 def write_fixture_dataset(root: Path) -> Path:
+    """Create a minimal fixture dataset."""
+
     dataset = root / "datasets" / "kubernetes-core"
     dataset.mkdir(parents=True)
     (dataset / "dataset.toml").write_text(
@@ -49,6 +52,8 @@ difficulty = "hard"
 
 
 def write_fixture_job(root: Path) -> Path:
+    """Create a minimal fixture Harbor job directory."""
+
     job = root / "jobs" / "job-openai"
     write_json(
         job / "result.json",
@@ -77,6 +82,8 @@ def write_fixture_job(root: Path) -> Path:
 
 
 def run_normalizer(dataset: Path, job: Path, output: Path) -> None:
+    """Run the normalizer against fixture inputs."""
+
     command = [
         str(NORMALIZER),
         "--job-dir",
@@ -100,6 +107,8 @@ def run_normalizer(dataset: Path, job: Path, output: Path) -> None:
 
 
 def run_dry_run(dataset: Path, job: Path) -> dict:
+    """Run the normalizer in dry-run mode."""
+
     command = [
         str(NORMALIZER),
         "--job-dir",
@@ -123,6 +132,8 @@ def run_dry_run(dataset: Path, job: Path) -> dict:
 
 
 def test_normalizer_writes_public_contract() -> None:
+    """Verify file output follows the public benchmark contract."""
+
     with tempfile.TemporaryDirectory() as tmp:
         root = Path(tmp)
         dataset = write_fixture_dataset(root)
@@ -151,6 +162,8 @@ def test_normalizer_writes_public_contract() -> None:
 
 
 def test_normalizer_dry_run_writes_no_files() -> None:
+    """Verify dry-run mode emits JSON without writing output files."""
+
     with tempfile.TemporaryDirectory() as tmp:
         root = Path(tmp)
         dataset = write_fixture_dataset(root)
@@ -163,6 +176,8 @@ def test_normalizer_dry_run_writes_no_files() -> None:
 
 
 def main() -> int:
+    """Run fixture tests without a test framework."""
+
     test_normalizer_writes_public_contract()
     test_normalizer_dry_run_writes_no_files()
     print("benchmark result normalizer tests ok")

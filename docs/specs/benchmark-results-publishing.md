@@ -10,7 +10,7 @@ dry-run normalizer:
 - `schemas/benchmark-results/run.schema.json`
 - `schemas/benchmark-results/results.schema.json`
 - `schemas/benchmark-results/d1.sql`
-- `scripts/normalize-benchmark-run.py`
+- `scripts/normalize-benchmark-run.py`, a self-contained uv script
 - `scripts/test-benchmark-results-normalizer.py`
 
 ## Context
