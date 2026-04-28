@@ -1,6 +1,9 @@
 #!/usr/bin/env -S uv run --script
 # /// script
 # requires-python = ">=3.11"
+# dependencies = [
+#   "rich>=13.7",
+# ]
 # ///
 """Normalize a Harbor job directory into InfraBench benchmark result JSON."""
 
@@ -16,10 +19,22 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from rich.console import Console
+from rich.progress import (
+    BarColumn,
+    MofNCompleteColumn,
+    Progress,
+    SpinnerColumn,
+    TaskID,
+    TextColumn,
+    TimeElapsedColumn,
+)
+
 import tomllib
 
 SCHEMA_VERSION = "1.0"
 UTC_FORMAT = "%Y-%m-%dT%H%M%SZ"
+CONSOLE = Console(stderr=True)
 
 
 @dataclass(frozen=True)
@@ -86,6 +101,26 @@ def parse_args() -> argparse.Namespace:
         help="Write artifacts.tar.zst containing the Harbor job directory.",
     )
     return parser.parse_args()
+
+
+def make_progress() -> Progress:
+    """Create the terminal progress display for normalizer work."""
+
+    return Progress(
+        SpinnerColumn(),
+        TextColumn("[progress.description]{task.description}"),
+        BarColumn(),
+        MofNCompleteColumn(),
+        TimeElapsedColumn(),
+        console=CONSOLE,
+    )
+
+
+def advance(progress: Progress | None, task_id: TaskID | None) -> None:
+    """Advance a progress task when progress reporting is enabled."""
+
+    if progress is not None and task_id is not None:
+        progress.advance(task_id)
 
 
 def load_json(path: Path) -> dict[str, Any]:
@@ -465,8 +500,13 @@ def result_to_json(result: TrialResult) -> dict[str, Any]:
 
 def build_documents(
     args: argparse.Namespace,
+    progress: Progress | None = None,
 ) -> tuple[dict[str, Any], dict[str, Any], list[TrialResult]]:
     """Build run and results documents from CLI arguments."""
+
+    metadata_task: TaskID | None = None
+    if progress is not None:
+        metadata_task = progress.add_task("Reading run metadata", total=5)
 
     job_dir = args.job_dir.resolve()
     dataset_path = args.dataset_path.resolve()
@@ -474,9 +514,12 @@ def build_documents(
         raise SystemExit(f"{job_dir}: job directory not found")
     if not dataset_path.is_dir():
         raise SystemExit(f"{dataset_path}: dataset directory not found")
+    advance(progress, metadata_task)
 
     dataset_name = load_dataset_name(dataset_path)
+    advance(progress, metadata_task)
     tasks = load_task_metadata(dataset_path)
+    advance(progress, metadata_task)
     commit = args.infra_bench_commit or git_commit()
     started_at = args.started_at
     job_result = read_json_if_present(job_dir / "result.json")
@@ -495,21 +538,31 @@ def build_documents(
         args.model_name,
         commit,
     )
+    advance(progress, metadata_task)
 
     trial_dirs = find_trial_dirs(job_dir)
     if not trial_dirs:
         raise SystemExit(f"{job_dir}: no Harbor trial result.json files found")
+    advance(progress, metadata_task)
 
-    trial_results = [
-        normalize_trial(
+    normalize_task: TaskID | None = None
+    if progress is not None:
+        normalize_task = progress.add_task(
+            "Normalizing trial results", total=len(trial_dirs)
+        )
+
+    trial_results = []
+    for trial_dir in trial_dirs:
+        trial_results.append(
+            normalize_trial(
             trial_dir=trial_dir,
             tasks=tasks,
             run_id=run_id,
             r2_prefix=args.r2_prefix.strip("/"),
             cost_usd=None,
+            )
         )
-        for trial_dir in trial_dirs
-    ]
+        advance(progress, normalize_task)
 
     passed = sum(1 for result in trial_results if result.passed)
     failed = len(trial_results) - passed
@@ -713,12 +766,23 @@ def write_outputs(
     trial_results: list[TrialResult],
     include_archive: bool,
     job_dir: Path,
+    progress: Progress | None = None,
 ) -> None:
     """Write all normalized benchmark output files."""
 
+    documents_task: TaskID | None = None
+    if progress is not None:
+        document_total = 4 + (len(trial_results) * 2)
+        documents_task = progress.add_task(
+            "Writing normalized artifacts", total=document_total
+        )
+
     write_json(output_dir / "run.json", run_doc)
+    advance(progress, documents_task)
     write_json(output_dir / "results.json", results_doc)
+    advance(progress, documents_task)
     write_d1_sql(output_dir, run_doc, results_doc)
+    advance(progress, documents_task)
     summary = {
         "schema_version": SCHEMA_VERSION,
         "run_id": run_doc["run_id"],
@@ -727,12 +791,20 @@ def write_outputs(
         "summary": run_doc["summary"],
     }
     write_json(output_dir / "summary.json", summary)
+    advance(progress, documents_task)
     for result in trial_results:
         public_dir = output_dir / "public" / result.task_slug
         write_json(public_dir / "verifier-summary.json", result.verifier_summary)
+        advance(progress, documents_task)
         write_json(public_dir / "agent-summary.json", result.agent_summary)
+        advance(progress, documents_task)
     if include_archive:
+        archive_task: TaskID | None = None
+        if progress is not None:
+            archive_task = progress.add_task("Creating job archive", total=None)
         write_archive(job_dir, output_dir)
+        if progress is not None and archive_task is not None:
+            progress.update(archive_task, completed=1, total=1)
 
 
 def main() -> int:
@@ -741,19 +813,22 @@ def main() -> int:
     args = parse_args()
     if not args.dry_run and args.output_dir is None:
         raise SystemExit("--output-dir is required unless --dry-run is set")
-    run_doc, results_doc, trial_results = build_documents(args)
     if args.dry_run:
+        run_doc, results_doc, _trial_results = build_documents(args)
         print(json.dumps({"run": run_doc, "results": results_doc}, indent=2))
         return 0
     assert args.output_dir is not None
-    write_outputs(
-        output_dir=args.output_dir,
-        run_doc=run_doc,
-        results_doc=results_doc,
-        trial_results=trial_results,
-        include_archive=args.include_archive,
-        job_dir=args.job_dir.resolve(),
-    )
+    with make_progress() as progress:
+        run_doc, results_doc, trial_results = build_documents(args, progress=progress)
+        write_outputs(
+            output_dir=args.output_dir,
+            run_doc=run_doc,
+            results_doc=results_doc,
+            trial_results=trial_results,
+            include_archive=args.include_archive,
+            job_dir=args.job_dir.resolve(),
+            progress=progress,
+        )
     print(f"wrote benchmark results to {args.output_dir}")
     return 0
 
