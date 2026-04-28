@@ -15,6 +15,26 @@
 Tasks are compatible with [Harbor](https://www.harborframework.com/) and can be
 run through `uvx`.
 
+Run a local Kubernetes benchmark task with Harbor:
+
+```bash
+uvx --from harbor harbor run \
+  --job-name kubernetes-core-local-smoke \
+  -p datasets/kubernetes-core \
+  -a codex \
+  -m gpt-5.5 \
+  --ak reasoning_effort=high \
+  -e docker \
+  -n 1 \
+  -y \
+  --max-retries 0 \
+  -i fix-crashloop-env-var
+```
+
+For repeated local `kubernetes-core` runs, configure k3s registry
+authentication first so the ephemeral clusters can authenticate their own Docker
+Hub pulls. See [k3s registry authentication](docs/k3s-registry-auth.md).
+
 ## Citation
 
 If you use `infra-bench` in academic work, please cite it using the "Cite this
