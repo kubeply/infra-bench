@@ -143,6 +143,14 @@ def read_json_if_present(path: Path) -> dict[str, Any]:
     return load_json(path)
 
 
+def read_text_if_present(path: Path) -> str | None:
+    """Return text file contents when the file exists."""
+
+    if not path.exists():
+        return None
+    return path.read_text(errors="replace")
+
+
 def load_dataset_name(dataset_path: Path) -> str:
     """Read the Harbor dataset name from dataset.toml."""
 
@@ -299,6 +307,15 @@ def duration_between_timestamps(
     return duration
 
 
+def phase_data(data: dict[str, Any], name: str) -> dict[str, Any]:
+    """Return timing phase data when present in a Harbor result."""
+
+    value = data.get(name)
+    if isinstance(value, dict):
+        return value
+    return {}
+
+
 def current_timestamp() -> str:
     """Return the current UTC timestamp without microseconds."""
 
@@ -401,6 +418,12 @@ def artifact_key(prefix: str, run_id: str, task_slug: str, filename: str) -> str
     return f"{prefix}/runs/{run_id}/public/{task_slug}/{filename}"
 
 
+def public_file_key(prefix: str, run_id: str, filename: str) -> str:
+    """Build an R2 object key for a public run artifact."""
+
+    return f"{prefix}/runs/{run_id}/{filename}"
+
+
 def normalize_trial(
     trial_dir: Path,
     tasks: dict[str, TaskMetadata],
@@ -425,15 +448,25 @@ def normalize_trial(
     if passed is None:
         passed = reward >= 1.0
 
-    duration = first_number(
-        combined,
-        {"duration_sec", "duration_seconds", "duration", "elapsed_sec"},
+    agent_execution = phase_data(trial_result, "agent_execution")
+    verifier = phase_data(trial_result, "verifier")
+    duration = first_present(
+        first_number(
+            agent_execution,
+            {"duration_sec", "duration_seconds", "duration", "elapsed_sec"},
+        ),
+        first_number(
+            combined,
+            {"agent_duration_sec", "agent_duration_seconds"},
+        ),
     )
     started = normalize_timestamp(
-        first_string(combined, {"started_at", "start_time", "startedAt"})
+        first_string(agent_execution, {"started_at", "start_time", "startedAt"})
+        or first_string(combined, {"started_at", "start_time", "startedAt"})
     )
     finished = normalize_timestamp(
-        first_string(combined, {"finished_at", "end_time", "finishedAt"})
+        first_string(agent_execution, {"finished_at", "end_time", "finishedAt"})
+        or first_string(combined, {"finished_at", "end_time", "finishedAt"})
     )
     if duration is None:
         duration = duration_between_timestamps(started, finished)
@@ -441,20 +474,42 @@ def normalize_trial(
 
     verifier_key = artifact_key(r2_prefix, run_id, task.slug, "verifier-summary.json")
     agent_key = artifact_key(r2_prefix, run_id, task.slug, "agent-summary.json")
+    verifier_started = normalize_timestamp(
+        first_string(verifier, {"started_at", "start_time", "startedAt"})
+    )
+    verifier_finished = normalize_timestamp(
+        first_string(verifier, {"finished_at", "end_time", "finishedAt"})
+    )
     verifier_summary = {
         "schema_version": SCHEMA_VERSION,
         "task_name": task.name,
         "passed": passed,
         "reward": reward,
         "score": score,
+        "started_at": verifier_started,
+        "finished_at": verifier_finished,
+        "duration_sec": duration_between_timestamps(
+            verifier_started,
+            verifier_finished,
+        ),
         "has_reward_txt": (trial_dir / "verifier" / "reward.txt").exists(),
         "has_reward_json": (trial_dir / "verifier" / "reward.json").exists(),
+        "reward_txt": read_text_if_present(trial_dir / "verifier" / "reward.txt"),
+        "test_log": read_text_if_present(trial_dir / "verifier" / "test.log"),
+        "test_stdout": read_text_if_present(trial_dir / "verifier" / "test-stdout.txt"),
+        "debug_log": read_text_if_present(trial_dir / "verifier" / "debug.log"),
     }
     agent_summary = {
         "schema_version": SCHEMA_VERSION,
         "task_name": task.name,
         "status": first_string(combined, {"status", "state"}),
-        "raw_transcript_public": False,
+        "started_at": started,
+        "finished_at": finished,
+        "duration_sec": duration,
+        "raw_transcript_public": True,
+        "codex_log": read_text_if_present(trial_dir / "agent" / "codex.txt"),
+        "trajectory": read_json_if_present(trial_dir / "agent" / "trajectory.json")
+        or None,
     }
 
     return TrialResult(
@@ -629,8 +684,13 @@ def build_documents(
             "cost_usd": run_cost,
         },
         "artifacts": {
-            "run": f"{args.r2_prefix.strip('/')}/runs/{run_id}/run.json",
-            "results": f"{args.r2_prefix.strip('/')}/runs/{run_id}/results.json",
+            "run": public_file_key(args.r2_prefix.strip("/"), run_id, "run.json"),
+            "results": public_file_key(
+                args.r2_prefix.strip("/"), run_id, "results.json"
+            ),
+            "summary": public_file_key(
+                args.r2_prefix.strip("/"), run_id, "summary.json"
+            ),
             "archive": archive_key,
         },
     }

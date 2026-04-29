@@ -74,11 +74,29 @@ def write_fixture_job(root: Path) -> Path:
             "reward": 1,
             "started_at": "2026-04-26T12:00:00Z",
             "finished_at": "2026-04-26T12:05:00Z",
+            "agent_execution": {
+                "started_at": "2026-04-26T12:01:00Z",
+                "finished_at": "2026-04-26T12:03:00Z",
+            },
+            "verifier": {
+                "started_at": "2026-04-26T12:04:00Z",
+                "finished_at": "2026-04-26T12:04:15Z",
+            },
             "status": "completed",
         },
     )
+    write_json(
+        trial / "agent" / "trajectory.json",
+        {
+            "schema_version": "ATIF-v1.5",
+            "steps": [{"source": "agent", "message": "fixed it"}],
+        },
+    )
+    (trial / "agent" / "codex.txt").write_text("agent transcript\n")
     (trial / "verifier").mkdir()
     (trial / "verifier" / "reward.txt").write_text("1\n")
+    (trial / "verifier" / "test.log").write_text("verifier test log\n")
+    (trial / "verifier" / "test-stdout.txt").write_text("verifier stdout\n")
     return job
 
 
@@ -153,10 +171,27 @@ def test_normalizer_writes_public_contract() -> None:
         assert result["task_name"] == "kubeply/restore-multi-hop-checkout-route"
         assert result["difficulty"] == "hard"
         assert result["passed"] is True
-        assert result["duration_sec"] == 300
-        assert run["summary"]["duration_sec"] == 300
+        assert result["duration_sec"] == 120
+        assert result["started_at"] == "2026-04-26T12:01:00Z"
+        assert result["finished_at"] == "2026-04-26T12:03:00Z"
+        assert run["summary"]["duration_sec"] == 120
+        assert run["artifacts"]["summary"].endswith("/summary.json")
         assert "/public/" in result["agent_artifact_key"]
         assert result["agent_artifact_key"].endswith("agent-summary.json")
+        agent_summary = json.loads(
+            (output / "public" / result["task_slug"] / "agent-summary.json").read_text()
+        )
+        verifier_summary = json.loads(
+            (
+                output / "public" / result["task_slug"] / "verifier-summary.json"
+            ).read_text()
+        )
+        assert agent_summary["raw_transcript_public"] is True
+        assert agent_summary["codex_log"] == "agent transcript\n"
+        assert agent_summary["trajectory"]["schema_version"] == "ATIF-v1.5"
+        assert verifier_summary["duration_sec"] == 15
+        assert verifier_summary["test_log"] == "verifier test log\n"
+        assert verifier_summary["test_stdout"] == "verifier stdout\n"
         assert (
             "INSERT OR REPLACE INTO benchmark_runs"
             in (output / "d1-upsert.sql").read_text()
