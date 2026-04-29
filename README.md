@@ -19,17 +19,19 @@ Run a local Kubernetes benchmark task with Harbor:
 
 ```bash
 uvx --from harbor harbor run \
-  --job-name kubernetes-core-local-smoke \
-  -p datasets/kubernetes-core \
-  -a codex \
-  -m gpt-5.5 \
-  --ak reasoning_effort=high \
+  --job-name <job-name> \
+  -p <dataset-path> \
+  -a <agent-name> \
+  -m <model-name> \
   -e docker \
   -n 1 \
   -y \
   --max-retries 0 \
-  -i fix-crashloop-env-var
+  -i <task-name>
 ```
+
+For model-specific examples, including Codex reasoning settings and Gemini CLI
+workspace approval, see [Harbor model commands](docs/harbor-model-commands.md).
 
 For repeated local `kubernetes-core` runs, configure k3s registry
 authentication first so the ephemeral clusters can authenticate their own Docker
