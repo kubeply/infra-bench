@@ -72,7 +72,8 @@ def write_fixture_job(root: Path) -> Path:
         {
             "passed": True,
             "reward": 1,
-            "duration_sec": 300,
+            "started_at": "2026-04-26T12:00:00Z",
+            "finished_at": "2026-04-26T12:05:00Z",
             "status": "completed",
         },
     )
@@ -152,6 +153,8 @@ def test_normalizer_writes_public_contract() -> None:
         assert result["task_name"] == "kubeply/restore-multi-hop-checkout-route"
         assert result["difficulty"] == "hard"
         assert result["passed"] is True
+        assert result["duration_sec"] == 300
+        assert run["summary"]["duration_sec"] == 300
         assert "/public/" in result["agent_artifact_key"]
         assert result["agent_artifact_key"].endswith("agent-summary.json")
         assert (

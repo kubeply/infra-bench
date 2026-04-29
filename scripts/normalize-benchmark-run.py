@@ -278,6 +278,27 @@ def normalize_timestamp(value: str | None) -> str | None:
     return parsed.astimezone(UTC).isoformat().replace("+00:00", "Z")
 
 
+def duration_between_timestamps(
+    started_at: str | None,
+    finished_at: str | None,
+) -> float | None:
+    """Compute elapsed seconds from normalized timestamps when possible."""
+
+    if started_at is None or finished_at is None:
+        return None
+
+    try:
+        started = datetime.fromisoformat(started_at.replace("Z", "+00:00"))
+        finished = datetime.fromisoformat(finished_at.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+
+    duration = (finished - started).total_seconds()
+    if duration < 0:
+        return None
+    return duration
+
+
 def current_timestamp() -> str:
     """Return the current UTC timestamp without microseconds."""
 
@@ -414,6 +435,8 @@ def normalize_trial(
     finished = normalize_timestamp(
         first_string(combined, {"finished_at", "end_time", "finishedAt"})
     )
+    if duration is None:
+        duration = duration_between_timestamps(started, finished)
     score = max(0.0, min(1.0, reward))
 
     verifier_key = artifact_key(r2_prefix, run_id, task.slug, "verifier-summary.json")
