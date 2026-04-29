@@ -110,6 +110,7 @@ latest summaries.
 ```text
 benchmarks/runs/<run_id>/run.json
 benchmarks/runs/<run_id>/results.json
+benchmarks/runs/<run_id>/summary.json
 benchmarks/runs/<run_id>/artifacts.tar.zst
 benchmarks/runs/<run_id>/public/<task-slug>/verifier-summary.json
 benchmarks/runs/<run_id>/public/<task-slug>/agent-summary.json
@@ -151,6 +152,7 @@ cache and must not be treated as the source of truth.
   "artifacts": {
     "run": "benchmarks/runs/<run_id>/run.json",
     "results": "benchmarks/runs/<run_id>/results.json",
+    "summary": "benchmarks/runs/<run_id>/summary.json",
     "archive": "benchmarks/runs/<run_id>/artifacts.tar.zst"
   }
 }
@@ -276,13 +278,15 @@ Before upload, the normalizer must redact or exclude:
 - unpublished solution files or verifier internals that would weaken future
   benchmark integrity
 
-Public artifacts should favor verifier summaries and high-level logs over raw
-agent transcripts until transcript publication rules are defined.
+Public per-task artifacts include the normalized agent summary and verifier
+summary. Those summaries may include agent trajectory, Codex execution log, and
+verifier logs when generated from a benchmark run that is intended for public
+publication. They must still exclude credentials, kubeconfigs, private payloads,
+and unpublished solution material.
 
-Raw Harbor job archives, full agent transcripts, and full verifier logs should
-not be exposed through public marketing links by default. They may still be
-uploaded to restricted storage for audit and debugging when access controls are
-configured outside this repository.
+Raw Harbor job archives should not be exposed through public marketing links by
+default. They may still be uploaded to restricted storage for audit and
+debugging when access controls are configured outside this repository.
 
 ## Marketing Site Contract
 
@@ -306,7 +310,7 @@ should consume only normalized D1 rows and R2 JSON summaries.
 2. Add a local normalizer that reads Harbor job folders and emits JSON without
    uploading. Done.
 3. Add fixture-based tests for normalizer behavior. Done.
-4. Add an R2 upload mode gated by explicit Cloudflare credentials.
+4. Add an R2 upload mode gated by explicit Cloudflare credentials. Done.
 5. Add a D1 write mode gated by explicit Cloudflare credentials. The local
    normalizer already emits `d1-upsert.sql` for deterministic loading.
 6. Add a dry-run command for CI validation. Done.
