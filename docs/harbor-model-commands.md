@@ -12,10 +12,9 @@ uvx --from harbor harbor run \
   -a <agent-name> \
   -m <model-name> \
   -e docker \
-  -n <task-count> \
+  -n <parallel-task-count> \
   -y \
-  --max-retries 0 \
-  -i <task-name>
+  --max-retries 0
 ```
 
 Examples of common placeholders:
@@ -26,15 +25,18 @@ Examples of common placeholders:
 | `<dataset-path>` | `datasets/kubernetes-core` |
 | `<agent-name>` | `codex` |
 | `<model-name>` | `gpt-5.5` |
-| `<task-count>` | `1` for one selected task, or omit `-i <task-name>` and use the number of tasks to sample |
+| `<parallel-task-count>` | `1` to run tasks one at a time |
 | `<task-name>` | `fix-crashloop-env-var` |
+
+Without `-i <task-name>`, Harbor runs the full dataset. Add `-i <task-name>` to
+run only one selected task.
 
 For repeated local `kubernetes-core` runs, configure Docker Hub registry
 authentication first. See [k3s registry authentication](k3s-registry-auth.md).
 
 ## Codex
 
-Run GPT-5.5 with high reasoning:
+Run the full Kubernetes dataset with GPT-5.5 high reasoning, one task at a time:
 
 ```bash
 uvx --from harbor harbor run \
@@ -44,12 +46,13 @@ uvx --from harbor harbor run \
   -m gpt-5.5 \
   --ak reasoning_effort=high \
   -e docker \
-  -n 58 \
+  -n 1 \
   -y \
   --max-retries 0
 ```
 
-Run GPT-5.5 with medium reasoning:
+Run the full Kubernetes dataset with GPT-5.5 medium reasoning, one task at a
+time:
 
 ```bash
 uvx --from harbor harbor run \
@@ -59,7 +62,7 @@ uvx --from harbor harbor run \
   -m gpt-5.5 \
   --ak reasoning_effort=medium \
   -e docker \
-  -n 58 \
+  -n 1 \
   -y \
   --max-retries 0
 ```
@@ -85,7 +88,7 @@ uvx --from harbor harbor run \
 Gemini CLI must be trusted and allowed to approve tool calls. Without these
 agent settings, Harbor runs can fail with `NonZeroAgentExitCodeError`.
 
-Run Gemini 3 Flash Preview on the full Kubernetes dataset:
+Run Gemini 3 Flash Preview on the full Kubernetes dataset, one task at a time:
 
 ```bash
 uvx --from harbor harbor run \
@@ -96,7 +99,7 @@ uvx --from harbor harbor run \
   --ae GEMINI_CLI_TRUST_WORKSPACE=true \
   --ak approval_mode=yolo \
   -e docker \
-  -n 58 \
+  -n 1 \
   -y \
   --max-retries 0
 ```
