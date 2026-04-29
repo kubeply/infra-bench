@@ -3,7 +3,7 @@ schema_version = "1.1"
 [task]
 name = "kubeply/allow-api-network-policy"
 description = "Repair a live Kubernetes NetworkPolicy that blocks intended frontend traffic to an API Service."
-category = "kubernetes"
+category = "access-and-isolation"
 keywords = [
   "kubernetes",
   "network-policy",

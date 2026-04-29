@@ -41,7 +41,7 @@ schema_version = "1.1"
 [task]
 name = "kubeply/restore-multi-hop-checkout-route"
 description = "Fixture task"
-category = "kubernetes"
+category = "service-connectivity"
 keywords = ["kubernetes", "service-routing"]
 
 [metadata]

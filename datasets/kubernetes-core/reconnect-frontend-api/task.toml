@@ -3,7 +3,7 @@ schema_version = "1.1"
 [task]
 name = "kubeply/reconnect-frontend-api"
 description = "Repair a frontend Deployment whose API dependency URL points to the wrong Kubernetes Service."
-category = "kubernetes"
+category = "service-connectivity"
 keywords = [
   "kubernetes",
   "multi-app-dependencies",

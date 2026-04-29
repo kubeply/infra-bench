@@ -3,7 +3,7 @@ schema_version = "1.1"
 [task]
 name = "kubeply/add-rbac-list-verb"
 description = "Repair a live Kubernetes Role so a diagnostic Job's ServiceAccount can list ConfigMaps."
-category = "kubernetes"
+category = "access-and-isolation"
 keywords = [
   "kubernetes",
   "rbac-access",

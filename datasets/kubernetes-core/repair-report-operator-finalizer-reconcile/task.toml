@@ -3,7 +3,7 @@ schema_version = "1.1"
 [task]
 name = "kubeply/repair-report-operator-finalizer-reconcile"
 description = "Repair a live Kubernetes Report operator whose generated config reconciliation and finalizer cleanup are blocked."
-category = "kubernetes"
+category = "platform-apis-controllers"
 keywords = [
   "kubernetes",
   "operators-crds",

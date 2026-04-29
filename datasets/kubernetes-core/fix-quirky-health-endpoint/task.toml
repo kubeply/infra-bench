@@ -3,7 +3,7 @@ schema_version = "1.1"
 [task]
 name = "kubeply/fix-quirky-health-endpoint"
 description = "Repair a Deployment readiness probe for an app that exposes a nonstandard health endpoint."
-category = "kubernetes"
+category = "workload-health"
 keywords = [
   "kubernetes",
   "quirky-apps",

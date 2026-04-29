@@ -3,7 +3,7 @@ schema_version = "1.1"
 [task]
 name = "kubeply/restore-stateful-cache-identity"
 description = "Restore a live Kubernetes StatefulSet-backed cache after a partial restore while preserving pod identity, PVC data, and stable DNS."
-category = "kubernetes"
+category = "storage-state"
 keywords = [
   "kubernetes",
   "storage-stateful",

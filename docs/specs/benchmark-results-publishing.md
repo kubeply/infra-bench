@@ -169,7 +169,7 @@ cache and must not be treated as the source of truth.
       "task_name": "kubeply/restore-multi-hop-checkout-route",
       "task_slug": "restore-multi-hop-checkout-route",
       "difficulty": "hard",
-      "category": "kubernetes",
+      "category": "service-connectivity",
       "keywords": ["service-routing", "ingress", "networking"],
       "passed": true,
       "reward": 1.0,

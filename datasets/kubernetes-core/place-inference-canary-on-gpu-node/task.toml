@@ -3,7 +3,7 @@ schema_version = "1.1"
 [task]
 name = "kubeply/place-inference-canary-on-gpu-node"
 description = "Repair a live Kubernetes inference canary so it runs on the simulated GPU node while CPU-only workloads stay on general capacity."
-category = "kubernetes"
+category = "scheduling-capacity"
 keywords = [
   "kubernetes",
   "gpu-operations",

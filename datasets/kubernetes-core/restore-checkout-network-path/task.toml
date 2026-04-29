@@ -3,7 +3,7 @@ schema_version = "1.1"
 [task]
 name = "kubeply/restore-checkout-network-path"
 description = "Repair a live Kubernetes checkout-to-inventory path in a namespace with default-deny NetworkPolicy."
-category = "kubernetes"
+category = "access-and-isolation"
 keywords = [
   "kubernetes",
   "network-policy",

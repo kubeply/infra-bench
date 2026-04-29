@@ -3,7 +3,7 @@ schema_version = "1.1"
 [task]
 name = "kubeply/fix-job-command-argument"
 description = "Repair a live Kubernetes Job so its maintenance script runs with the expected command argument."
-category = "kubernetes"
+category = "workload-health"
 keywords = [
   "kubernetes",
   "batch-scheduled-work",

@@ -3,7 +3,7 @@ schema_version = "1.1"
 [task]
 name = "kubeply/repair-secret-projection-reload"
 description = "Repair a billing API rollout after a Secret-backed database credential rotation."
-category = "kubernetes"
+category = "configuration-secrets"
 keywords = [
   "kubernetes",
   "config-secrets",

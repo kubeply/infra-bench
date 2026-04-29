@@ -3,7 +3,7 @@ schema_version = "1.1"
 [task]
 name = "kubeply/fix-pvc-mount-claim"
 description = "Repair a live Kubernetes Deployment whose pod cannot start because its volume references the wrong PersistentVolumeClaim."
-category = "kubernetes"
+category = "storage-state"
 keywords = [
   "kubernetes",
   "storage-stateful",

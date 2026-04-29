@@ -3,7 +3,7 @@ schema_version = "1.1"
 [task]
 name = "kubeply/TODO_TASK_NAME"
 description = "TODO_SHORT_DESCRIPTION"
-category = "kubernetes"
+category = "service-connectivity"
 keywords = ["kubernetes", "TODO_AREA_KEYWORD", "kubectl"]
 
 [[task.authors]]

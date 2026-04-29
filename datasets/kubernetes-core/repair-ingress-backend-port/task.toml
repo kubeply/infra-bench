@@ -3,7 +3,7 @@ schema_version = "1.1"
 [task]
 name = "kubeply/repair-ingress-backend-port"
 description = "Repair a live Kubernetes Ingress whose backend references the wrong Service port."
-category = "kubernetes"
+category = "service-connectivity"
 keywords = [
   "kubernetes",
   "ingress-tls",
