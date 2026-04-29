@@ -187,6 +187,8 @@ def test_normalizer_writes_public_contract() -> None:
             ).read_text()
         )
         assert agent_summary["raw_transcript_public"] is True
+        assert agent_summary["agent_log_name"] == "codex.txt"
+        assert agent_summary["agent_log"] == "agent transcript\n"
         assert agent_summary["codex_log"] == "agent transcript\n"
         assert agent_summary["trajectory"]["schema_version"] == "ATIF-v1.5"
         assert verifier_summary["duration_sec"] == 15

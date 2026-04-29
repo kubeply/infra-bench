@@ -35,6 +35,14 @@ import tomllib
 SCHEMA_VERSION = "1.0"
 UTC_FORMAT = "%Y-%m-%dT%H%M%SZ"
 CONSOLE = Console(stderr=True)
+AGENT_LOG_FILENAMES = (
+    "codex.txt",
+    "gemini-cli.txt",
+    "claude-code.txt",
+    "opencode.txt",
+    "kimi-cli.txt",
+    "mini-swe-agent.txt",
+)
 
 
 @dataclass(frozen=True)
@@ -149,6 +157,18 @@ def read_text_if_present(path: Path) -> str | None:
     if not path.exists():
         return None
     return path.read_text(errors="replace")
+
+
+def read_first_agent_log(trial_dir: Path) -> tuple[str | None, str | None]:
+    """Read the first public text transcript emitted by known agent harnesses."""
+
+    agent_dir = trial_dir / "agent"
+    for name in AGENT_LOG_FILENAMES:
+        content = read_text_if_present(agent_dir / name)
+        if content is not None:
+            return name, content
+
+    return None, None
 
 
 def load_dataset_name(dataset_path: Path) -> str:
@@ -499,6 +519,7 @@ def normalize_trial(
         "test_stdout": read_text_if_present(trial_dir / "verifier" / "test-stdout.txt"),
         "debug_log": read_text_if_present(trial_dir / "verifier" / "debug.log"),
     }
+    agent_log_name, agent_log = read_first_agent_log(trial_dir)
     agent_summary = {
         "schema_version": SCHEMA_VERSION,
         "task_name": task.name,
@@ -507,6 +528,8 @@ def normalize_trial(
         "finished_at": finished,
         "duration_sec": duration,
         "raw_transcript_public": True,
+        "agent_log_name": agent_log_name,
+        "agent_log": agent_log,
         "codex_log": read_text_if_present(trial_dir / "agent" / "codex.txt"),
         "trajectory": read_json_if_present(trial_dir / "agent" / "trajectory.json")
         or None,

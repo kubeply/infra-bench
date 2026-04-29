@@ -28,6 +28,26 @@ Examples of common placeholders:
 | `<parallel-task-count>` | `1` to run tasks one at a time |
 | `<task-name>` | `fix-crashloop-env-var` |
 
+Common agent names:
+
+| Agent | Harbor agent name |
+| --- | --- |
+| Codex | `codex` |
+| Gemini CLI | `gemini-cli` |
+| Claude Code | `claude-code` |
+| OpenCode | `opencode` |
+| Kimi CLI | `kimi-cli` |
+| Mini SWE Agent | `mini-swe-agent` |
+
+Recommended agents for non-default providers:
+
+| Provider family | Recommended Harbor agent | Model format |
+| --- | --- | --- |
+| DeepSeek | `opencode` | `deepseek/<model-name>` |
+| Mistral | `opencode` | `mistral/<model-name>` |
+| Z.ai | `mini-swe-agent` | `zai/<model-name>` |
+| Moonshot AI / Kimi K | `kimi-cli` | `moonshot/<model-name>` or `kimi/<model-name>` |
+
 Without `-i <task-name>`, Harbor runs the full dataset. Add `-i <task-name>` to
 run only one selected task.
 
@@ -123,6 +143,138 @@ uvx --from harbor harbor run \
 
 If the installed Harbor/Gemini adapter expects a different approval key, use
 `--ak yolo=true` instead of `--ak approval_mode=yolo`.
+
+## Claude Code
+
+Run Claude Code on the full Kubernetes dataset, one task at a time:
+
+```bash
+uvx --from harbor harbor run \
+  --job-name kubernetes-core-claude-code-<model-name> \
+  -p datasets/kubernetes-core \
+  -a claude-code \
+  -m <model-name> \
+  -e docker \
+  -n 1 \
+  -y \
+  --max-retries 0
+```
+
+Run a single Claude Code task:
+
+```bash
+uvx --from harbor harbor run \
+  --job-name kubernetes-core-claude-code-<model-name>-<task-name> \
+  -p datasets/kubernetes-core \
+  -a claude-code \
+  -m <model-name> \
+  -e docker \
+  -n 1 \
+  -y \
+  --max-retries 0 \
+  -i <task-name>
+```
+
+## OpenCode
+
+Use OpenCode for providers it supports directly, including DeepSeek and
+Mistral.
+
+Run the full Kubernetes dataset with OpenCode, one task at a time:
+
+```bash
+uvx --from harbor harbor run \
+  --job-name kubernetes-core-opencode-<provider>-<model-name> \
+  -p datasets/kubernetes-core \
+  -a opencode \
+  -m <provider>/<model-name> \
+  -e docker \
+  -n 1 \
+  -y \
+  --max-retries 0
+```
+
+Run a single OpenCode task:
+
+```bash
+uvx --from harbor harbor run \
+  --job-name kubernetes-core-opencode-<provider>-<model-name>-<task-name> \
+  -p datasets/kubernetes-core \
+  -a opencode \
+  -m <provider>/<model-name> \
+  -e docker \
+  -n 1 \
+  -y \
+  --max-retries 0 \
+  -i <task-name>
+```
+
+## Kimi CLI
+
+Use Kimi CLI for Moonshot AI and Kimi K models.
+
+Run the full Kubernetes dataset with Kimi CLI, one task at a time:
+
+```bash
+uvx --from harbor harbor run \
+  --job-name kubernetes-core-kimi-cli-<model-name> \
+  -p datasets/kubernetes-core \
+  -a kimi-cli \
+  -m moonshot/<model-name> \
+  -e docker \
+  -n 1 \
+  -y \
+  --max-retries 0
+```
+
+Run a single Kimi CLI task:
+
+```bash
+uvx --from harbor harbor run \
+  --job-name kubernetes-core-kimi-cli-<model-name>-<task-name> \
+  -p datasets/kubernetes-core \
+  -a kimi-cli \
+  -m moonshot/<model-name> \
+  -e docker \
+  -n 1 \
+  -y \
+  --max-retries 0 \
+  -i <task-name>
+```
+
+## Mini SWE Agent
+
+Use Mini SWE Agent for LiteLLM-backed providers without a more specific Harbor
+CLI adapter, including Z.ai.
+
+Run the full Kubernetes dataset with Mini SWE Agent, one task at a time:
+
+```bash
+uvx --from harbor harbor run \
+  --job-name kubernetes-core-mini-swe-agent-<provider>-<model-name> \
+  -p datasets/kubernetes-core \
+  -a mini-swe-agent \
+  -m <provider>/<model-name> \
+  -e docker \
+  -n 1 \
+  -y \
+  --max-retries 0
+```
+
+Run a single Mini SWE Agent task:
+
+```bash
+uvx --from harbor harbor run \
+  --job-name kubernetes-core-mini-swe-agent-<provider>-<model-name>-<task-name> \
+  -p datasets/kubernetes-core \
+  -a mini-swe-agent \
+  -m <provider>/<model-name> \
+  -e docker \
+  -n 1 \
+  -y \
+  --max-retries 0 \
+  -i <task-name>
+```
 
 ## Oracle
 
