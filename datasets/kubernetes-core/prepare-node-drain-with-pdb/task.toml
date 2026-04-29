@@ -3,7 +3,7 @@ schema_version = "1.1"
 [task]
 name = "kubeply/prepare-node-drain-with-pdb"
 description = "Prepare a live Kubernetes workload for a planned node drain while preserving its disruption budget."
-category = "kubernetes"
+category = "migration-maintenance"
 keywords = ["kubernetes", "node-migration", "scheduling-capacity", "kubectl"]
 [[task.authors]]
 name = "Kubeply"

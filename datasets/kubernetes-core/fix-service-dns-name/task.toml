@@ -3,7 +3,7 @@ schema_version = "1.1"
 [task]
 name = "kubeply/fix-service-dns-name"
 description = "Repair a live Kubernetes client workload whose configured Service DNS name points to the wrong namespace."
-category = "kubernetes"
+category = "service-connectivity"
 keywords = [
   "kubernetes",
   "dns-cluster-services",

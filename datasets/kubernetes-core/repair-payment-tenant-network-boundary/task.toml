@@ -3,7 +3,7 @@ schema_version = "1.1"
 [task]
 name = "kubeply/repair-payment-tenant-network-boundary"
 description = "Restore live Kubernetes payment processing after tenant relabeling drift while preserving cross-tenant isolation."
-category = "kubernetes"
+category = "access-and-isolation"
 keywords = [
   "kubernetes",
   "network-policy",

@@ -3,7 +3,7 @@ schema_version = "1.1"
 [task]
 name = "kubeply/restore-portal-ingress-tls-route"
 description = "Restore a live Kubernetes portal route after an edge routing regression."
-category = "kubernetes"
+category = "service-connectivity"
 keywords = ["kubernetes", "ingress-tls", "service-routing", "kubectl"]
 [[task.authors]]
 name = "Kubeply"

@@ -3,7 +3,7 @@ schema_version = "1.1"
 [task]
 name = "kubeply/fix-controller-service-selector"
 description = "Repair a live Kubernetes controller Service whose selector no longer matches the controller pod labels."
-category = "kubernetes"
+category = "platform-apis-controllers"
 keywords = [
   "kubernetes",
   "controller-upgrades",

@@ -3,7 +3,7 @@ schema_version = "1.1"
 [task]
 name = "kubeply/clear-upgrade-blocking-apis"
 description = "Clear Kubernetes upgrade preflight failures from deprecated stored manifests and their intended live objects."
-category = "kubernetes"
+category = "platform-apis-controllers"
 keywords = ["kubernetes", "kubernetes-upgrades", "manifest-repair", "kubectl"]
 [[task.authors]]
 name = "Kubeply"

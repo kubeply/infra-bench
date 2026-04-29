@@ -3,7 +3,7 @@ schema_version = "1.1"
 [task]
 name = "kubeply/trace-service-route-regression"
 description = "Restore a broken storefront-to-catalog service route in a noisy Kubernetes namespace."
-category = "kubernetes"
+category = "service-connectivity"
 keywords = [
   "kubernetes",
   "service-routing",

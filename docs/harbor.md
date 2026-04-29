@@ -55,8 +55,8 @@ Required top-level content:
 | --- | --- | --- |
 | `task.name` | string | Globally unique Harbor task name, using `kubeply/<task-name>`. |
 | `task.description` | string | Short public description of the task. |
-| `task.category` | string | Broad dataset domain, such as `kubernetes`, `terraform`, or `observability`. |
-| `task.keywords` | list of strings | Search and discovery keywords. |
+| `task.category` | string | Benchmark reporting bucket, such as `service-connectivity`, `workload-health`, or `access-and-isolation`. |
+| `task.keywords` | list of strings | Search and discovery keywords, including the broad dataset domain such as `kubernetes`. |
 | `task.authors` | list of tables | Each author includes `name` and, when available, `email`. |
 
 Example:
@@ -65,7 +65,7 @@ Example:
 [task]
 name = "kubeply/<task-name>"
 description = "Repair a focused infrastructure problem."
-category = "kubernetes"
+category = "service-connectivity"
 keywords = ["kubernetes", "service-routing", "manifests"]
 
 [[task.authors]]

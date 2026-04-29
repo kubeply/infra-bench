@@ -3,7 +3,7 @@ schema_version = "1.1"
 [task]
 name = "kubeply/target-gpu-node-label"
 description = "Repair a live Kubernetes Deployment whose pods are Pending because its simulated GPU nodeSelector targets the wrong accelerator label."
-category = "kubernetes"
+category = "scheduling-capacity"
 keywords = [
   "kubernetes",
   "gpu-operations",

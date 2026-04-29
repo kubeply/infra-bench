@@ -3,7 +3,7 @@ schema_version = "1.1"
 [task]
 name = "kubeply/repair-statefulset-headless-service-identity"
 description = "Repair a live Kubernetes datastore StatefulSet whose peer DNS breaks after a service change."
-category = "kubernetes"
+category = "storage-state"
 keywords = [
   "kubernetes",
   "storage-stateful",

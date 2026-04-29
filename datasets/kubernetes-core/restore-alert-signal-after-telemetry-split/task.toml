@@ -3,7 +3,7 @@ schema_version = "1.1"
 [task]
 name = "kubeply/restore-alert-signal-after-telemetry-split"
 description = "Restore a live Kubernetes alert signal after a telemetry split left the failing checkout path unsignaled."
-category = "kubernetes"
+category = "workload-health"
 keywords = [
   "kubernetes",
   "observability-incident",

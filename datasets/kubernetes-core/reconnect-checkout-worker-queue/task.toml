@@ -3,7 +3,7 @@ schema_version = "1.1"
 [task]
 name = "kubeply/reconnect-checkout-worker-queue"
 description = "Repair a live Kubernetes checkout worker dependency path so background orders reach the existing queue again."
-category = "kubernetes"
+category = "service-connectivity"
 keywords = [
   "kubernetes",
   "multi-app-dependencies",

@@ -3,7 +3,7 @@ schema_version = "1.1"
 [task]
 name = "kubeply/repair-worker-hpa-scaling-inputs"
 description = "Repair a live Kubernetes worker autoscaler whose CPU inputs drifted."
-category = "kubernetes"
+category = "scheduling-capacity"
 keywords = ["kubernetes", "autoscaling", "cpu-operations", "kubectl"]
 [[task.authors]]
 name = "Kubeply"

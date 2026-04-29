@@ -3,7 +3,7 @@ schema_version = "1.1"
 [task]
 name = "kubeply/fix-node-selector-mismatch"
 description = "Repair a live Kubernetes Deployment whose pods are Pending because its nodeSelector does not match any node."
-category = "kubernetes"
+category = "scheduling-capacity"
 keywords = [
   "kubernetes",
   "scheduling-capacity",

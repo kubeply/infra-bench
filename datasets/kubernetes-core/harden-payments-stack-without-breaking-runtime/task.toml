@@ -3,7 +3,7 @@ schema_version = "1.1"
 [task]
 name = "kubeply/harden-payments-stack-without-breaking-runtime"
 description = "Restore a live payments stack so it satisfies restricted security posture without breaking runtime behavior."
-category = "kubernetes"
+category = "access-and-isolation"
 keywords = [
   "kubernetes",
   "security-posture",

@@ -3,7 +3,7 @@ schema_version = "1.1"
 [task]
 name = "kubeply/debug-service-endpoints"
 description = "Debug a live Kubernetes Service with no endpoints and repair its selector."
-category = "kubernetes"
+category = "service-connectivity"
 keywords = [
   "kubernetes",
   "service-routing",

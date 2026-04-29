@@ -3,7 +3,7 @@ schema_version = "1.1"
 [task]
 name = "kubeply/fix-hpa-scale-target"
 description = "Repair a live Kubernetes HorizontalPodAutoscaler whose scaleTargetRef points to the wrong Deployment."
-category = "kubernetes"
+category = "scheduling-capacity"
 keywords = [
   "kubernetes",
   "autoscaling",

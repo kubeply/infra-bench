@@ -3,7 +3,7 @@ schema_version = "1.1"
 [task]
 name = "kubeply/repair-readiness-probe-path"
 description = "Repair a live Kubernetes Deployment whose rollout is blocked by an incorrect readiness probe path."
-category = "kubernetes"
+category = "workload-health"
 keywords = [
   "kubernetes",
   "rollout-readiness",

@@ -3,7 +3,7 @@ schema_version = "1.1"
 [task]
 name = "kubeply/stabilize-checkout-autoscaling-under-load"
 description = "Stabilize a live Kubernetes checkout rollout so autoscaled capacity becomes usable under load."
-category = "kubernetes"
+category = "scheduling-capacity"
 keywords = [
   "kubernetes",
   "autoscaling",

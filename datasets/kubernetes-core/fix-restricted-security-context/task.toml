@@ -3,7 +3,7 @@ schema_version = "1.1"
 [task]
 name = "kubeply/fix-restricted-security-context"
 description = "Harden a Deployment pod template so it passes restricted Pod Security admission."
-category = "kubernetes"
+category = "access-and-isolation"
 keywords = [
   "kubernetes",
   "security-posture",

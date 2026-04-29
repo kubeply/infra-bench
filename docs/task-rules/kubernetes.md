@@ -71,9 +71,21 @@ Kubernetes tasks should include one primary coverage-area keyword in
 `[task].keywords`. Area keywords are plain Harbor task keywords, not GitHub
 label names: use `service-routing`, not `area:service-routing`.
 
-Keep `task.category = "kubernetes"` for the dataset domain. Use
-`metadata.scenario_type` for the task workflow shape, such as
-`live_cluster_debug`, `upgrade_readiness`, `migration`, or `incident_response`.
+Use `task.category` for the task's primary reporting bucket. Keep `kubernetes`
+in `[task].keywords` for dataset-domain filtering. Use `metadata.scenario_type`
+for the task workflow shape, such as `live_cluster_debug`,
+`upgrade_readiness`, `migration`, or `incident_response`.
+
+| Category | Covers | Primary Area Keywords |
+| --- | --- | --- |
+| `access-and-isolation` | Permissions, security posture, and traffic boundaries. | `rbac-access`, `network-policy`, `security-posture` |
+| `configuration-secrets` | ConfigMap, Secret, environment, projection, and rotation repairs. | `config-secrets` |
+| `migration-maintenance` | Restores, namespace migrations, node drains, and maintenance moves. | `backup-restore-migration`, `node-migration` |
+| `platform-apis-controllers` | Deprecated APIs, CRDs, operators, and controller upgrade drift. | `kubernetes-upgrades`, `controller-upgrades`, `operators-crds` |
+| `scheduling-capacity` | Placement, taints, resources, CPU/GPU capacity, and autoscaling inputs. | `scheduling-capacity`, `cpu-operations`, `gpu-operations`, `autoscaling` |
+| `service-connectivity` | Services, DNS, ingress, endpoints, and multi-service dependency paths. | `service-routing`, `dns-cluster-services`, `ingress-tls`, `multi-app-dependencies` |
+| `storage-state` | PVCs, volume binding, StatefulSets, headless Services, and data identity. | `storage-stateful` |
+| `workload-health` | Rollouts, probes, jobs, app startup contracts, and incident signal recovery. | `rollout-readiness`, `batch-scheduled-work`, `quirky-apps`, `observability-incident` |
 
 | Area Keyword | Covers |
 | --- | --- |

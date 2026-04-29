@@ -12,9 +12,11 @@
 
 Every `task.toml` `[task]` section should include:
 
-- `category`: broad dataset domain, starting with `kubernetes`.
+- `category`: benchmark reporting bucket, such as `service-connectivity`,
+  `workload-health`, or `access-and-isolation`.
 - `keywords`: search and coverage labels such as `service-routing`,
-  `manifests`, `service`, `rbac`, or `storage`.
+  `manifests`, `service`, `rbac`, or `storage`. Include the broad dataset
+  domain, such as `kubernetes`, as a keyword.
 
 Every `task.toml` `[metadata]` section should include:
 
@@ -32,8 +34,9 @@ Prefer task-specific metadata when it clarifies evaluation:
 
 Use task keywords for searchable task areas and technical details. For
 Kubernetes tasks, prefer plain area keywords such as `service-routing` instead
-of GitHub-style label names such as `area:service-routing`. Keep `category`
-broad and use `scenario_type` for the workflow shape, not the topic area.
+of GitHub-style label names such as `area:service-routing`. Use `category` for
+the primary reporting bucket and `scenario_type` for the workflow shape, not the
+topic area.
 
 Do not duplicate `task.authors` in metadata with fields such as `author_name` or
 `author_email`. Metadata should describe evaluation and filtering details that

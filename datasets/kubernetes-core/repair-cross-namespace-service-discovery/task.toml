@@ -3,7 +3,7 @@ schema_version = "1.1"
 [task]
 name = "kubeply/repair-cross-namespace-service-discovery"
 description = "Repair a live Kubernetes worker whose database Service reference resolves in the wrong namespace after a namespace split."
-category = "kubernetes"
+category = "service-connectivity"
 keywords = [
   "kubernetes",
   "dns-cluster-services",

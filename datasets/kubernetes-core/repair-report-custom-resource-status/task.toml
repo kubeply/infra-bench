@@ -3,7 +3,7 @@ schema_version = "1.1"
 [task]
 name = "kubeply/repair-report-custom-resource-status"
 description = "Repair a live Kubernetes Report custom resource whose controller cannot reconcile its generated output."
-category = "kubernetes"
+category = "platform-apis-controllers"
 keywords = ["kubernetes", "operators-crds", "config-secrets", "kubectl"]
 [[task.authors]]
 name = "Kubeply"

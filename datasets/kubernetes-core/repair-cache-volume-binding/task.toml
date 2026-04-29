@@ -3,7 +3,7 @@ schema_version = "1.1"
 [task]
 name = "kubeply/repair-cache-volume-binding"
 description = "Repair a live Kubernetes cache-backed API whose pods cannot become ready after a storage wiring change."
-category = "kubernetes"
+category = "storage-state"
 keywords = [
   "kubernetes",
   "storage-stateful",

@@ -3,7 +3,7 @@ schema_version = "1.1"
 [task]
 name = "kubeply/recover-web-rollout-after-bad-release"
 description = "Recover a public web rollout after a bad release left mixed ReplicaSets and stale service routing."
-category = "kubernetes"
+category = "workload-health"
 keywords = [
   "kubernetes",
   "rollout-readiness",

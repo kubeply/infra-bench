@@ -13,235 +13,235 @@ email = "thomas@kubeply.com"
 
 [[tasks]]
 name = "kubeply/debug-service-endpoints"
-digest = "sha256:fae11c1c13824af731d69ba38f4b8b23f1e9927b6e4cafd31f39b70661cca5da"
+digest = "sha256:0ba435bc676ba83e0cdaec90880b52d42661145284a7bbdf9d422d297c1ec41b"
 
 [[tasks]]
 name = "kubeply/repair-readiness-probe-path"
-digest = "sha256:548112e3303435a0904334810a335cc67de6e2d97e5f523be0b2f03abb49e0be"
+digest = "sha256:95bcbb5191e4a12a36893caff5fdf33dc91dcfb0bd848c87f13551d9722bcd1b"
 
 [[tasks]]
 name = "kubeply/fix-config-key-reference"
-digest = "sha256:8dd88e2b0d5be1461d9b83ec9fcaf83eacce16d4ac1bba8c99b4df39316655bc"
+digest = "sha256:e678884b53f46951fa093f9453d906ef4f2e10742df88ff7500db11299d2e1f1"
 
 [[tasks]]
 name = "kubeply/add-rbac-list-verb"
-digest = "sha256:1a73e889cc96bab6dd58819538d6d497a18b5c908ef2f825d9645b709f66e0c4"
+digest = "sha256:12aa65d361deaad738a6cc25858c35c705fcd9d2be780b725b8d495c61d2b250"
 
 [[tasks]]
 name = "kubeply/fix-node-selector-mismatch"
-digest = "sha256:bad19125c4b41dfe7f7cbf5210c93e8d6d17c8912405d71ca59bd5269bd97ce7"
+digest = "sha256:73f25460da8945beb4708d7d23c73da69266a78d19aee0e5b83cd8258e087163"
 
 [[tasks]]
 name = "kubeply/rightsize-cpu-request"
-digest = "sha256:ea3caa5e5e4e58920f79d36094962adb037d23322c0be9a00ad76d3af69e8af7"
+digest = "sha256:e7efb35382d88a9f467dd7063d95e9c2aa37fe72823d48e5749ed95460b0b5f1"
 
 [[tasks]]
 name = "kubeply/target-gpu-node-label"
-digest = "sha256:1eaba3dccbe5c9081f838f518af00f7059137388405962cd2f2187d534836ccc"
+digest = "sha256:c24138522f1dff4f5180ed58a10838ce05a640c5a79bd9dc259511f94d2a5d52"
 
 [[tasks]]
 name = "kubeply/fix-pvc-mount-claim"
-digest = "sha256:1d2ecc4eef28a723fffa1a5505603a384f90bad5c0011d95097c8b4e81016a89"
+digest = "sha256:eec274a78bc1f2f2e888a088073baaa10e0dba1373b0238b86c451ef1068b3ee"
 
 [[tasks]]
 name = "kubeply/allow-api-network-policy"
-digest = "sha256:1e128950534b6be21ec24fc6e34209bbba23304f0458f2865f902a5598298da7"
+digest = "sha256:ba185468d1e7021f1afd92c93db19352ddf805a1f30d33de7d25ddf4b7f2213c"
 
 [[tasks]]
 name = "kubeply/reconnect-frontend-api"
-digest = "sha256:92fbe8b25e1f9a0e0e4dca28490d72c7cfca97cec58d8ad44764f1d5562db15a"
+digest = "sha256:c00da9ca8e06aaababcca1823e57755a08a7ba20ff6f92dc5c826360851ec493"
 
 [[tasks]]
 name = "kubeply/fix-restricted-security-context"
-digest = "sha256:930cdea840d9da58832bec143191da057fcdf333eb65932099f8b79afcc53056"
+digest = "sha256:53b903b50ec218ecc3d93e149f8f2447626c918e16f65b2f320d34bcdf905945"
 
 [[tasks]]
 name = "kubeply/fix-crashloop-env-var"
-digest = "sha256:83e5692c3b35fc0a999dd91fee355f760187e2b0fae2cc1d3b9f4fb3fe227714"
+digest = "sha256:2426838e1f08896175f0686baf06e4a19178186a90a5a4696a2439258c539fc8"
 
 [[tasks]]
 name = "kubeply/fix-service-dns-name"
-digest = "sha256:f06e60d1fd6ca4cdfb46c2466431fcbe1c1892f65f4a48604ca3af9502a08add"
+digest = "sha256:7fc263594ee39625937fa7dc3c8aa75c2f60dec2a1494022c4eaac4d866152e4"
 
 [[tasks]]
 name = "kubeply/fix-job-command-argument"
-digest = "sha256:04c1e8f1d4a4c3963777b6fe4e9f86fb043445f3f55cdb885aa4cc7e96ebaf77"
+digest = "sha256:51353ca1b53794d54cf1b527aef6566974b8cedd0f5faed4a492d1e1c636158d"
 
 [[tasks]]
 name = "kubeply/fix-quirky-health-endpoint"
-digest = "sha256:f40b8280ccbc814e3d8a32932102e463d1672149978a10e92cff0a5a3e1b8c16"
+digest = "sha256:b3b7fad7f4886ad8df52f913ec8e47c3312d62e1cda07e669c1eea1510afc391"
 
 [[tasks]]
 name = "kubeply/repair-ingress-backend-port"
-digest = "sha256:446ca45759ce2014d1565cb67e48aef3a7edd4769ac7a82960490d5600344f27"
+digest = "sha256:3f427718481d85cd919fb778539806c5a99d9b0bc70944f0ece6d521ba12adf9"
 
 [[tasks]]
 name = "kubeply/fix-hpa-scale-target"
-digest = "sha256:00c5ed5975f6ac983db280e52a4a337c1854a502ca39eab9ef1a7e9211cd1732"
+digest = "sha256:891d3f6e4ce2e9cb5fa11545f63eebe7c9348aa7faa7a36cfc0a11259234c1e3"
 
 [[tasks]]
 name = "kubeply/fix-controller-service-selector"
-digest = "sha256:45f297483346ead30e6a4a9ba7ff4177455f38047c1d759fda15de8ddb1c52d2"
+digest = "sha256:d8893e9728ca5e6d30ab4b8c5d0825c3f3d9c50c1bf9c502aa76e05e00fad2b1"
 
 [[tasks]]
 name = "kubeply/restore-missing-configmap"
-digest = "sha256:1e72e26493c84e5bb58bc73ce7db302edfe9e5d205e56e091162eb15dd45070a"
+digest = "sha256:67c33b8a0ad9d9b80f120e5ff374ee022957d3d73bc51472b0fb2f6cc851276b"
 
 [[tasks]]
 name = "kubeply/replace-deprecated-ingress-api"
-digest = "sha256:29be4bd5d43fa5683b43bc7189274b835924e17fdda93512664409296820d8cd"
+digest = "sha256:0bd3df6faad8e93434add21e7c92a6f5c6e5af7acb0f2b3cea9a00da2c97cc58"
 
 [[tasks]]
 name = "kubeply/add-maintenance-toleration"
-digest = "sha256:a5ed470e0e5d443dae6187f5f0d5299969138c6ccd3928ca06ef7960771ea0de"
+digest = "sha256:2e425ad96df7611b1e860b3c894aea4849bd858769381b45fc4c24431ac2b393"
 
 [[tasks]]
 name = "kubeply/fix-simple-cr-field"
-digest = "sha256:96bcc2687606628e05bf9de94843e607bf7f00e7acaee32fd3895f86fd57c92d"
+digest = "sha256:f0bcfed87ea40db79a57ba07302727107ee9279371b237a06effdaf359eb2fbf"
 
 [[tasks]]
 name = "kubeply/trace-service-route-regression"
-digest = "sha256:70bf27638d8fe750af0c787e4ca715c7dce7863be0e5b4c59770128b9aa81d92"
+digest = "sha256:d896dfbeefba866ae0392f13fb0df22a0794c6779003e62c22bcd82effaaddc0"
 
 [[tasks]]
 name = "kubeply/repair-secret-projection-reload"
-digest = "sha256:3b55bda8005cffa806919a38951c9dbbf620be6a6705b83e5e28bde9cca9cd59"
+digest = "sha256:b8eaaac2a2ce393b930e2a12561d98f7bfb53ee8d9dd0940583160a8c2d568f7"
 
 [[tasks]]
 name = "kubeply/recover-api-rollout-after-config-change"
-digest = "sha256:6b03c28f21a5b52f64a4ebabd36e75a2bfa3d8aa85e4062e468a120737dd56e8"
+digest = "sha256:d2ce534a7f77c2b73f92f9c7d2430966508cb95918aa31b439d1439cb7dce03f"
 
 [[tasks]]
 name = "kubeply/schedule-reporting-api-on-labeled-node"
-digest = "sha256:ee0519d8e33803ff19fec9022c9b939a2899476c96f3652b6afbc37328c0ff26"
+digest = "sha256:7d12d772740137cecfeef6dbeae50a6c6c0388403e5f626d89ffa8d84130b370"
 
 [[tasks]]
 name = "kubeply/stabilize-cpu-throttled-worker"
-digest = "sha256:599b9c59b397c58609e3e5774cefc8390a427a8b9fbfecfb5f3e672271f7528d"
+digest = "sha256:a05dae71dca2141652fd8607e9878825040813a0e4e03bca40dba566d728f164"
 
 [[tasks]]
 name = "kubeply/restore-worker-config-access"
-digest = "sha256:ae7cf533c1f14e66925163f2975e99961bc80d5618d003cd5c02380a5097c2bd"
+digest = "sha256:ece292b84016977f9f117012ef3b259c52cdf01f3861a0cb8a83734a15c9089d"
 
 [[tasks]]
 name = "kubeply/restore-metrics-controller-after-values-change"
-digest = "sha256:94a80b26d83065dccb4e372dbd44b5f6f3836c75d45c2283d76e0e8e2e0f9170"
+digest = "sha256:867a7eb7563a036bdab0c2d44f979ef778c72b8a45c90ac6dfc54dda759a599f"
 
 [[tasks]]
 name = "kubeply/prepare-node-drain-with-pdb"
-digest = "sha256:a5ca612435cdad0de44041d89ee16fc5d81215b1088d088c3f34181ed920f113"
+digest = "sha256:791f6a5a24d015849a42377b61a6fc64e7b873591593051e5066099fe260672c"
 
 [[tasks]]
 name = "kubeply/repair-worker-hpa-scaling-inputs"
-digest = "sha256:311949a7ae1a1556b98d6c5111add13523968508c9057176547f761d3837e9bc"
+digest = "sha256:6234b456fcab54bd10e9410090b2b3df341fa1575ce14f485602cdf1de3a189f"
 
 [[tasks]]
 name = "kubeply/repair-cross-namespace-service-discovery"
-digest = "sha256:3d50b9dfd0a7ecaf43bc1947ae599a4b3753a9e6f778596beeef0e3f610811c7"
+digest = "sha256:d2a8df946048a3a476b3f092d576585d4f0e5fbba11d4082dc931f4ff767c845"
 
 [[tasks]]
 name = "kubeply/repair-cache-volume-binding"
-digest = "sha256:db48abe5dff2afa02dfeb12eeb46c0607a390b18bb9e5c4fbc40790a90f6f52c"
+digest = "sha256:03c405c7d8553e289bfbf3c274fdfe1c1c5f8bb37fe7a9234eafad57c913cf25"
 
 [[tasks]]
 name = "kubeply/restore-checkout-network-path"
-digest = "sha256:920eabaf5625aa509afcaca84c768873e97d0157e9842d2ba5a54bf2566807b2"
+digest = "sha256:feace86dfc5bde49d716174cadfe1b784207b8aacdc18f09028386c24d392723"
 
 [[tasks]]
 name = "kubeply/restore-portal-ingress-tls-route"
-digest = "sha256:86bf4a1cc9e73f96330e6f4fcc3bde4ac0a0cb05f6db8c3a7eb428654e36a7b3"
+digest = "sha256:d6f7017742fbbcc545fd57b228bd57c8319caf63e59304b565c641696aa851f0"
 
 [[tasks]]
 name = "kubeply/clear-upgrade-blocking-apis"
-digest = "sha256:1912c55c469d9bcdb6951bc95fa297e6ab8f832e5002679a4103c3d0ff8e6e6e"
+digest = "sha256:ba752eb1025a4a2a5e7d051d2d2f526195c4c424e27b863a2f7d49d4a92a676f"
 
 [[tasks]]
 name = "kubeply/place-inference-canary-on-gpu-node"
-digest = "sha256:4aa2a4501d294a36428cf9c09a034e07b6cb369db1b5c5832dc7638801153846"
+digest = "sha256:b7da6c9e4234031efcdde87aea3fbeffd775240c004c154eb1ac49e9633b55b3"
 
 [[tasks]]
 name = "kubeply/repair-sidecar-generated-config"
-digest = "sha256:b0150476135f5788c2a7014590044ecbfd7b931c683089c2593bd5c226337daa"
+digest = "sha256:f2403eae655ad3c778d6d8a8cfc9709a878631a09d0b9d5ad95a912e26d1e34e"
 
 [[tasks]]
 name = "kubeply/repair-restricted-multi-container-pod"
-digest = "sha256:78aefa87389612ce87d58cc38bca5f47873ef16475322e1a0b073c661f13cc8f"
+digest = "sha256:cc375b5fadadc592220f2aa52837a5dae60b0433ffe420db5d10ac1418b180f9"
 
 [[tasks]]
 name = "kubeply/complete-staging-namespace-restore"
-digest = "sha256:8bce115e4b7f567ef0decf8c725abf17ee634e729127308e0cb3d5055b81e873"
+digest = "sha256:442ce7af34421fd03670be40286596dd81f3bdaaa3cb940b608d7a27cc1f92e1"
 
 [[tasks]]
 name = "kubeply/reconnect-checkout-worker-queue"
-digest = "sha256:dfdd250ef7add349d5cef9f53ddcc966bbb7c60cd8c4a7b8c8f6fad24f213574"
+digest = "sha256:5b926f7c3276a196d1c69cb9dcf3bd5d3c1de400e7bc8bdfaa6456c0c6032cea"
 
 [[tasks]]
 name = "kubeply/restore-grafana-logs-datasource"
-digest = "sha256:44e6975c1bcaa35199b88954b0ab766b908563d761d6b26209760fa6192c4846"
+digest = "sha256:75284f4b1eaca3428cc314ea2d093e7a3c97edf22429db023c4ca02582da4473"
 
 [[tasks]]
 name = "kubeply/recover-nightly-report-cronjob"
-digest = "sha256:39c7678cae57c26f3d1132c4c615e456a1091c88c61071c6e83b4e62f67e6ee9"
+digest = "sha256:aa3e41686f946555c1f418d8492f28acf85d6da3a0eb450a7841f9cc3c9f6b53"
 
 [[tasks]]
 name = "kubeply/repair-report-custom-resource-status"
-digest = "sha256:a15b2f34fdfb7a4c0ee0ae95e933b44f35f52c8705a0195db25f481d4881a858"
+digest = "sha256:2052fc277f3c61f7caf5cd196f32021a679ef973a02b88316ec680ccf4ed2a93"
 
 [[tasks]]
 name = "kubeply/repair-statefulset-headless-service-identity"
-digest = "sha256:2659d9aa395cc5fdc1ad80e0e1f5ac162ed88572598b45bd1e228a260fbd4050"
+digest = "sha256:f5016aa9b05f948a87e8dbec275eebf752b112ddb28b5e5e30d8001566bb9051"
 
 [[tasks]]
 name = "kubeply/repair-plugin-driven-app-startup"
-digest = "sha256:7d026c0b82a7ad5b81ee446f01d5270773a4af4eaefe70699afd5ab173cf9924"
+digest = "sha256:fb8eaa055436aee9e3572c294d895b3aeaed0ff9c97a37d450fcf6ae85dbc241"
 
 [[tasks]]
 name = "kubeply/restore-alert-signal-after-telemetry-split"
-digest = "sha256:e4443b7b13ef7bff8743545022e938da1e6a515d386a36a686b433400244091a"
+digest = "sha256:ab2252ab00aa644cd44c5dd84cc18d7be46b085bdf0c489d879604fa16ef92af"
 
 [[tasks]]
 name = "kubeply/complete-namespace-restore-preserving-state"
-digest = "sha256:1885e260e196d0a513ab7dc9c834621748f250bcf518934f7148f043e14ee610"
+digest = "sha256:ca62a5000b396af6b01b1e593317813d176c309d587525e81b674a0fe4405591"
 
 [[tasks]]
 name = "kubeply/harden-payments-stack-without-breaking-runtime"
-digest = "sha256:c60117567b194ceb9b04a308d41d445d12973c9644b07b3c8e503644d9eb2c3e"
+digest = "sha256:740f3998a1cc20d8b6ef23ef8de68deaa05c4315e147cced0c7a635c9c997d2d"
 
 [[tasks]]
 name = "kubeply/restore-order-pipeline-after-queue-migration"
-digest = "sha256:b3563313296612b027b5d54c16c9239ab6f97edbef5f2b22e6affbf56a1e7772"
+digest = "sha256:86680a928dab222133cd1d591733e4ea1dda135a500d1cfc9c140fd3c15f1f40"
 
 [[tasks]]
 name = "kubeply/repair-report-operator-finalizer-reconcile"
-digest = "sha256:8b411919dd1d8c5317ae51c35ca158a444521e8bd5042fbdbd5774c315ee3d55"
+digest = "sha256:8cb0e833f1936609c2f5bf9ef8beb0eee482f4ad69afbe726bba72cc6dcb42fe"
 
 [[tasks]]
 name = "kubeply/stabilize-checkout-autoscaling-under-load"
-digest = "sha256:3211fda478c1738c3f4a94a98b4101c380d89648cedb854862cadd5b401d9a1d"
+digest = "sha256:6cb5158ca11c3ed5993f09c57a87e1456f07ad843ab783328a6e468a915b9774"
 
 [[tasks]]
 name = "kubeply/complete-node-pool-drain-migration"
-digest = "sha256:7a7b0c26a628bb3585fbe906453c63104a9f8ba39e0244027e14212d6aa0d24a"
+digest = "sha256:d0f15a16ee2b38f96b8b66c2ab3618bc8e109d27d516a5d786d50500ddb14681"
 
 [[tasks]]
 name = "kubeply/restore-stateful-cache-identity"
-digest = "sha256:217d72c63ad9f7145ff9b2a6fde52e5d4229af4a1886c7bd416539945a859e27"
+digest = "sha256:326a54ef6f895dd90cd113739bf7b2cc4957114164331decb5c6e90ab1b0d3e7"
 
 [[tasks]]
 name = "kubeply/repair-payment-tenant-network-boundary"
-digest = "sha256:ad55a86584bfdc20092bf20aac593008f6fefca9fe622e166062942009289a91"
+digest = "sha256:f1bd7eb5377dfc9b2cf16beffc5800929e56104c666ea43b8185506ddbb9b8a6"
 
 [[tasks]]
 name = "kubeply/recover-web-rollout-after-bad-release"
-digest = "sha256:7191eb9860d6de7828f3e1e8bcae5ac5ea2f86e09abf153690634c87769e95ad"
+digest = "sha256:bcb1d51d0c680172fa007dc4c32e51284f652ee63975ccb4ad2c8200a6e168ed"
 
 [[tasks]]
 name = "kubeply/coordinate-secret-rotation-rollout"
-digest = "sha256:5ecdf72abe79d4e52ef7d93377dded19c4e2d799f6a4732f08d1e37ba8b9aab9"
+digest = "sha256:ae350f80eb4c71dd29ffc5f02a4e7ee747ed8447edf2b898e9b92f099f50d7ec"
 
 [[tasks]]
 name = "kubeply/restore-multi-hop-checkout-route"
-digest = "sha256:d6cfa8a214fb8dc39fcb364ec6445128b679f6a0b0711b12f408e171967ba1d8"
+digest = "sha256:f007f79fe4c3b0df89d8b952cc839c87f86bba5d44b3226aebf75944904b536d"
 
 
 [[files]]
