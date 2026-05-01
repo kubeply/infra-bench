@@ -12,6 +12,7 @@
     "infra_bench_commit",
     "harbor_version",
     "agent_harness",
+    "agent_tool",
     "model",
     "started_at",
     "finished_at",
@@ -45,10 +46,13 @@
       "type": "string",
       "minLength": 1
     },
+    "agent_tool": {
+      "type": ["string", "null"]
+    },
     "model": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["provider", "name", "version"],
+      "required": ["provider", "name", "version", "reasoning"],
       "properties": {
         "provider": {
           "type": "string",
@@ -59,6 +63,9 @@
           "minLength": 1
         },
         "version": {
+          "type": ["string", "null"]
+        },
+        "reasoning": {
           "type": ["string", "null"]
         }
       }

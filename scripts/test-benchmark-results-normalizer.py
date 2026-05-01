@@ -115,6 +115,8 @@ def run_normalizer(dataset: Path, job: Path, output: Path) -> None:
         "o4-mini",
         "--model-version",
         "2026-04-26",
+        "--model-reasoning",
+        "high",
         "--infra-bench-commit",
         "9fe586c000000000000000000000000000000000",
         "--run-id",
@@ -166,6 +168,13 @@ def test_normalizer_writes_public_contract() -> None:
         assert run["summary"]["task_count"] == 1
         assert run["summary"]["passed"] == 1
         assert run["summary"]["score"] == 1
+        assert run["agent_tool"] == "codex"
+        assert run["model"] == {
+            "provider": "openai",
+            "name": "o4-mini",
+            "version": "2026-04-26",
+            "reasoning": "high",
+        }
 
         [result] = results["results"]
         assert result["task_name"] == "kubeply/restore-multi-hop-checkout-route"
@@ -198,6 +207,8 @@ def test_normalizer_writes_public_contract() -> None:
             "INSERT OR REPLACE INTO benchmark_runs"
             in (output / "d1-upsert.sql").read_text()
         )
+        assert "agent_tool" in (output / "d1-upsert.sql").read_text()
+        assert "model_reasoning" in (output / "d1-upsert.sql").read_text()
         assert "BEGIN TRANSACTION" not in (output / "d1-upsert.sql").read_text()
         assert "COMMIT" not in (output / "d1-upsert.sql").read_text()
         assert not (output / "public" / result["task_slug"] / "agent.log").exists()
