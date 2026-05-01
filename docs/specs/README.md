@@ -59,7 +59,9 @@ scripts/normalize-benchmark-run.py \
   --dataset-path "$DATASET_PATH" \
   --model-provider "<provider>" \
   --model-name "<model-name>" \
-  --model-version "<model-version-or-effort>" \
+  --model-version "<model-version>" \
+  --model-reasoning "<reasoning-effort>" \
+  --agent-tool "<agent-tool>" \
   --run-id "$RUN_ID" \
   --output-dir "build/benchmark-results/$RUN_ID"
 ```

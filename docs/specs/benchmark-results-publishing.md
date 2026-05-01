@@ -134,10 +134,12 @@ cache and must not be treated as the source of truth.
   "infra_bench_commit": "9fe586c...",
   "harbor_version": "x.y.z",
   "agent_harness": "harbor",
+  "agent_tool": "codex",
   "model": {
     "provider": "openai",
     "name": "o4-mini",
-    "version": null
+    "version": null,
+    "reasoning": "high"
   },
   "started_at": "2026-04-26T12:00:00Z",
   "finished_at": "2026-04-26T13:10:00Z",
@@ -198,9 +200,11 @@ CREATE TABLE benchmark_runs (
   infra_bench_commit TEXT NOT NULL,
   harbor_version TEXT,
   agent_harness TEXT NOT NULL,
+  agent_tool TEXT,
   model_provider TEXT NOT NULL,
   model_name TEXT NOT NULL,
   model_version TEXT,
+  model_reasoning TEXT,
   started_at TEXT NOT NULL,
   finished_at TEXT,
   task_count INTEGER NOT NULL,
