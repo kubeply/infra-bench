@@ -79,6 +79,10 @@ class TrialResult:
     score: float
     duration_sec: float | None
     cost_usd: float | None
+    input_tokens: int | None
+    cache_tokens: int | None
+    output_tokens: int | None
+    total_tokens: int | None
     started_at: str | None
     finished_at: str | None
     verifier_artifact_key: str
@@ -274,7 +278,7 @@ def first_bool(data: Any, keys: set[str]) -> bool | None:
     return None
 
 
-def first_present(*values: float | None) -> float | None:
+def first_present(*values: Any) -> Any:
     """Return the first value that is not None."""
 
     for value in values:
@@ -296,6 +300,33 @@ def coerce_float(value: Any) -> float | None:
         except ValueError:
             return None
     return None
+
+
+def coerce_int(value: Any) -> int | None:
+    """Convert a scalar value to int when it is a whole number."""
+
+    number = coerce_float(value)
+    if number is None or not number.is_integer():
+        return None
+    return int(number)
+
+
+def first_int(data: Any, keys: set[str]) -> int | None:
+    """Return the first integer value for any matching key."""
+
+    for value in recursive_values(data, keys):
+        number = coerce_int(value)
+        if number is not None:
+            return number
+    return None
+
+
+def sum_optional_ints(*values: int | None) -> int | None:
+    """Sum integers only when every provided value is known."""
+
+    if any(value is None for value in values):
+        return None
+    return sum(value for value in values if value is not None)
 
 
 def normalize_timestamp(value: str | None) -> str | None:
@@ -502,6 +533,23 @@ def normalize_trial(
     if duration is None:
         duration = duration_between_timestamps(started, finished)
     score = max(0.0, min(1.0, reward))
+    agent_result = phase_data(trial_result, "agent_result")
+    input_tokens = first_int(
+        agent_result,
+        {"n_input_tokens", "input_tokens", "prompt_tokens"},
+    )
+    cache_tokens = first_int(
+        agent_result,
+        {"n_cache_tokens", "cache_tokens", "cached_tokens"},
+    )
+    output_tokens = first_int(
+        agent_result,
+        {"n_output_tokens", "output_tokens", "completion_tokens"},
+    )
+    total_tokens = first_present(
+        first_int(agent_result, {"n_total_tokens", "total_tokens"}),
+        sum_optional_ints(input_tokens, output_tokens),
+    )
 
     verifier_key = artifact_key(r2_prefix, run_id, task.slug, "verifier-summary.json")
     agent_key = artifact_key(r2_prefix, run_id, task.slug, "agent-summary.json")
@@ -538,6 +586,10 @@ def normalize_trial(
         "started_at": started,
         "finished_at": finished,
         "duration_sec": duration,
+        "input_tokens": input_tokens,
+        "cache_tokens": cache_tokens,
+        "output_tokens": output_tokens,
+        "total_tokens": total_tokens,
         "raw_transcript_public": True,
         "agent_log_name": agent_log_name,
         "agent_log": agent_log,
@@ -557,6 +609,10 @@ def normalize_trial(
         score=score,
         duration_sec=duration,
         cost_usd=cost_usd,
+        input_tokens=input_tokens,
+        cache_tokens=cache_tokens,
+        output_tokens=output_tokens,
+        total_tokens=total_tokens,
         started_at=started,
         finished_at=finished,
         verifier_artifact_key=verifier_key,
@@ -603,6 +659,10 @@ def result_to_json(result: TrialResult) -> dict[str, Any]:
         "score": result.score,
         "duration_sec": result.duration_sec,
         "cost_usd": result.cost_usd,
+        "input_tokens": result.input_tokens,
+        "cache_tokens": result.cache_tokens,
+        "output_tokens": result.output_tokens,
+        "total_tokens": result.total_tokens,
         "started_at": result.started_at,
         "finished_at": result.finished_at,
         "verifier_artifact_key": result.verifier_artifact_key,
@@ -684,6 +744,30 @@ def build_documents(
         if result.duration_sec is not None
     ]
     total_duration = sum(durations) if durations else None
+    has_input_tokens = any(result.input_tokens is not None for result in trial_results)
+    has_cache_tokens = any(result.cache_tokens is not None for result in trial_results)
+    has_output_tokens = any(result.output_tokens is not None for result in trial_results)
+    has_total_tokens = any(result.total_tokens is not None for result in trial_results)
+    input_tokens = (
+        sum(result.input_tokens for result in trial_results if result.input_tokens is not None)
+        if has_input_tokens
+        else None
+    )
+    cache_tokens = (
+        sum(result.cache_tokens for result in trial_results if result.cache_tokens is not None)
+        if has_cache_tokens
+        else None
+    )
+    output_tokens = (
+        sum(result.output_tokens for result in trial_results if result.output_tokens is not None)
+        if has_output_tokens
+        else None
+    )
+    total_tokens = (
+        sum(result.total_tokens for result in trial_results if result.total_tokens is not None)
+        if has_total_tokens
+        else None
+    )
     run_cost = args.cost_usd
     if run_cost is not None:
         per_task_cost = run_cost / len(trial_results)
@@ -729,6 +813,10 @@ def build_documents(
             "score": passed / len(trial_results),
             "duration_sec": total_duration,
             "cost_usd": run_cost,
+            "input_tokens": input_tokens,
+            "cache_tokens": cache_tokens,
+            "output_tokens": output_tokens,
+            "total_tokens": total_tokens,
         },
         "artifacts": {
             "run": public_file_key(args.r2_prefix.strip("/"), run_id, "run.json"),
@@ -799,6 +887,10 @@ def validate_documents(run_doc: dict[str, Any], results_doc: dict[str, Any]) -> 
             "score",
             "duration_sec",
             "cost_usd",
+            "input_tokens",
+            "cache_tokens",
+            "output_tokens",
+            "total_tokens",
             "started_at",
             "finished_at",
             "verifier_artifact_key",
@@ -867,6 +959,33 @@ def write_d1_sql(
     summary = run_doc["summary"]
     model = run_doc["model"]
     artifacts = run_doc["artifacts"]
+    run_values = [
+        run_doc["run_id"],
+        run_doc["dataset"],
+        run_doc["infra_bench_commit"],
+        run_doc["harbor_version"],
+        run_doc["agent_harness"],
+        run_doc["agent_tool"],
+        model["provider"],
+        model["name"],
+        model["version"],
+        model["reasoning"],
+        run_doc["started_at"],
+        run_doc["finished_at"],
+        summary["task_count"],
+        summary["passed"],
+        summary["failed"],
+        summary["score"],
+        summary["duration_sec"],
+        summary["cost_usd"],
+        summary["input_tokens"],
+        summary["cache_tokens"],
+        summary["output_tokens"],
+        summary["total_tokens"],
+        artifacts["run"],
+        artifacts["results"],
+        artifacts["archive"],
+    ]
     statements = [
         "-- Generated by scripts/normalize-benchmark-run.py",
         (
@@ -874,18 +993,42 @@ def write_d1_sql(
             "(run_id, dataset, infra_bench_commit, harbor_version, agent_harness, agent_tool, "
             "model_provider, model_name, model_version, model_reasoning, started_at, finished_at, "
             "task_count, passed, failed, score, duration_sec, cost_usd, "
+            "input_tokens, cache_tokens, output_tokens, total_tokens, "
             "run_artifact_key, results_artifact_key, archive_artifact_key) VALUES "
-            f"({sql_values([run_doc['run_id'], run_doc['dataset'], run_doc['infra_bench_commit'], run_doc['harbor_version'], run_doc['agent_harness'], run_doc['agent_tool'], model['provider'], model['name'], model['version'], model['reasoning'], run_doc['started_at'], run_doc['finished_at'], summary['task_count'], summary['passed'], summary['failed'], summary['score'], summary['duration_sec'], summary['cost_usd'], artifacts['run'], artifacts['results'], artifacts['archive']])});"
+            f"({sql_values(run_values)});"
         ),
     ]
     for result in results_doc["results"]:
         row_id = f"{run_doc['run_id']}/{result['task_name']}"
+        result_values = [
+            row_id,
+            run_doc["run_id"],
+            result["task_name"],
+            result["task_slug"],
+            result["difficulty"],
+            result["category"],
+            result["passed"],
+            result["reward"],
+            result["score"],
+            result["duration_sec"],
+            result["cost_usd"],
+            result["input_tokens"],
+            result["cache_tokens"],
+            result["output_tokens"],
+            result["total_tokens"],
+            result["started_at"],
+            result["finished_at"],
+            result["verifier_artifact_key"],
+            result["agent_artifact_key"],
+        ]
         statements.append(
             "INSERT OR REPLACE INTO benchmark_task_results "
             "(id, run_id, task_name, task_slug, difficulty, category, passed, "
-            "reward, score, duration_sec, cost_usd, started_at, finished_at, "
+            "reward, score, duration_sec, cost_usd, "
+            "input_tokens, cache_tokens, output_tokens, total_tokens, "
+            "started_at, finished_at, "
             "verifier_artifact_key, agent_artifact_key) VALUES "
-            f"({sql_values([row_id, run_doc['run_id'], result['task_name'], result['task_slug'], result['difficulty'], result['category'], result['passed'], result['reward'], result['score'], result['duration_sec'], result['cost_usd'], result['started_at'], result['finished_at'], result['verifier_artifact_key'], result['agent_artifact_key']])});"
+            f"({sql_values(result_values)});"
         )
     (output_dir / "d1-upsert.sql").write_text("\n".join(statements) + "\n")
 

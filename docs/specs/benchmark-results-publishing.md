@@ -73,7 +73,7 @@ D1 stores compact query data:
 - dataset and task identity
 - model and agent harness identity
 - pass/fail, reward, and score
-- duration and cost metrics when available
+- duration, cost, and token usage metrics when available
 - R2 object keys for evidence and summaries
 
 The marketing site should query D1 for tables, filters, and comparisons. It may
@@ -149,7 +149,11 @@ cache and must not be treated as the source of truth.
     "failed": 17,
     "score": 0.7069,
     "duration_sec": 4200,
-    "cost_usd": null
+    "cost_usd": null,
+    "input_tokens": 1234567,
+    "cache_tokens": 1000000,
+    "output_tokens": 45678,
+    "total_tokens": 1280245
   },
   "artifacts": {
     "run": "benchmarks/runs/<run_id>/run.json",
@@ -178,6 +182,10 @@ cache and must not be treated as the source of truth.
       "score": 1.0,
       "duration_sec": 312,
       "cost_usd": null,
+      "input_tokens": 12345,
+      "cache_tokens": 10000,
+      "output_tokens": 678,
+      "total_tokens": 13023,
       "started_at": "2026-04-26T12:04:00Z",
       "finished_at": "2026-04-26T12:09:12Z",
       "verifier_artifact_key": "benchmarks/runs/<run_id>/public/restore-multi-hop-checkout-route/verifier-summary.json",
@@ -188,6 +196,11 @@ cache and must not be treated as the source of truth.
 ```
 
 Missing optional values should be represented as `null`, not omitted.
+Token usage fields should preserve Harbor agent totals when present. If an
+agent does not report usage, such as current Gemini CLI artifacts, keep these
+fields as `null`. `cache_tokens` is reported separately because it is commonly
+a subset of input/cache-read accounting, while `total_tokens` is
+`input_tokens + output_tokens` when no explicit total is available.
 
 ## D1 Data Model
 
@@ -213,6 +226,10 @@ CREATE TABLE benchmark_runs (
   score REAL NOT NULL,
   duration_sec REAL,
   cost_usd REAL,
+  input_tokens INTEGER,
+  cache_tokens INTEGER,
+  output_tokens INTEGER,
+  total_tokens INTEGER,
   run_artifact_key TEXT NOT NULL,
   results_artifact_key TEXT NOT NULL,
   archive_artifact_key TEXT
@@ -230,6 +247,10 @@ CREATE TABLE benchmark_task_results (
   score REAL NOT NULL,
   duration_sec REAL,
   cost_usd REAL,
+  input_tokens INTEGER,
+  cache_tokens INTEGER,
+  output_tokens INTEGER,
+  total_tokens INTEGER,
   started_at TEXT,
   finished_at TEXT,
   verifier_artifact_key TEXT,
