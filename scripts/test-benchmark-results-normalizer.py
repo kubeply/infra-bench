@@ -82,6 +82,12 @@ def write_fixture_job(root: Path) -> Path:
                 "started_at": "2026-04-26T12:04:00Z",
                 "finished_at": "2026-04-26T12:04:15Z",
             },
+            "agent_result": {
+                "n_input_tokens": 1234,
+                "n_cache_tokens": 1000,
+                "n_output_tokens": 56,
+                "cost_usd": None,
+            },
             "status": "completed",
         },
     )
@@ -181,9 +187,17 @@ def test_normalizer_writes_public_contract() -> None:
         assert result["difficulty"] == "hard"
         assert result["passed"] is True
         assert result["duration_sec"] == 120
+        assert result["input_tokens"] == 1234
+        assert result["cache_tokens"] == 1000
+        assert result["output_tokens"] == 56
+        assert result["total_tokens"] == 1290
         assert result["started_at"] == "2026-04-26T12:01:00Z"
         assert result["finished_at"] == "2026-04-26T12:03:00Z"
         assert run["summary"]["duration_sec"] == 120
+        assert run["summary"]["input_tokens"] == 1234
+        assert run["summary"]["cache_tokens"] == 1000
+        assert run["summary"]["output_tokens"] == 56
+        assert run["summary"]["total_tokens"] == 1290
         assert run["artifacts"]["summary"].endswith("/summary.json")
         assert "/public/" in result["agent_artifact_key"]
         assert result["agent_artifact_key"].endswith("agent-summary.json")
@@ -199,6 +213,10 @@ def test_normalizer_writes_public_contract() -> None:
         assert agent_summary["agent_log_name"] == "codex.txt"
         assert agent_summary["agent_log"] == "agent transcript\n"
         assert agent_summary["codex_log"] == "agent transcript\n"
+        assert agent_summary["input_tokens"] == 1234
+        assert agent_summary["cache_tokens"] == 1000
+        assert agent_summary["output_tokens"] == 56
+        assert agent_summary["total_tokens"] == 1290
         assert agent_summary["trajectory"]["schema_version"] == "ATIF-v1.5"
         assert verifier_summary["duration_sec"] == 15
         assert verifier_summary["test_log"] == "verifier test log\n"
@@ -209,6 +227,7 @@ def test_normalizer_writes_public_contract() -> None:
         )
         assert "agent_tool" in (output / "d1-upsert.sql").read_text()
         assert "model_reasoning" in (output / "d1-upsert.sql").read_text()
+        assert "input_tokens" in (output / "d1-upsert.sql").read_text()
         assert "BEGIN TRANSACTION" not in (output / "d1-upsert.sql").read_text()
         assert "COMMIT" not in (output / "d1-upsert.sql").read_text()
         assert not (output / "public" / result["task_slug"] / "agent.log").exists()
@@ -225,7 +244,37 @@ def test_normalizer_dry_run_writes_no_files() -> None:
 
         assert normalized["run"]["run_id"] == "fixture-run"
         assert normalized["results"]["results"][0]["passed"] is True
+        assert normalized["results"]["results"][0]["total_tokens"] == 1290
         assert not (root / "out").exists()
+
+
+def test_normalizer_keeps_missing_usage_null() -> None:
+    """Verify missing agent usage remains null for agents that do not report it."""
+
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        dataset = write_fixture_dataset(root)
+        job = write_fixture_job(root)
+        trial_result = job / "restore-multi-hop-checkout-route" / "result.json"
+        data = json.loads(trial_result.read_text())
+        data["agent_result"] = {
+            "n_input_tokens": None,
+            "n_cache_tokens": None,
+            "n_output_tokens": None,
+            "cost_usd": None,
+        }
+        write_json(trial_result, data)
+        normalized = run_dry_run(dataset, job)
+
+        result = normalized["results"]["results"][0]
+        assert result["input_tokens"] is None
+        assert result["cache_tokens"] is None
+        assert result["output_tokens"] is None
+        assert result["total_tokens"] is None
+        assert normalized["run"]["summary"]["input_tokens"] is None
+        assert normalized["run"]["summary"]["cache_tokens"] is None
+        assert normalized["run"]["summary"]["output_tokens"] is None
+        assert normalized["run"]["summary"]["total_tokens"] is None
 
 
 def main() -> int:
@@ -233,6 +282,7 @@ def main() -> int:
 
     test_normalizer_writes_public_contract()
     test_normalizer_dry_run_writes_no_files()
+    test_normalizer_keeps_missing_usage_null()
     print("benchmark result normalizer tests ok")
     return 0
 

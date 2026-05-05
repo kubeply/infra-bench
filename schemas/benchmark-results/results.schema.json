@@ -29,6 +29,10 @@
           "score",
           "duration_sec",
           "cost_usd",
+          "input_tokens",
+          "cache_tokens",
+          "output_tokens",
+          "total_tokens",
           "started_at",
           "finished_at",
           "verifier_artifact_key",
@@ -74,6 +78,22 @@
           },
           "cost_usd": {
             "type": ["number", "null"],
+            "minimum": 0
+          },
+          "input_tokens": {
+            "type": ["integer", "null"],
+            "minimum": 0
+          },
+          "cache_tokens": {
+            "type": ["integer", "null"],
+            "minimum": 0
+          },
+          "output_tokens": {
+            "type": ["integer", "null"],
+            "minimum": 0
+          },
+          "total_tokens": {
+            "type": ["integer", "null"],
             "minimum": 0
           },
           "started_at": {
