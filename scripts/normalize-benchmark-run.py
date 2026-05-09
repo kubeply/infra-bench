@@ -746,25 +746,43 @@ def build_documents(
     total_duration = sum(durations) if durations else None
     has_input_tokens = any(result.input_tokens is not None for result in trial_results)
     has_cache_tokens = any(result.cache_tokens is not None for result in trial_results)
-    has_output_tokens = any(result.output_tokens is not None for result in trial_results)
+    has_output_tokens = any(
+        result.output_tokens is not None for result in trial_results
+    )
     has_total_tokens = any(result.total_tokens is not None for result in trial_results)
     input_tokens = (
-        sum(result.input_tokens for result in trial_results if result.input_tokens is not None)
+        sum(
+            result.input_tokens
+            for result in trial_results
+            if result.input_tokens is not None
+        )
         if has_input_tokens
         else None
     )
     cache_tokens = (
-        sum(result.cache_tokens for result in trial_results if result.cache_tokens is not None)
+        sum(
+            result.cache_tokens
+            for result in trial_results
+            if result.cache_tokens is not None
+        )
         if has_cache_tokens
         else None
     )
     output_tokens = (
-        sum(result.output_tokens for result in trial_results if result.output_tokens is not None)
+        sum(
+            result.output_tokens
+            for result in trial_results
+            if result.output_tokens is not None
+        )
         if has_output_tokens
         else None
     )
     total_tokens = (
-        sum(result.total_tokens for result in trial_results if result.total_tokens is not None)
+        sum(
+            result.total_tokens
+            for result in trial_results
+            if result.total_tokens is not None
+        )
         if has_total_tokens
         else None
     )
