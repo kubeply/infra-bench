@@ -22,7 +22,7 @@ env:
   # renovate: datasource=github-releases depName=kubeply/rudolint
   RUDOLINT_VERSION: v0.1.0
   # renovate: datasource=pypi depName=uv
-  UV_VERSION: 0.11.8
+  UV_VERSION: 0.11.16
 
 jobs:
   actionlint:
