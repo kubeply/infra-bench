@@ -1,0 +1,9 @@
+# infra-bench task images intentionally use current Debian package revisions.
+# Pinning apt package revisions here would make benchmark maintenance noisy
+# without improving task reproducibility meaningfully.
+#
+# The apt lists directory is mounted as a BuildKit cache in task images, so
+# deleting it inside the RUN step would clear the cache that repeat builds use.
+ignore:
+  - RDL3008
+  - RDL3009
