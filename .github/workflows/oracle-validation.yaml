@@ -27,7 +27,7 @@ jobs:
       - uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
         with:
           # renovate: datasource=pypi depName=uv
-          version: 0.11.8
+          version: 0.11.16
 
       - name: Run Kubernetes Core oracle sweep
         run: uvx --from harbor harbor run -p datasets/kubernetes-core -a oracle
