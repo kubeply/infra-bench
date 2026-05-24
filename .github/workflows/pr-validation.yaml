@@ -19,8 +19,6 @@ env:
   ACTIONLINT_VERSION: v1.7.12
   # renovate: datasource=github-releases depName=oven-sh/bun
   BUN_VERSION: 1.3.10
-  # renovate: datasource=github-releases depName=kubeply/rudolint
-  RUDOLINT_VERSION: v0.1.0
   # renovate: datasource=pypi depName=uv
   UV_VERSION: 0.11.16
 
@@ -71,9 +69,8 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: kubeply/rudolint@ae67cdb271b99a3bca5762c6ec5a28793b3d2910 # v0.1.0
+      - uses: kubeply/rudolint@ef6bac6f06175688479491999f632f167f971f3e # v1.0.0
         with:
-          version: ${{ env.RUDOLINT_VERSION }}
           config: .rudolint.yaml
           paths: |
             datasets
