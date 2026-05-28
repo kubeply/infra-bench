@@ -253,7 +253,7 @@ digest = "sha256:b4379f4a4cfb8c2c5c55d5e9e582f31d66215d2bf7a90104c41447a5b7df8cc
 
 [[tasks]]
 name = "kubeply/raw-rollout-checkout-release"
-digest = "sha256:3dc26cc27b5c8896d216d0c28f0f14357a654e5c7506ec8cb210ef25ae80c57a"
+digest = "sha256:cdfdf987b956f8b734dcc9a0dd2a09b07ec06349d77165e740b95612429feb1c"
 
 [[tasks]]
 name = "kubeply/kply-sandbox-checkout-release"

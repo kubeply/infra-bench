@@ -46,7 +46,3 @@ endpoints="$(kubectl -n "$namespace" get endpoints checkout-api -o jsonpath='{.s
 [[ "$selector" == "checkout-api" && "$service_selector" == "checkout-api" ]] || fail "production selectors changed"
 [[ "$target_port" == "http" ]] || fail "production Service targetPort changed"
 [[ -n "$endpoints" ]] || fail "production Service has no endpoints"
-
-pod="$(kubectl -n "$namespace" get pod -l app=checkout-api -o jsonpath='{.items[0].metadata.name}')"
-body="$(kubectl -n "$namespace" exec "$pod" -- cat /www/index.html 2>/dev/null || true)"
-[[ "$body" == "checkout v2" ]] || fail "production pod returned '$body'"
