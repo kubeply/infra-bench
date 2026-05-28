@@ -247,6 +247,10 @@ digest = "sha256:6f82441df3096e5b132ce6b1f1a3aee916072498b3a086161b7ca90edbc416e
 name = "kubeply/fit-critical-api-on-constrained-nodes"
 digest = "sha256:41fbf10a5460b8ffc390798f9a71d8cfa37cb4d87149414a3af95640888c6f68"
 
+[[tasks]]
+name = "kubeply/repair-tenant-operator-permissions"
+digest = "sha256:b4379f4a4cfb8c2c5c55d5e9e582f31d66215d2bf7a90104c41447a5b7df8cc8"
+
 
 [[files]]
 path = "metric.py"
