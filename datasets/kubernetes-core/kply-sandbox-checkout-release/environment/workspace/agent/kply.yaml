@@ -1,0 +1,8 @@
+apps:
+  checkout:
+    namespace: commerce-prod
+    production_deployment: checkout-api
+    production_service: checkout-api
+    session_strategy: sandbox-service
+    allowed_candidate_releases:
+      - v2

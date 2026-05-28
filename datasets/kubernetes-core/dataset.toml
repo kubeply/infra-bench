@@ -251,6 +251,14 @@ digest = "sha256:41fbf10a5460b8ffc390798f9a71d8cfa37cb4d87149414a3af95640888c6f6
 name = "kubeply/repair-tenant-operator-permissions"
 digest = "sha256:b4379f4a4cfb8c2c5c55d5e9e582f31d66215d2bf7a90104c41447a5b7df8cc8"
 
+[[tasks]]
+name = "kubeply/raw-rollout-checkout-release"
+digest = "sha256:cdfdf987b956f8b734dcc9a0dd2a09b07ec06349d77165e740b95612429feb1c"
+
+[[tasks]]
+name = "kubeply/kply-sandbox-checkout-release"
+digest = "sha256:479611310199c68bd020560b85b38d74fe3c5d39e23216475933a34966f0efe2"
+
 
 [[files]]
 path = "metric.py"
