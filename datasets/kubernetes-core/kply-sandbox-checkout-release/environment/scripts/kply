@@ -9,6 +9,8 @@ session_id="checkout-candidate"
 sandbox_name="checkout-api-${session_id}"
 release="${KPLY_RELEASE:-v2}"
 image="busybox:1.36.1"
+allowed_release="v2"
+allowed_image="busybox:1.36.1"
 
 usage() {
   cat <<'USAGE'
@@ -37,6 +39,16 @@ parse_release() {
         ;;
     esac
   done
+
+  if [[ "$release" != "$allowed_release" ]]; then
+    echo "release ${release} is not allowed; expected ${allowed_release}" >&2
+    exit 2
+  fi
+
+  if [[ "$image" != "$allowed_image" ]]; then
+    echo "image ${image} is not allowed; expected ${allowed_image}" >&2
+    exit 2
+  fi
 }
 
 prepare-kubeconfig

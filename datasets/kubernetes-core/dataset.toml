@@ -257,7 +257,7 @@ digest = "sha256:3dc26cc27b5c8896d216d0c28f0f14357a654e5c7506ec8cb210ef25ae80c57
 
 [[tasks]]
 name = "kubeply/kply-sandbox-checkout-release"
-digest = "sha256:47db79a9a8e9d3fb28fc8ba994a6089926ee2f6282cc1f432bdda30880ff5bbe"
+digest = "sha256:479611310199c68bd020560b85b38d74fe3c5d39e23216475933a34966f0efe2"
 
 
 [[files]]
