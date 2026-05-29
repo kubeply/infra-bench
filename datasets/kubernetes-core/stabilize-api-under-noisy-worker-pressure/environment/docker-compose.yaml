@@ -14,7 +14,7 @@ services:
       - --disable=traefik
       - --disable=servicelb
       - --write-kubeconfig=/admin-kube/admin-kubeconfig.yaml
-      - --write-kubeconfig-mode=666
+      - --write-kubeconfig-mode=600
       - --tls-san=k3s
     volumes:
       - admin-kubeconfig:/admin-kube

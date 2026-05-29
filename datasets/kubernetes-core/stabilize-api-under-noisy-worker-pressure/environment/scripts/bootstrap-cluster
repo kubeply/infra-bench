@@ -90,4 +90,4 @@ contexts:
     user: infra-bench-agent
 current-context: infra-bench-agent
 EOF
-chmod 0444 /kube/kubeconfig.yaml
+chmod 0400 /kube/kubeconfig.yaml
