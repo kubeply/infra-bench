@@ -24,6 +24,7 @@ CREATE_GUARDED_RESOURCES = {
 
 ALLOW_BROAD_WRITES = {
     ("fix-job-command-argument", "batch", "jobs"),
+    ("kply-sandbox-checkout-release", "", "configmaps"),
     ("repair-cross-namespace-service-discovery", "", "configmaps"),
     ("repair-plugin-driven-app-startup", "", "configmaps"),
     ("replace-deprecated-ingress-api", "networking.k8s.io", "ingresses"),
