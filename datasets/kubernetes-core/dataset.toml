@@ -245,7 +245,7 @@ digest = "sha256:6f82441df3096e5b132ce6b1f1a3aee916072498b3a086161b7ca90edbc416e
 
 [[tasks]]
 name = "kubeply/recover-ingress-controller-after-values-upgrade"
-digest = "sha256:17abf9362da1cd2f7f7a62dbd8c3010326aabee66216a5ff9c3c383686c87dbc"
+digest = "sha256:2a48ca6170c274ac74ffb9b547a5ec8c396a8712ed27da7019a8c7b370bd0811"
 
 [[tasks]]
 name = "kubeply/recover-maintenance-cronjob-rbac-config"
