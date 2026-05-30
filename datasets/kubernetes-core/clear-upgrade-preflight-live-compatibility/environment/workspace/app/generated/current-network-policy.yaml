@@ -3,6 +3,8 @@ kind: NetworkPolicy
 metadata:
   name: docs-allow-same-namespace
   namespace: release-team
+  annotations:
+    infra-bench.kubeply.com/ingress-scope: "allow-all-for-traefik"
 spec:
   podSelector:
     matchLabels:
@@ -10,4 +12,5 @@ spec:
   policyTypes:
     - Ingress
   ingress:
+    # Traefik runs in kube-system, so this must allow ingress from outside the namespace.
     - {}

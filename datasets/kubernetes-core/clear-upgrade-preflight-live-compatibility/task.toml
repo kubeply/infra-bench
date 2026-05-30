@@ -41,6 +41,7 @@ allow_internet = true
 mcp_servers = []
 
 [verifier.env]
+KUBECONFIG = "/kube/kubeconfig.yaml"
 
 [environment.env]
 KUBECONFIG = "/kube/kubeconfig.yaml"
