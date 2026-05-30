@@ -1,0 +1,184 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+namespace="commerce-prod"
+app_name="checkout"
+production_deployment="checkout-api"
+production_service="checkout-api"
+session_id="checkout-candidate"
+sandbox_name="checkout-api-${session_id}"
+release="${KPLY_RELEASE:-v2}"
+image="busybox:1.36.1"
+allowed_release="v2"
+allowed_image="busybox:1.36.1"
+
+usage() {
+  cat <<'USAGE'
+benchmark-local kply shim
+
+commands:
+  kply app inspect checkout
+  kply session plan checkout --release v2
+  kply session apply checkout --release v2
+USAGE
+}
+
+parse_release() {
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --release)
+        release="$2"
+        shift 2
+        ;;
+      --image)
+        image="$2"
+        shift 2
+        ;;
+      *)
+        shift
+        ;;
+    esac
+  done
+
+  if [[ "$release" != "$allowed_release" ]]; then
+    echo "release ${release} is not allowed; expected ${allowed_release}" >&2
+    exit 2
+  fi
+
+  if [[ "$image" != "$allowed_image" ]]; then
+    echo "image ${image} is not allowed; expected ${allowed_image}" >&2
+    exit 2
+  fi
+}
+
+prepare-kubeconfig
+
+case "${1:-}" in
+  app)
+    [[ "${2:-}" == "inspect" && "${3:-}" == "$app_name" ]] || { usage; exit 2; }
+    cat <<EOF
+name: ${app_name}
+namespace: ${namespace}
+production_deployment: ${production_deployment}
+production_service: ${production_service}
+session_strategy: sandbox-service
+EOF
+    ;;
+  session)
+    command="${2:-}"
+    app="${3:-}"
+    [[ "$app" == "$app_name" ]] || { usage; exit 2; }
+    shift 3
+    parse_release "$@"
+
+    case "$command" in
+      plan)
+        cat <<EOF
+session_id: ${session_id}
+app: ${app_name}
+namespace: ${namespace}
+production_deployment: ${production_deployment}
+production_service: ${production_service}
+sandbox_deployment: ${sandbox_name}
+sandbox_service: ${sandbox_name}
+candidate_release: ${release}
+candidate_image: ${image}
+production_mutation: forbidden
+EOF
+        ;;
+      apply)
+        kubectl -n "$namespace" apply -f - <<EOF
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ${sandbox_name}
+  labels:
+    app: ${sandbox_name}
+    kply.kubeply.io/session: ${session_id}
+    kply.kubeply.io/source: ${production_deployment}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ${sandbox_name}
+  template:
+    metadata:
+      labels:
+        app: ${sandbox_name}
+        kply.kubeply.io/session: ${session_id}
+      annotations:
+        release.kubeply.io/id: ${release}
+    spec:
+      containers:
+        - name: checkout-api
+          image: ${image}
+          env:
+            - name: RELEASE
+              value: ${release}
+          command:
+            - /bin/sh
+            - -c
+            - |
+              mkdir -p /www
+              printf 'checkout %s\n' "\${RELEASE}" > /www/index.html
+              printf 'ready\n' > /www/readyz
+              exec httpd -f -p 8080 -h /www
+          ports:
+            - name: http
+              containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: http
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              cpu: 100m
+              memory: 64Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ${sandbox_name}
+  labels:
+    kply.kubeply.io/session: ${session_id}
+spec:
+  selector:
+    app: ${sandbox_name}
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kply-session-${session_id}
+  labels:
+    kply.kubeply.io/session: ${session_id}
+data:
+  app: ${app_name}
+  candidate_image: ${image}
+  candidate_release: ${release}
+  production_deployment: ${production_deployment}
+  production_service: ${production_service}
+  production_mutated: "false"
+  sandbox_deployment: ${sandbox_name}
+  sandbox_service: ${sandbox_name}
+  status: applied
+EOF
+        kubectl -n "$namespace" rollout status "deployment/${sandbox_name}" --timeout=180s
+        ;;
+      *)
+        usage
+        exit 2
+        ;;
+    esac
+    ;;
+  *)
+    usage
+    exit 2
+    ;;
+esac
