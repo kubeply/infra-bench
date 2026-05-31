@@ -6,7 +6,7 @@
 
 | Dataset | 🟢 Easy | 🟡 Medium | 🔴 Hard | Status |
 | --- | ---: | ---: | ---: | --- |
-| [`kubeply/kubernetes-core`](datasets/kubernetes-core) | 22 | 23 | 14 | 🛠️ Working |
+| [`kubeply/kubernetes-core`](datasets/kubernetes-core) | 22 | 25 | 16 | 🛠️ Working |
 | [`kubeply/terraform-core`](datasets/terraform-core) | 0 | 0 | 0 | 🛠️ Working |
 | `kubeply/observability-core` | 0 | 0 | 0 | ⏳ Not started yet |
 
@@ -36,6 +36,10 @@ workspace approval, see [Harbor model commands](docs/harbor-model-commands.md).
 For repeated local `kubernetes-core` runs, configure k3s registry
 authentication first so the ephemeral clusters can authenticate their own Docker
 Hub pulls. See [k3s registry authentication](docs/k3s-registry-auth.md).
+
+To compare raw `kubectl` agent behavior with a bounded `kply` workflow, run the
+paired checkout release tasks documented in
+[kply comparison tasks](docs/kply-comparison-tasks.md).
 
 ## Citation
 
