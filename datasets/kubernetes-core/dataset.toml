@@ -253,7 +253,7 @@ digest = "sha256:ce580ffab2c9ac72e3a6b0560dc3e542e0755bba825e4d02385c8208be666d4
 
 [[tasks]]
 name = "kubeply/restore-gpu-inference-batch-capacity"
-digest = "sha256:7ce879221b3d2926e4a2663be1bf8a4f7d82cec7b96062f111267a05a0d77b77"
+digest = "sha256:60f4f07c5303f99c328b9b6768998a8ae2e387266670644e7a2a1cca373a05f8"
 
 [[tasks]]
 name = "kubeply/clear-upgrade-preflight-live-compatibility"

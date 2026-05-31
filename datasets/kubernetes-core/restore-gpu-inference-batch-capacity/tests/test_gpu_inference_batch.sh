@@ -116,8 +116,9 @@ for pod in $(kubectl -n "$namespace" get pods -l app=nightly-inference-batch -o 
   [[ "$pod_node" == "$gpu_node" && "$owner_kind" == "Job" ]] || fail "inference pod $pod ran on $pod_node with owner $owner_kind"
 done
 
-while IFS='|' read -r pod_name pod_app pod_node owner_kind; do
+while IFS='|' read -r pod_name pod_app pod_node owner_kind deletion_timestamp; do
   [[ -z "$pod_name" ]] && continue
+  [[ -z "$deletion_timestamp" ]] || continue
   case "$pod_app" in
     web-api|image-prep-worker|cpu-image-prep)
       [[ "$pod_node" == "$general_node" ]] || fail "CPU-only pod $pod_name ran on $pod_node"
@@ -126,7 +127,7 @@ while IFS='|' read -r pod_name pod_app pod_node owner_kind; do
   [[ "$owner_kind" == "ReplicaSet" || "$owner_kind" == "Job" ]] || fail "unexpected owner for $pod_name: $owner_kind"
 done < <(
   kubectl -n "$namespace" get pods \
-    -o jsonpath='{range .items[*]}{.metadata.name}{"|"}{.metadata.labels.app}{"|"}{.spec.nodeName}{"|"}{.metadata.ownerReferences[0].kind}{"\n"}{end}'
+    -o jsonpath='{range .items[*]}{.metadata.name}{"|"}{.metadata.labels.app}{"|"}{.spec.nodeName}{"|"}{.metadata.ownerReferences[0].kind}{"|"}{.metadata.deletionTimestamp}{"\n"}{end}'
 )
 
 echo "gpu inference batch completed while CPU-only work stayed on general capacity"
