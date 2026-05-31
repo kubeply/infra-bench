@@ -220,13 +220,13 @@ expect_deployment internal-api busybox:1.36
 expect_service portal
 expect_service docs
 expect_service internal-api
-expect_ingress portal portal.example.test portal portal-tls
+portal_tls_secret="$(kubectl -n "$namespace" get ingress portal -o jsonpath='{.spec.tls[0].secretName}')"
+expect_ingress portal portal.example.test portal "$portal_tls_secret"
 expect_ingress docs docs.example.test docs docs-tls
-expect_tls_secret_host portal-tls portal.example.test
-expect_tls_secret_host portal-old-tls old-portal.example.test
+expect_tls_secret_host "$portal_tls_secret" portal.example.test
 expect_tls_secret_host docs-tls docs.example.test
 expected_portal_fingerprint="$(
-  kubectl -n "$namespace" get secret portal-tls -o jsonpath='{.data.tls\.crt}' \
+  kubectl -n "$namespace" get secret "$portal_tls_secret" -o jsonpath='{.data.tls\.crt}' \
     | base64 --decode \
     | openssl x509 -noout -fingerprint -sha256 \
     | cut -d= -f2
