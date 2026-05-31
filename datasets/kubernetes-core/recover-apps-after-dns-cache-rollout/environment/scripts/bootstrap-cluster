@@ -26,7 +26,7 @@ for _ in $(seq 1 120); do
   sleep 2
 done
 
-if [[ "${checkout_ready:-0}" != "0" || "${worker_ready:-0}" != "0" || "${docs_ready:-0}" != "1" || "${checkout_error:-0}" -eq 0 || "${worker_error:-0}" -eq 0 ]]; then
+if [[ "${checkout_ready:-0}" != "0" || "${worker_ready:-0}" != "0" || "${docs_ready:-0}" != "1" || "${checkout_error:-0}" -eq 0 || "${worker_error:-0}" -eq 0 || "${docs_ok:-0}" -eq 0 ]]; then
   echo "expected two app-local DNS failures while docs-api proves cluster DNS works" >&2
   kubectl -n "$namespace" get all,endpoints,configmaps -o wide >&2 || true
   kubectl -n "$namespace" logs deployment/checkout-api --tail=80 >&2 || true
