@@ -225,6 +225,12 @@ expect_ingress docs docs.example.test docs docs-tls
 expect_tls_secret_host portal-tls portal.example.test
 expect_tls_secret_host portal-old-tls old-portal.example.test
 expect_tls_secret_host docs-tls docs.example.test
+expected_portal_fingerprint="$(
+  kubectl -n "$namespace" get secret portal-tls -o jsonpath='{.data.tls\.crt}' \
+    | base64 --decode \
+    | openssl x509 -noout -fingerprint -sha256 \
+    | cut -d= -f2
+)"
 
 client_image="$(kubectl -n "$namespace" get deployment "$client_deployment" -o jsonpath='{.spec.template.spec.containers[0].image}')"
 client_replicas="$(kubectl -n "$namespace" get deployment "$client_deployment" -o jsonpath='{.spec.replicas}')"
@@ -308,10 +314,40 @@ if [[ -z "$client_pod" || "$traefik_service" != "traefik" ]]; then
   exit 1
 fi
 
+traefik_port_forward_log="/tmp/traefik-port-forward.log"
+kubectl -n kube-system port-forward service/traefik 10443:443 >"$traefik_port_forward_log" 2>&1 &
+traefik_port_forward_pid="$!"
+cleanup_port_forward() {
+  kill "$traefik_port_forward_pid" >/dev/null 2>&1 || true
+  wait "$traefik_port_forward_pid" >/dev/null 2>&1 || true
+}
+trap cleanup_port_forward EXIT
+
+for _ in $(seq 1 20); do
+  if timeout 5 openssl s_client -connect 127.0.0.1:10443 -servername portal.example.test </dev/null >/dev/null 2>&1; then
+    break
+  fi
+
+  if ! kill -0 "$traefik_port_forward_pid" >/dev/null 2>&1; then
+    echo "Traefik port-forward stopped before TLS verification" >&2
+    cat "$traefik_port_forward_log" >&2 || true
+    exit 1
+  fi
+
+  sleep 1
+done
+
 for _ in $(seq 1 30); do
   client_log="$(kubectl -n "$namespace" logs deployment/"$client_deployment" --tail=160 2>/tmp/client.err || true)"
+  served_portal_fingerprint="$(
+    timeout 5 openssl s_client -connect 127.0.0.1:10443 -servername portal.example.test </dev/null 2>/dev/null \
+      | openssl x509 -noout -fingerprint -sha256 2>/dev/null \
+      | cut -d= -f2 \
+      || true
+  )"
   if kubectl -n "$namespace" exec "$client_pod" -- wget -qO- -T 3 --header "Host: portal.example.test" http://traefik.kube-system.svc.cluster.local/ >/tmp/portal.out 2>/tmp/portal.err \
     && grep -q "portal route restored" /tmp/portal.out \
+    && [[ "$served_portal_fingerprint" == "$expected_portal_fingerprint" ]] \
     && kubectl -n "$namespace" exec "$client_pod" -- wget -qO- -T 3 --header "Host: docs.example.test" http://traefik.kube-system.svc.cluster.local/ >/tmp/docs.out 2>/tmp/docs.err \
     && grep -q "docs route healthy" /tmp/docs.out \
     && kubectl -n "$namespace" exec "$client_pod" -- wget -qO- -T 3 http://internal-api:80/ >/tmp/internal-api.out 2>/tmp/internal-api.err \
@@ -339,5 +375,11 @@ echo "--- internal-api stdout ---" >&2
 cat /tmp/internal-api.out >&2 || true
 echo "--- internal-api stderr ---" >&2
 cat /tmp/internal-api.err >&2 || true
+echo "--- served portal TLS fingerprint ---" >&2
+echo "${served_portal_fingerprint:-missing}" >&2
+echo "--- expected portal TLS fingerprint ---" >&2
+echo "$expected_portal_fingerprint" >&2
+echo "--- traefik port-forward log ---" >&2
+cat "$traefik_port_forward_log" >&2 || true
 dump_debug
 exit 1
