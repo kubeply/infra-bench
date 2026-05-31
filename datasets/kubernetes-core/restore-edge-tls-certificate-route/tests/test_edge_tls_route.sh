@@ -221,6 +221,13 @@ expect_service portal
 expect_service docs
 expect_service internal-api
 portal_tls_secret="$(kubectl -n "$namespace" get ingress portal -o jsonpath='{.spec.tls[0].secretName}')"
+case "$portal_tls_secret" in
+  portal-tls | portal-old-tls) ;;
+  *)
+    echo "Ingress portal must reference a portal-owned TLS Secret, got ${portal_tls_secret}" >&2
+    exit 1
+    ;;
+esac
 expect_ingress portal portal.example.test portal "$portal_tls_secret"
 expect_ingress docs docs.example.test docs docs-tls
 expect_tls_secret_host "$portal_tls_secret" portal.example.test
