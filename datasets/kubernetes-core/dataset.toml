@@ -247,6 +247,42 @@ digest = "sha256:6f82441df3096e5b132ce6b1f1a3aee916072498b3a086161b7ca90edbc416e
 name = "kubeply/restore-edge-tls-certificate-route"
 digest = "sha256:21f5c9e83f6daf2c734e05468b43719dfb827633acd46b5809e39e441c440d22"
 
+[[tasks]]
+name = "kubeply/restore-gpu-inference-batch-capacity"
+digest = "sha256:7ce879221b3d2926e4a2663be1bf8a4f7d82cec7b96062f111267a05a0d77b77"
+
+[[tasks]]
+name = "kubeply/clear-upgrade-preflight-live-compatibility"
+digest = "sha256:befc213d435aac9678e3ba31254f5fd0c6d54f2b8b7af5e304b389121fe8eef2"
+
+[[tasks]]
+name = "kubeply/recover-ingress-controller-after-values-upgrade"
+digest = "sha256:2a48ca6170c274ac74ffb9b547a5ec8c396a8712ed27da7019a8c7b370bd0811"
+
+[[tasks]]
+name = "kubeply/recover-maintenance-cronjob-rbac-config"
+digest = "sha256:61a524b264ecd4c4713209eba423e87f5011ae4998b587ca5ba0dd7e08047375"
+
+[[tasks]]
+name = "kubeply/fit-critical-api-on-constrained-nodes"
+digest = "sha256:41fbf10a5460b8ffc390798f9a71d8cfa37cb4d87149414a3af95640888c6f68"
+
+[[tasks]]
+name = "kubeply/repair-tenant-operator-permissions"
+digest = "sha256:b4379f4a4cfb8c2c5c55d5e9e582f31d66215d2bf7a90104c41447a5b7df8cc8"
+
+[[tasks]]
+name = "kubeply/raw-rollout-checkout-release"
+digest = "sha256:cdfdf987b956f8b734dcc9a0dd2a09b07ec06349d77165e740b95612429feb1c"
+
+[[tasks]]
+name = "kubeply/kply-sandbox-checkout-release"
+digest = "sha256:479611310199c68bd020560b85b38d74fe3c5d39e23216475933a34966f0efe2"
+
+[[tasks]]
+name = "kubeply/stabilize-api-under-noisy-worker-pressure"
+digest = "sha256:8d3fb45287d9510646907c043477642224fd22a4b68a320272fbebd14e088c1a"
+
 
 [[files]]
 path = "metric.py"

@@ -1,0 +1,216 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: commerce-prod
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: infra-bench-agent
+  namespace: commerce-prod
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: infra-bench-agent-token
+  namespace: commerce-prod
+  annotations:
+    kubernetes.io/service-account.name: infra-bench-agent
+type: kubernetes.io/service-account-token
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: infra-bench-agent
+  namespace: commerce-prod
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps", "endpoints", "events", "pods", "services"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    resourceNames: ["kply-session-checkout-candidate"]
+    verbs: ["get", "patch", "update"]
+  - apiGroups: [""]
+    resources: ["services"]
+    resourceNames: ["checkout-api-checkout-candidate"]
+    verbs: ["get", "patch", "update"]
+  - apiGroups: [""]
+    resources: ["pods/log"]
+    verbs: ["get"]
+  - apiGroups: [""]
+    resources: ["pods/exec"]
+    verbs: ["create"]
+  - apiGroups: ["apps"]
+    resources: ["deployments", "replicasets"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    resourceNames: ["checkout-api-checkout-candidate"]
+    verbs: ["get", "patch", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: infra-bench-agent
+  namespace: commerce-prod
+subjects:
+  - kind: ServiceAccount
+    name: infra-bench-agent
+    namespace: commerce-prod
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: infra-bench-agent
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: infra-bench-baseline
+  namespace: commerce-prod
+data: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: checkout-api
+  namespace: commerce-prod
+  labels:
+    app: checkout-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: checkout-api
+  template:
+    metadata:
+      labels:
+        app: checkout-api
+      annotations:
+        release.kubeply.io/id: v1
+    spec:
+      containers:
+        - name: checkout-api
+          image: busybox:1.36.1
+          env:
+            - name: RELEASE
+              value: v1
+          command:
+            - /bin/sh
+            - -c
+            - |
+              mkdir -p /www
+              printf 'checkout %s\n' "${RELEASE}" > /www/index.html
+              printf 'ready\n' > /www/readyz
+              exec httpd -f -p 8080 -h /www
+          ports:
+            - name: http
+              containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: http
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              cpu: 100m
+              memory: 64Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: checkout-api
+  namespace: commerce-prod
+spec:
+  selector:
+    app: checkout-api
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kply-session-checkout-candidate
+  namespace: commerce-prod
+  labels:
+    kply.kubeply.io/session: checkout-candidate
+data:
+  app: checkout
+  candidate_image: ""
+  candidate_release: ""
+  production_deployment: checkout-api
+  production_service: checkout-api
+  production_mutated: "false"
+  sandbox_deployment: checkout-api-checkout-candidate
+  sandbox_service: checkout-api-checkout-candidate
+  status: reserved
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: checkout-api-checkout-candidate
+  namespace: commerce-prod
+  labels:
+    app: checkout-api-checkout-candidate
+    kply.kubeply.io/session: checkout-candidate
+    kply.kubeply.io/source: checkout-api
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app: checkout-api-checkout-candidate
+  template:
+    metadata:
+      labels:
+        app: checkout-api-checkout-candidate
+        kply.kubeply.io/session: checkout-candidate
+      annotations:
+        release.kubeply.io/id: reserved
+    spec:
+      containers:
+        - name: checkout-api
+          image: busybox:1.36.1
+          env:
+            - name: RELEASE
+              value: reserved
+          command:
+            - /bin/sh
+            - -c
+            - |
+              mkdir -p /www
+              printf 'checkout %s\n' "${RELEASE}" > /www/index.html
+              printf 'ready\n' > /www/readyz
+              exec httpd -f -p 8080 -h /www
+          ports:
+            - name: http
+              containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: http
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              cpu: 100m
+              memory: 64Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: checkout-api-checkout-candidate
+  namespace: commerce-prod
+  labels:
+    kply.kubeply.io/session: checkout-candidate
+spec:
+  selector:
+    app: checkout-api-checkout-candidate
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
