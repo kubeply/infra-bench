@@ -289,7 +289,7 @@ digest = "sha256:8d3fb45287d9510646907c043477642224fd22a4b68a320272fbebd14e088c1
 
 [[tasks]]
 name = "kubeply/restore-stateful-cache-after-pvc-expansion-drift"
-digest = "sha256:b8a3b38cc9be5e7f826699fd0f74ac011dfa58b7ef9cda08d244a16a4414cea3"
+digest = "sha256:03d70261a12406e7cbf1c631d3025e889824b32c873d82be7282aa1376044ea0"
 
 [[files]]
 path = "metric.py"

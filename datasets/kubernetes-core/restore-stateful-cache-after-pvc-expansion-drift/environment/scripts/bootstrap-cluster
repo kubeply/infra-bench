@@ -117,7 +117,7 @@ if [[ -z "${token_data:-}" || -z "${ca_data:-}" ]]; then
 fi
 
 api_server="$(kubectl config view --raw --minify -o jsonpath='{.clusters[0].cluster.server}')"
-agent_token="$(printf '%s' "$token_data" | base64 --decode)"
+agent_token="$(printf '%s' "$token_data" | base64 -d)"
 
 mkdir -p /kube
 cat > /kube/kubeconfig.yaml <<EOF
