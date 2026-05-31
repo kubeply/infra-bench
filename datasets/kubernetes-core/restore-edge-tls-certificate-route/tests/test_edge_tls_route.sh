@@ -317,11 +317,7 @@ fi
 traefik_port_forward_log="/tmp/traefik-port-forward.log"
 kubectl -n kube-system port-forward service/traefik 10443:443 >"$traefik_port_forward_log" 2>&1 &
 traefik_port_forward_pid="$!"
-cleanup_port_forward() {
-  kill "$traefik_port_forward_pid" >/dev/null 2>&1 || true
-  wait "$traefik_port_forward_pid" >/dev/null 2>&1 || true
-}
-trap cleanup_port_forward EXIT
+trap 'kill "$traefik_port_forward_pid" >/dev/null 2>&1 || true; wait "$traefik_port_forward_pid" >/dev/null 2>&1 || true' EXIT
 
 for _ in $(seq 1 20); do
   if timeout 5 openssl s_client -connect 127.0.0.1:10443 -servername portal.example.test </dev/null >/dev/null 2>&1; then

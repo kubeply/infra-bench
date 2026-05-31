@@ -245,7 +245,7 @@ digest = "sha256:6f82441df3096e5b132ce6b1f1a3aee916072498b3a086161b7ca90edbc416e
 
 [[tasks]]
 name = "kubeply/restore-edge-tls-certificate-route"
-digest = "sha256:cb979ee94cbc6bc54fc082b0060e6c1a81cd4c600824b2998f74a3acdee34e74"
+digest = "sha256:8479cfe82cb3c498a68ce52be32492430fba51bb9398f3c55c3060ef5ec71d92"
 
 [[tasks]]
 name = "kubeply/restore-gpu-inference-batch-capacity"

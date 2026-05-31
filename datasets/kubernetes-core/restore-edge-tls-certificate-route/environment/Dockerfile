@@ -11,8 +11,9 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   && arch="$(dpkg --print-architecture)" \
   && curl -fsSLo /usr/local/bin/kubectl "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/${arch}/kubectl" \
   && curl -fsSLo /tmp/kubectl.sha256 "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/${arch}/kubectl.sha256" \
-  && printf '%s  %s\n' "$(cat /tmp/kubectl.sha256)" "/usr/local/bin/kubectl" | sha256sum -c - \
-  && rm -f /tmp/kubectl.sha256 \
+  && printf '%s  %s\n' "$(cat /tmp/kubectl.sha256)" "/usr/local/bin/kubectl" > /tmp/kubectl.sha256.check \
+  && sha256sum -c /tmp/kubectl.sha256.check \
+  && rm -f /tmp/kubectl.sha256 /tmp/kubectl.sha256.check \
   && chmod +x /usr/local/bin/kubectl
 
 ENV KUBECONFIG=/kube/kubeconfig.yaml
