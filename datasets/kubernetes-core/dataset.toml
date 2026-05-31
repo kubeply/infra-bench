@@ -287,6 +287,9 @@ digest = "sha256:479611310199c68bd020560b85b38d74fe3c5d39e23216475933a34966f0efe
 name = "kubeply/stabilize-api-under-noisy-worker-pressure"
 digest = "sha256:8d3fb45287d9510646907c043477642224fd22a4b68a320272fbebd14e088c1a"
 
+[[tasks]]
+name = "kubeply/restore-stateful-cache-after-pvc-expansion-drift"
+digest = "sha256:b8a3b38cc9be5e7f826699fd0f74ac011dfa58b7ef9cda08d244a16a4414cea3"
 
 [[files]]
 path = "metric.py"
