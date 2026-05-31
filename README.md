@@ -6,7 +6,7 @@
 
 | Dataset | 🟢 Easy | 🟡 Medium | 🔴 Hard | Status |
 | --- | ---: | ---: | ---: | --- |
-| [`kubeply/kubernetes-core`](datasets/kubernetes-core) | 22 | 25 | 16 | 🛠️ Working |
+| [`kubeply/kubernetes-core`](datasets/kubernetes-core) | 22 | 25 | 22 | 🛠️ Working |
 | [`kubeply/terraform-core`](datasets/terraform-core) | 0 | 0 | 0 | 🛠️ Working |
 | `kubeply/observability-core` | 0 | 0 | 0 | ⏳ Not started yet |
 
