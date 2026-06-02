@@ -291,6 +291,10 @@ digest = "sha256:479611310199c68bd020560b85b38d74fe3c5d39e23216475933a34966f0efe
 name = "kubeply/stabilize-api-under-noisy-worker-pressure"
 digest = "sha256:8d3fb45287d9510646907c043477642224fd22a4b68a320272fbebd14e088c1a"
 
+[[tasks]]
+name = "kubeply/rebalance-api-replicas-with-topology-spread"
+digest = "sha256:0ba842b0661027e8bb4ffb6ebe7c23adf2ecc3df623bf10c76d4ec5201cb601c"
+
 [[files]]
 path = "metric.py"
 digest = "sha256:52299ec1e5986fcc50c3c13eaeef2e66038b9184b0a9cb69c34d886eb7fcf8a7"
