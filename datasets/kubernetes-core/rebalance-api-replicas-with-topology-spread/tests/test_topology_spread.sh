@@ -1,12 +1,16 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -Eeuo pipefail
 
 namespace="commerce-platform"
+debug_dumped=0
 mkdir -p /logs/verifier
 
-prepare-kubeconfig
-
 dump_debug() {
+  if [[ "$debug_dumped" == "1" ]]; then
+    return 0
+  fi
+  debug_dumped=1
+
   {
     echo "### nodes"
     kubectl get nodes -o wide --show-labels || true
@@ -36,6 +40,16 @@ fail() {
   dump_debug
   exit 1
 }
+
+on_error() {
+  local status="$?"
+  dump_debug
+  exit "$status"
+}
+
+trap on_error ERR
+
+prepare-kubeconfig
 
 baseline() {
   kubectl -n "$namespace" get configmap infra-bench-baseline \
