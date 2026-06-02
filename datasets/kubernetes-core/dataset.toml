@@ -293,7 +293,7 @@ digest = "sha256:8d3fb45287d9510646907c043477642224fd22a4b68a320272fbebd14e088c1
 
 [[tasks]]
 name = "kubeply/rebalance-api-replicas-with-topology-spread"
-digest = "sha256:0ba842b0661027e8bb4ffb6ebe7c23adf2ecc3df623bf10c76d4ec5201cb601c"
+digest = "sha256:eb9adfab333f9f2957ee931d30d98ec09594753a70f7286d4c884f3a6594ff2b"
 
 [[files]]
 path = "metric.py"
