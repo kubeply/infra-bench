@@ -224,6 +224,10 @@ name = "kubeply/complete-node-pool-drain-migration"
 digest = "sha256:a9d76918085a0c1a5cb9e24f75a128040eabef91bc1e6317e1ea61b5fdc3a2a1"
 
 [[tasks]]
+name = "kubeply/restore-stateful-cache-after-pvc-expansion-drift"
+digest = "sha256:03d70261a12406e7cbf1c631d3025e889824b32c873d82be7282aa1376044ea0"
+
+[[tasks]]
 name = "kubeply/restore-stateful-cache-identity"
 digest = "sha256:a9d8089e634220bb42ed345e457c03d2c579dca42550ed3d9f5bfdb7faed6f63"
 
@@ -286,7 +290,6 @@ digest = "sha256:479611310199c68bd020560b85b38d74fe3c5d39e23216475933a34966f0efe
 [[tasks]]
 name = "kubeply/stabilize-api-under-noisy-worker-pressure"
 digest = "sha256:8d3fb45287d9510646907c043477642224fd22a4b68a320272fbebd14e088c1a"
-
 
 [[files]]
 path = "metric.py"
