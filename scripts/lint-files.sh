@@ -28,7 +28,7 @@ require_command uvx
 # renovate: datasource=npm depName=@taplo/cli
 TAPLO_VERSION="0.7.0"
 # renovate: datasource=npm depName=prettier
-PRETTIER_VERSION="3.8.3"
+PRETTIER_VERSION="3.8.4"
 # renovate: datasource=pypi depName=ruff
 RUFF_VERSION="0.15.16"
 
