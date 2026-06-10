@@ -295,6 +295,10 @@ digest = "sha256:8d3fb45287d9510646907c043477642224fd22a4b68a320272fbebd14e088c1
 name = "kubeply/rebalance-api-replicas-with-topology-spread"
 digest = "sha256:bde5617f4ca16821545659c92d50e050821303f64af24d4de3efee83df516140"
 
+[[tasks]]
+name = "kubeply/restore-worker-placement-across-tainted-pools"
+digest = "sha256:b3a979c1e427b65e89d944641c8db41f17ddf5d8a3598d4fe2649a4abe3517b2"
+
 [[files]]
 path = "metric.py"
 digest = "sha256:52299ec1e5986fcc50c3c13eaeef2e66038b9184b0a9cb69c34d886eb7fcf8a7"
