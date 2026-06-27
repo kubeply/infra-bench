@@ -28,9 +28,9 @@ require_command uvx
 # renovate: datasource=npm depName=@taplo/cli
 TAPLO_VERSION="0.7.0"
 # renovate: datasource=npm depName=prettier
-PRETTIER_VERSION="3.8.4"
+PRETTIER_VERSION="3.9.0"
 # renovate: datasource=pypi depName=ruff
-RUFF_VERSION="0.15.16"
+RUFF_VERSION="0.15.20"
 
 toml_files=()
 while IFS= read -r -d "" path; do
