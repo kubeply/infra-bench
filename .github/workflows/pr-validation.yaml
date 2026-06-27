@@ -20,7 +20,7 @@ env:
   # renovate: datasource=github-releases depName=oven-sh/bun
   BUN_VERSION: 1.3.10
   # renovate: datasource=pypi depName=uv
-  UV_VERSION: 0.11.19
+  UV_VERSION: 0.11.25
 
 jobs:
   actionlint:
@@ -69,7 +69,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: kubeply/rudolint@8bd45e745dfb3b0a28fcdd5cf09bea556372c8ca # v1.4.0
+      - uses: kubeply/rudolint@900cbb9bfd46590df20f033ed85d3c1fd1c76856 # v1.5.0
         with:
           config: .rudolint.yaml
           paths: |
