@@ -1,0 +1,359 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{xcolor}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue,
+  citecolor=blue,
+  urlcolor=blue
+}
+
+\title{InfraBench: A Reproducible Benchmark for Evaluating AI Agents on Real Infrastructure Operations}
+
+\author{
+Thomas Chaigneau\\
+Independent Researcher / Kubeply\\
+\texttt{thomas@kubeply.com}
+}
+
+\date{Draft of May 5, 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+AI agents are increasingly evaluated on software engineering, desktop-use, and
+terminal-use benchmarks, but infrastructure operations remain underrepresented
+despite being a practical target for autonomous agents. We introduce
+InfraBench, an open benchmark of realistic infrastructure tasks for evaluating
+agents in reproducible execution environments. The first dataset,
+\texttt{kubeply/kubernetes-core}, contains 58 Kubernetes operations tasks
+covering workload health, service connectivity, scheduling, storage, access
+control, migration, maintenance, and incident response. Each task includes a
+natural-language operator instruction, an isolated environment, a deterministic
+oracle solution, and an executable verifier. The benchmark is compatible with
+Harbor and is designed to measure whether an agent can diagnose a broken
+infrastructure state, make a minimal repair, and leave the system in a
+verifiably correct condition. Preliminary runs across nine frontier and
+open-model agent configurations show aggregate success rates between 68.9\%
+and 84.5\%, with materially lower performance on hard tasks than on easy tasks.
+These results suggest that infrastructure operations expose a different failure
+surface from conventional coding benchmarks: agents often solve simple manifest
+or routing defects, but struggle with multi-resource state preservation,
+rollout coordination, and policy-sensitive repairs. We release the task
+definitions, metadata, oracle scripts, and result normalization tooling under
+Apache-2.0 to support reproducible evaluation and future infrastructure-agent
+research.
+\end{abstract}
+
+\section{Introduction}
+
+AI agents are moving from single-turn code generation toward long-horizon
+computer work. Existing benchmarks have made this transition measurable in
+software maintenance, desktop environments, and terminal workflows
+\cite{jimenez2024swebench,xie2024osworld,merrill2026terminalbench}. These
+benchmarks are valuable because they replace synthetic prompts with executable
+tasks, hidden tests, and stateful environments. However, infrastructure and
+platform engineering remain weakly covered as a benchmark domain.
+
+This gap matters. Production infrastructure work differs from ordinary coding
+tasks in several ways. The agent must reason about live or staged system state,
+understand operational invariants, preserve identities and security boundaries,
+coordinate rollouts, and avoid changes that appear to fix a symptom while
+violating the intended platform contract. A Kubernetes incident can require
+diagnosing a Deployment, Service, Ingress, Secret, NetworkPolicy, PodDisruption
+Budget, and node condition together. These tasks are not purely code-editing
+problems; they are state repair problems.
+
+InfraBench is an open benchmark intended to make this class of work measurable.
+Its first dataset, \texttt{kubeply/kubernetes-core}, focuses on Kubernetes
+operator tasks. Each task presents the agent with a concise instruction and an
+environment containing a broken infrastructure state. The agent must inspect
+the environment, perform the repair, and pass an executable verifier. The
+verifier checks the operator outcome rather than simply matching an expected
+patch.
+
+This paper makes three contributions:
+
+\begin{enumerate}
+  \item We define a benchmark format for realistic infrastructure operations
+  tasks with natural-language instructions, isolated environments, oracle
+  solutions, and deterministic verifiers.
+  \item We release \texttt{kubeply/kubernetes-core}, a 58-task Kubernetes
+  dataset spanning eight task categories and three difficulty tiers.
+  \item We report preliminary multi-agent results and analyze how performance
+  varies by task difficulty, showing that hard infrastructure tasks remain
+  substantially less reliable than easy diagnosis tasks.
+\end{enumerate}
+
+\section{Related Work}
+
+SWE-bench evaluates language models on real software engineering issues drawn
+from GitHub repositories \cite{jimenez2024swebench}. It established that
+repository-scale repair is a useful and difficult target for agent evaluation.
+InfraBench follows the same broad principle of executable, realistic tasks, but
+targets infrastructure operations rather than application code maintenance.
+
+OSWorld evaluates multimodal agents in real desktop environments
+\cite{xie2024osworld}. Its emphasis on stateful environments and executable
+success criteria is similar to InfraBench, but the task domain is general
+computer use. Terminal-Bench focuses on hard command-line tasks in terminal
+environments and includes unique environments, human-written solutions, and
+comprehensive tests \cite{merrill2026terminalbench}. InfraBench is closest in
+spirit to Terminal-Bench, but narrows the domain to infrastructure operations
+and adds task metadata around operational categories, Kubernetes concepts, and
+difficulty calibration.
+
+Kubernetes itself is a mature and widely used orchestration system
+\cite{kubernetes2026}. It is a natural first target because infrastructure
+agents frequently need to reason about Kubernetes resources, runtime state,
+controller behavior, network policy, scheduling, storage identity, and
+configuration propagation.
+
+\section{Benchmark Design}
+
+\subsection{Task Shape}
+
+InfraBench tasks follow the Harbor-compatible task shape
+\cite{harbor2026,infrabench2026}:
+
+\begin{verbatim}
+task-name/
+|-- instruction.md
+|-- task.toml
+|-- environment/
+|-- solution/
+|   `-- solve.sh
+`-- tests/
+    `-- test.sh
+\end{verbatim}
+
+\texttt{instruction.md} is the only prompt shown to the agent. The
+\texttt{environment/} directory contains the starting state. The
+\texttt{solution/solve.sh} script is an oracle repair used to validate that the
+task is solvable. The \texttt{tests/test.sh} verifier writes the reward result.
+
+The benchmark intentionally separates three roles. The task prompt describes
+the operator-facing problem. The environment contains the evidence and broken
+state. The verifier encodes the hidden correctness criteria. This separation is
+important because infrastructure tasks are vulnerable to prompt leakage: naming
+the exact resource field or diagnosis in the prompt can turn a medium task into
+a mechanical edit.
+
+\subsection{Operator Realism}
+
+Tasks are designed around one-sentence operator stories: a platform engineer
+needs to restore a workload, route, policy, migration, or maintenance outcome
+because a user-visible or operator-visible condition is broken. The agent is
+usually expected to make a minimal repair rather than rewrite the environment.
+Verifiers reject common bypasses such as deleting policies, replacing unrelated
+resources, broadening access control, or mutating verifier-trusted baselines.
+
+The current Kubernetes dataset uses neutral namespaces and resource names where
+possible. Medium and hard tasks avoid telling the agent the exact root cause.
+For example, a prompt may state that checkout records are failing without
+naming the broken NetworkPolicy selector, stale Secret projection, or incorrect
+headless Service identity that causes the failure.
+
+\subsection{Scoring}
+
+Each task returns a reward through the verifier. The current dataset uses
+binary pass/fail scoring, and aggregate score is the mean reward over all tasks
+in the selected dataset. Future versions may add partial credit where the
+operator outcome naturally decomposes into independent sub-goals, but the first
+release favors simple interpretability.
+
+\section{The Kubernetes-Core Dataset}
+
+\texttt{kubeply/kubernetes-core} contains 58 tasks. Table
+\ref{tab:dataset-difficulty} shows the difficulty split, and Table
+\ref{tab:dataset-category} shows the category split.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lrr}
+\toprule
+Difficulty & Tasks & Share \\
+\midrule
+Easy & 22 & 37.9\% \\
+Medium & 23 & 39.7\% \\
+Hard & 13 & 22.4\% \\
+\midrule
+Total & 58 & 100.0\% \\
+\bottomrule
+\end{tabular}
+\caption{Task counts by difficulty in \texttt{kubeply/kubernetes-core}.}
+\label{tab:dataset-difficulty}
+\end{table}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lr}
+\toprule
+Category & Tasks \\
+\midrule
+Workload health & 11 \\
+Service connectivity & 10 \\
+Scheduling and capacity & 9 \\
+Access and isolation & 8 \\
+Platform APIs and controllers & 7 \\
+Migration and maintenance & 6 \\
+Storage and state & 4 \\
+Configuration and secrets & 3 \\
+\bottomrule
+\end{tabular}
+\caption{Task counts by operational category.}
+\label{tab:dataset-category}
+\end{table}
+
+Most tasks are live-cluster debugging or incident-response scenarios. The
+scenario-type distribution is 36 live-cluster debug tasks, 16 incident-response
+tasks, two maintenance tasks, two migration tasks, one policy-authoring task,
+and one upgrade-readiness task. This distribution reflects the first dataset's
+goal: measure practical Kubernetes repair and diagnosis before expanding into
+Terraform, observability, or cloud-provider operations.
+
+\section{Preliminary Evaluation}
+
+We ran the 58-task dataset through Harbor-compatible agent configurations. The
+current results should be read as preliminary because the run artifacts have
+not yet been attached to an immutable paper release. They are useful for
+estimating whether the benchmark differentiates agents and difficulties.
+
+Table \ref{tab:model-results} reports aggregate pass rates. The best observed
+configuration solved 49 of 58 tasks. The lowest observed configuration solved
+40 of 58 tasks. This range is narrow enough to suggest that many easy tasks are
+within current agent capability, but wide enough to show meaningful
+configuration and model differences.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{llrrr}
+\toprule
+Provider & Model / setting & Passed & Total & Score \\
+\midrule
+OpenAI & GPT-5.5 medium & 49 & 58 & 84.5\% \\
+OpenAI & GPT-5.5 high & 46 & 58 & 79.3\% \\
+OpenAI & GPT-5.4 high & 46 & 58 & 79.3\% \\
+Anthropic & Claude Sonnet 4.6 high & 46 & 58 & 79.3\% \\
+Anthropic & Claude Opus 4.6 high & 46 & 58 & 79.3\% \\
+Google & Gemini 3 Flash Preview & 43 & 58 & 74.1\% \\
+Moonshot & Kimi K2.5 & 41 & 58 & 70.7\% \\
+Moonshot & Kimi K2.6 & 40 & 58 & 69.0\% \\
+Z.ai & GLM-5.1 & 40 & 58 & 69.0\% \\
+\bottomrule
+\end{tabular}
+\caption{Preliminary aggregate results on \texttt{kubeply/kubernetes-core}.}
+\label{tab:model-results}
+\end{table}
+
+Table \ref{tab:difficulty-results} breaks the same runs down by difficulty.
+The strongest pattern is that easy tasks are almost saturated, while hard tasks
+remain substantially harder. For the best aggregate run, the agent solved 21 of
+22 easy tasks, 20 of 23 medium tasks, and 8 of 13 hard tasks. Several other
+configurations solved all or nearly all easy tasks but less than half of the
+hard tasks.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lrrr}
+\toprule
+Model / setting & Easy & Medium & Hard \\
+\midrule
+GPT-5.5 medium & 21/22 & 20/23 & 8/13 \\
+GPT-5.5 high & 21/22 & 17/23 & 8/13 \\
+GPT-5.4 high & 20/22 & 19/23 & 7/13 \\
+Claude Sonnet 4.6 high & 22/22 & 19/23 & 5/13 \\
+Claude Opus 4.6 high & 21/22 & 18/23 & 7/13 \\
+Gemini 3 Flash Preview & 22/22 & 16/23 & 5/13 \\
+Kimi K2.5 & 22/22 & 15/23 & 4/13 \\
+Kimi K2.6 & 21/22 & 15/23 & 4/13 \\
+GLM-5.1 & 21/22 & 16/23 & 3/13 \\
+\bottomrule
+\end{tabular}
+\caption{Preliminary pass counts by difficulty.}
+\label{tab:difficulty-results}
+\end{table}
+
+\section{Error Surface}
+
+The preliminary results suggest three recurring failure modes. First, agents
+often succeed on local manifest or selector repairs but struggle when the
+correct fix requires preserving stateful identity across multiple resources.
+Second, agents can produce repairs that restore immediate readiness while
+weakening an isolation boundary, such as by broadening policy or access control
+more than the task allows. Third, agents sometimes fail to coordinate
+configuration changes with rollout behavior: the static resource becomes
+correct, but the running workload does not consume the intended state.
+
+These failure modes are operationally important. In production infrastructure,
+a patch that restarts the wrong workload, deletes a security policy, or creates
+a replacement resource with a new identity can pass a shallow health check
+while causing a later incident. InfraBench verifiers therefore test both the
+visible outcome and the surrounding invariants where possible.
+
+\section{Reproducibility and Release Process}
+
+InfraBench is released as an Apache-2.0 repository with task definitions,
+oracle scripts, verifiers, dataset manifests, and result-normalization tooling
+\cite{infrabench2026}. The intended reproducibility path is:
+
+\begin{enumerate}
+  \item select a tagged dataset release;
+  \item run Harbor against a task or dataset with a specified agent and model;
+  \item preserve raw job artifacts;
+  \item normalize the run into public \texttt{run.json} and \texttt{results.json}
+  summaries;
+  \item report the exact InfraBench commit and model/harness metadata.
+\end{enumerate}
+
+This paper draft is based on repository commit \texttt{33ca0d2bfda2}. The
+camera-ready version should replace this commit with an immutable dataset tag
+and attach public run artifacts for every table.
+
+\section{Limitations}
+
+The first limitation is scope. The current dataset is Kubernetes-only. This is
+intentional: Kubernetes provides a dense, realistic infrastructure domain, but
+it does not cover Terraform, observability, cloud-provider APIs, CI/CD systems,
+or incident collaboration workflows.
+
+The second limitation is authoring bias. Tasks are written by the benchmark
+maintainer and reflect one view of realistic platform work. Future releases
+should include external task review from platform engineers and SREs.
+
+The third limitation is contamination. Once tasks are public, model providers
+and agents may indirectly train on them. InfraBench should therefore version
+datasets, preserve historical results, and add fresh task releases over time.
+
+The fourth limitation is the absence of a human baseline in the current draft.
+Human operator timing and success rates would make the difficulty labels more
+defensible and should be added before submission if feasible.
+
+\section{Conclusion}
+
+InfraBench targets a practical gap in AI-agent evaluation: realistic
+infrastructure operations. The first dataset,
+\texttt{kubeply/kubernetes-core}, packages 58 Kubernetes repair tasks with
+operator prompts, isolated environments, oracle solutions, and executable
+verifiers. Preliminary runs show that current agents handle many easy
+Kubernetes repairs but remain less reliable on hard tasks involving state
+preservation, rollout coordination, and policy-sensitive changes. These results
+support the case for infrastructure-specific benchmarks as a complement to
+software engineering, desktop, and terminal benchmarks.
+
+\section*{Acknowledgements}
+
+The benchmark uses the Harbor task format and evaluation workflow. The author
+thanks the open-source infrastructure and AI-agent communities for the tools
+and prior benchmarks that shaped this work.
+
+\bibliographystyle{plain}
+\bibliography{references}
+
+\end{document}
